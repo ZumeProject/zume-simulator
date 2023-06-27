@@ -67,24 +67,9 @@ abstract class Zume_Simulator_Chart_Base
 
         wp_enqueue_style( 'zume_charts', plugin_dir_url(__FILE__) . 'charts.css', [], filemtime( plugin_dir_path(__FILE__) . 'charts.css' ) );
 
-        wp_enqueue_script( 'dt_metrics_project_script', get_template_directory_uri() . $this->js_file_name, [
-            'jquery',
-            'jquery-ui-core',
-            'amcharts-core',
-            'amcharts-charts',
-            'amcharts-animated',
-            'lodash'
-        ], filemtime( get_theme_file_path() . $this->js_file_name ), true );
+        wp_enqueue_style( 'datatable_css', '//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css', [], '1.13.4' );
+        wp_enqueue_script( 'datatable_js', '//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js', ['jquery'], '1.13.4', true );
 
-        wp_localize_script(
-            'dt_metrics_project_script', 'dtMetricsProject', [
-                'root' => esc_url_raw( rest_url() ),
-                'theme_uri' => get_template_directory_uri(),
-                'nonce' => wp_create_nonce( 'wp_rest' ),
-                'current_user_login' => wp_get_current_user()->user_login,
-                'current_user_id' => get_current_user_id(),
-            ]
-        );
     }
 
     public function has_permission(){

@@ -17,7 +17,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'add reports', 'disciple_tools' );
+        $this->base_title = __( 'simulate reports', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
@@ -25,6 +25,8 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
     }
+
+
 
     public function wp_head() {
         $user_list = $this->user_list();
@@ -338,10 +340,9 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
             jQuery(document).ready(function(){
                 "use strict";
                 let chart = jQuery('#chart')
-
+                let list = `<?php echo $user_list ?>`
                 chart.empty().html(`
                         <div id="zume-simulator">
-
                             <span class="loading-spinner active"></span>
                             <table class="hover" id="datatable">
                                 <thead>
@@ -362,7 +363,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                                             </select>
                                             <select id="user_id" style="float:left; width:35%;">
                                                 <option value="${window.user_id}">Me</option>
-                                               <?php echo $this->user_list() ?>
+                                                ${list}
                                             </select>
                                         </th>
                                     </tr>
@@ -436,7 +437,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     ]
                 });
 
-                jQuery.get('https://zume5.training/coaching/wp-json/zume_stats/v1/location', function(data){
+                jQuery.get('https://zume5.training/coaching/wp-json/zume_simulation/v1/location', function(data){
                     // console.log(data)
                     window.user_location = data
 
@@ -470,7 +471,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     jQuery('.loading-spinner').removeClass('active')
                 })
 
-                function makePostRequest(type, url, data, base = "zume_stats/v1/") {
+                function makePostRequest(type, url, data, base = "zume_simulation/v1/") {
                     //make sure base has a trailing slash if url does not start with one
                     if ( !base.endsWith('/') && !url.startsWith('/')){
                         base += '/'

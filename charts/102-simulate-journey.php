@@ -61,7 +61,6 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
             //  6 = S3 (Multiplying)
 
 
-
             jQuery(document).ready(function(){
                 "use strict";
                 let chart = jQuery('#chart')
@@ -254,12 +253,12 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     event.preventDefault()
                     jQuery('.loading-spinner').addClass('active')
                     const data = {
-                        "date": jQuery('#date').val(),
+                        "user_id": jQuery('#user_id').val(),
                         "days_ago": jQuery('#days_ago').val(),
                         "action": jQuery(this).text()
                     }
                     jQuery(this).addClass('done')
-                    makePostRequest('POST', 'stats', data)
+                    makePostRequest('POST', 'journey_log', data)
                         .then((response) => {
                             console.log(response)
                             jQuery('.loading-spinner').removeClass('active')
@@ -272,7 +271,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
 
                 jQuery('.loading-spinner').removeClass('active')
 
-                function makePostRequest(type, url, data, base = "zume_stats/v1/") {
+                function makePostRequest(type, url, data, base = "zume_simulation/v1/") {
                     //make sure base has a trailing slash if url does not start with one
                     if ( !base.endsWith('/') && !url.startsWith('/')){
                         base += '/'

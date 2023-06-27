@@ -28,8 +28,8 @@ class Zume_Simulator_Metrics_Base {
 
             require_once ('01-concepts.php');
 
-            require_once ('100-type.php');
-            require_once ('102-journey.php');
+            require_once ('100-simulate-reports.php');
+            require_once ('102-simulate-journey.php');
 
         }
     }
