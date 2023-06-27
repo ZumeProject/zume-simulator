@@ -26,31 +26,9 @@ class Zume_Simulator_Metrics_Base {
 
             require_once ('abstract.php');
 
-            require_once ('01-goals.php');
-            require_once ('01-location-list.php');
-
-            require_once ('10-trainee-overview.php');
-            require_once ('11-location-funnel.php');
-            require_once ('11-anonymous.php');
-            require_once ('12-registrants.php');
-            require_once ('13-active-training.php');
-            require_once ('14-post-training.php');
-            require_once ('15-s1-practitioner.php');
-            require_once ('16-s2-practitioner.php');
-            require_once ('17-s3-practitioner.php');
-
-            require_once ('20-overview.php');
-            require_once ('21-facilitator.php');
-            require_once ('22-early.php');
-            require_once ('23-advanced.php');
-
-            require_once ('40-public-facts.php');
-            require_once ('41-public-stats.php');
-
-            require_once ('50-concepts.php');
+            require_once ('01-concepts.php');
 
             require_once ('100-type.php');
-            require_once ('101-goals.php');
             require_once ('102-journey.php');
 
         }

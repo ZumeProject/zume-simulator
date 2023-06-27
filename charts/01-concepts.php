@@ -1,10 +1,11 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
+
+class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
-    public $base_slug = 'concepts'; // lowercase
+    public $base_slug = ''; // lowercase
     public $slug = ''; // lowercase
     public $title;
     public $base_title;
@@ -17,19 +18,21 @@ class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'Funnel Concepts', 'disciple_tools' );
+        $this->base_title = __( 'concepts', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-simulator/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
     }
 
     public function base_menu( $content ) {
-        $content .= '<li class=""><hr></li>';
-        $content .= '<li class="">HELP</li>';
-        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
+        $content .= '<li>ZÚME SIMULATOR</li>';
+        $content .= '<li><hr></li>';
+        $content .= '<li>This plugin is for development only. It is a collection of tools to simulate and test the zume training system</li>';
+        $content .= '<li><hr></li>';
+        $content .= '<li><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
     }
 
@@ -38,16 +41,13 @@ class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
         $this->js_api();
         ?>
         <script>
-            window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_stats/v1/'
             jQuery(document).ready(function(){
                 "use strict";
                 let chart = jQuery('#chart')
-                let title = '<?php echo $this->base_title ?>'
                 chart.empty().html(`
-                        <div id="zume-simulator">
+                        <div id="zume-path">
                             <div class="grid-x">
-                                <div class="cell small-6"><h1>${title}</h1></div>
-                                <div class="cell small-6"></div>
+                                <div class="cell"><h1>Concepts and Visualization of Zúme System</h1></div>
                             </div>
                             <hr>
                             <span class="loading-spinner active"></span>
@@ -110,10 +110,21 @@ class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
         </script>
         <?php
     }
-
     public function styles() {
-
+        ?>
+        <style>
+            .side-menu-item-highlight {
+                font-weight: 300;
+            }
+            #-menu {
+                font-weight: 700;
+            }
+            .zume-cards {
+                max-width: 700px;
+            }
+        </style>
+        <?php
     }
 
 }
-new Zume_Simulator_Path_Concept();
+new Zume_Simulator_Path_Goals();

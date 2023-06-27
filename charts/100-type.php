@@ -26,11 +26,6 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
         }
     }
 
-    public function base_menu( $content ) {
-        $content .= '<li class=""><hr>development only</li>';
-        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
-        return $content;
-    }
     public function wp_head() {
         $user_list = $this->user_list();
 
