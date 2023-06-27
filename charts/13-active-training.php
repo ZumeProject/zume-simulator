@@ -20,7 +20,7 @@ class Zume_Simulator_Path_Active extends Zume_Simulator_Chart_Base
         $this->base_title = __( 'Active Training', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-path/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator/$this->base_slug" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
@@ -43,7 +43,7 @@ class Zume_Simulator_Path_Active extends Zume_Simulator_Chart_Base
                 "use strict";
                 let chart = jQuery('#chart')
                 chart.empty().html(`
-                        <div id="zume-path">
+                        <div id="zume-simulator">
                             <div class="grid-x">
                                 <div class="cell small-6"><h1>Active Training</h1></div>
                                 <div class="cell small-6">

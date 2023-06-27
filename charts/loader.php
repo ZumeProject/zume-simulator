@@ -3,7 +3,7 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 class Zume_Simulator_Metrics_Base {
 
-    public $base_slug = 'zume-path';
+    public $base_slug = 'zume-simulator';
     private static $_instance = null;
     public static function instance() {
         if ( is_null( self::$_instance ) ) {
@@ -59,8 +59,8 @@ class Zume_Simulator_Metrics_Base {
     public function add_navigation_links( $tabs ) {
         if ( current_user_can( 'access_disciple_tools' ) ) {
             $tabs[] = [
-                "link" => site_url( "/zume-path/" ), // the link where the user will be directed when they click
-                "label" => __( "Goals", "disciple_tools" )  // the label the user will see
+                "link" => site_url( "/zume-simulator/" ), // the link where the user will be directed when they click
+                "label" => __( "Simulator", "disciple_tools" )  // the label the user will see
             ];
         }
         return $tabs;
@@ -71,8 +71,8 @@ class Zume_Simulator_Metrics_Base {
     }
 
     public function dt_templates_for_urls( $template_for_url ) {
-        $template_for_url['zume-path'] = 'template-metrics.php';
+        $template_for_url['zume-simulator'] = 'template-metrics.php';
         return $template_for_url;
     }
 }
-Zume_Metrics_Base::instance();
+Zume_Simulator_Metrics_Base::instance();

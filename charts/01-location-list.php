@@ -25,7 +25,7 @@ class Zume_Simulator_Metrics_Locations_Goals extends Zume_Simulator_Chart_Base
         $this->base_title = __( 'Goals by Location', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-path/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator/$this->base_slug" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'list_scripts' ], 99 );
         }
     }
@@ -53,7 +53,7 @@ class Zume_Simulator_Metrics_Locations_Goals extends Zume_Simulator_Chart_Base
             'dt_'.$this->slug.'_script', $this->js_object_name, [
                 'rest_endpoints_base' => esc_url_raw( rest_url() ) . $this->namespace,
                 'rest_endpoint' => esc_url_raw( rest_url() ) . $this->namespace . '/location_goals',
-                'load_url' =>  "zume-path/$this->base_slug",
+                'load_url' =>  "zume-simulator/$this->base_slug",
                 'base_slug' => $this->base_slug,
                 'root' => esc_url_raw( rest_url() ),
                 'nonce' => wp_create_nonce( 'wp_rest' ),

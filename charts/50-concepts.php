@@ -20,7 +20,7 @@ class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
         $this->base_title = __( 'Funnel Concepts', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-path/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator/$this->base_slug" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
@@ -29,7 +29,7 @@ class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
     public function base_menu( $content ) {
         $content .= '<li class=""><hr></li>';
         $content .= '<li class="">HELP</li>';
-        $content .= '<li class=""><a href="'.site_url('/zume-path/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
+        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
     }
 
@@ -44,7 +44,7 @@ class Zume_Simulator_Path_Concept extends Zume_Simulator_Chart_Base
                 let chart = jQuery('#chart')
                 let title = '<?php echo $this->base_title ?>'
                 chart.empty().html(`
-                        <div id="zume-path">
+                        <div id="zume-simulator">
                             <div class="grid-x">
                                 <div class="cell small-6"><h1>${title}</h1></div>
                                 <div class="cell small-6"></div>

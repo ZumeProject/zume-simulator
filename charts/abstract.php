@@ -4,7 +4,7 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 abstract class Zume_Simulator_Chart_Base
 {
 
-    public $core = 'zume-path';
+    public $core = 'zume-simulator';
     public $base_slug = 'example'; //lowercase
     public $base_title = 'Example';
 
@@ -19,13 +19,13 @@ abstract class Zume_Simulator_Chart_Base
         $this->base_slug = str_replace( ' ', '', trim( strtolower( $this->base_slug ) ) );
         $url_path = dt_get_url_path( true );
 
-        if ( strpos( $url_path, 'zume-path' ) === 0 ) {
+        if ( strpos( $url_path, 'zume-simulator' ) === 0 ) {
             if ( !$this->has_permission() ){
                 return;
             }
             add_filter( 'dt_metrics_menu', [ $this, 'base_menu' ], 20 ); //load menu links
 
-            if ( strpos( $url_path, "zume-path/$this->base_slug" ) === 0 ) {
+            if ( strpos( $url_path, "zume-simulator/$this->base_slug" ) === 0 ) {
                 add_filter( 'dt_templates_for_urls', [ $this, 'base_add_url' ] ); // add custom URLs
                 add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             }
@@ -34,15 +34,15 @@ abstract class Zume_Simulator_Chart_Base
     }
 
     public function base_menu( $content ) {
-        $content .= '<li class=""><a href="'.site_url('/zume-path/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
+        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
     }
 
     public function base_add_url( $template_for_url ) {
         if ( empty ( $this->base_slug ) ) {
-            $template_for_url["zume-path"] = 'template-metrics.php';
+            $template_for_url["zume-simulator"] = 'template-metrics.php';
         } else {
-            $template_for_url["zume-path/$this->base_slug"] = 'template-metrics.php';
+            $template_for_url["zume-simulator/$this->base_slug"] = 'template-metrics.php';
         }
         return $template_for_url;
     }

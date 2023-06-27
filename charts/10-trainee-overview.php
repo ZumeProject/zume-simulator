@@ -1,7 +1,7 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_Trainee_Critical_Path extends Zume_Chart_Base
+class Zume_Trainee_Critical_Path extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
     public $base_slug = 'trainee_critical_path'; // lowercase
@@ -20,7 +20,7 @@ class Zume_Trainee_Critical_Path extends Zume_Chart_Base
         $this->base_title = __( 'Overview', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-path/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator/$this->base_slug" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
@@ -29,7 +29,7 @@ class Zume_Trainee_Critical_Path extends Zume_Chart_Base
     public function base_menu( $content ) {
         $content .= '<li class=""><hr></li>';
         $content .= '<li class="">PRACTITIONERS</li>';
-        $content .= '<li class=""><a href="'.site_url('/zume-path/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
+        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
     }
     public function wp_head() {
@@ -40,7 +40,7 @@ class Zume_Trainee_Critical_Path extends Zume_Chart_Base
                     "use strict";
                     let chart = jQuery('#chart')
                     chart.empty().html(`
-                        <div id="zume-path">
+                        <div id="zume-simulator">
                             <div class="grid-x">
                                 <div class="cell small-6"><h1>Practitioner Journey - Overview</h1></div>
                                 <div class="cell small-6">
