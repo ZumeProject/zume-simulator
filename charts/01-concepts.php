@@ -45,7 +45,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                 "use strict";
                 let chart = jQuery('#chart')
                 chart.empty().html(`
-                        <div id="zume-path">
+                        <div id="zume-simulator-path">
                             <div class="grid-x">
                                 <div class="cell"><h1>Concepts and Visualization of Zúme System</h1></div>
                             </div>

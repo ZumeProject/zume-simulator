@@ -4,7 +4,7 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
-    public $base_slug = 'zume_report_types'; // lowercase
+    public $base_slug = 'zume_simulator_report_types'; // lowercase
     public $slug = '';
     public $title;
     public $base_title;
@@ -34,7 +34,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
         $this->js_api();
         ?>
         <script>
-            window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_stats/v1/'
+            window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_simulator/v1/'
             window.user_id = '<?php echo get_current_user_id() ?>'
 
             //  0 = Anonymous
@@ -343,32 +343,33 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                 let list = `<?php echo $user_list ?>`
                 chart.empty().html(`
                         <div id="zume-simulator">
-                            <span class="loading-spinner active"></span>
+                            <div>
+                                <select id="user_id" style="width:200px;">
+                                    <option value="${window.user_id}">Me</option>
+                                    ${list}
+                                </select>
+                                <select id="days_ago" style="width:200px;">
+                                    <option value="0">today</option>
+                                    <option value="3">3 Days Ago</option>
+                                    <option value="7">7 Days Ago</option>
+                                    <option value="10">10 Days Ago</option>
+                                    <option value="14">14 Days Ago</option>
+                                    <option value="18">18 Days Ago</option>
+                                    <option value="24">24 Days Ago</option>
+                                    <option value="30">30 Days Ago</option>
+                                </select>
+                                <span style="font-weight: bold; font-size: 1.5em;" id="location"><span class="loading-spinner active"></span></span>
+                            </div>
                             <table class="hover" id="datatable">
                                 <thead>
                                     <tr>
                                         <th style="min-width:150px;">Value/Stage</th>
                                         <th>Subtype</th>
                                         <th>Description</th>
-                                        <th>
-                                            <select id="days_ago" style="float:left; width:60%;">
-                                                <option value="0">today</option>
-                                                <option value="3">3 Days Ago</option>
-                                                <option value="7">7 Days Ago</option>
-                                                <option value="10">10 Days Ago</option>
-                                                <option value="14">14 Days Ago</option>
-                                                <option value="18">18 Days Ago</option>
-                                                <option value="24">24 Days Ago</option>
-                                                <option value="30">30 Days Ago</option>
-                                            </select>
-                                            <select id="user_id" style="float:left; width:35%;">
-                                                <option value="${window.user_id}">Me</option>
-                                                ${list}
-                                            </select>
-                                        </th>
+                                        <th></th>
                                     </tr>
                                 </thead>
-                                <tbody class="zume-report-types"></tbody>
+                                <tbody class="zume-simulator-report-types"></tbody>
                             </table>
                             <div class="grid-x"><div class="cell small-6">
                                 <u>Report Table Columns</u><br>
@@ -414,12 +415,12 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     6: 'S3 (Multiplying)',
                 }
                 jQuery.each( data, function( key, value ) {
-                    jQuery('.zume-report-types').append(`
+                    jQuery('.zume-simulator-report-types').append(`
                             <tr>
                                 <td>${'(' +value.value + ') ' + window.stage[value.value] }</td>
                                 <td style="font-weight:bold">${value.subtype}</td>
                                 <td>${value.description}</td>
-                                <td><button class="button small add" data-type="zume" data-subtype="${value.subtype}" data-value="${value.value}" disabled>+</button></td>
+                                <td><button class="button  small add" data-type="zume" data-subtype="${value.subtype}" data-value="${value.value}" disabled>+</button></td>
                            </tr>
                         `)
                 })
@@ -466,6 +467,8 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
 
                         })
                     })
+
+                    jQuery('#location').html(window.user_location.label)
 
                     buttons.removeAttr('disabled')
                     jQuery('.loading-spinner').removeClass('active')

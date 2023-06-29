@@ -49,7 +49,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
         </style>
 
         <script>
-            window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_stats/v1/'
+            window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_simulator/v1/'
             window.user_id = '<?php echo get_current_user_id() ?>'
 
             //  0 = Anonymous
@@ -235,6 +235,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                 <button class="button large alt-color">Coach Request</button>
                                 <button class="button large alt-color">Report Churches</button>
                                 <button class="button large alt-color">Coach Others</button>
+                                <button class="button large alt-color">Join Affinity Hub</button>
                                 <button class="button large alt-color">Provide Hub Leadership</button>
                             </div>
                             <div class="cell small-2">

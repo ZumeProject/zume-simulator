@@ -65,7 +65,7 @@ abstract class Zume_Simulator_Chart_Base
         wp_register_script( 'amcharts-charts', 'https://www.amcharts.com/lib/4/charts.js', false, '4' );
         wp_register_script( 'amcharts-animated', 'https://www.amcharts.com/lib/4/themes/animated.js', [ 'amcharts-core' ], '4' );
 
-        wp_enqueue_style( 'zume_charts', plugin_dir_url(__FILE__) . 'charts.css', [], filemtime( plugin_dir_path(__FILE__) . 'charts.css' ) );
+        wp_enqueue_style( 'zume_simulator_charts', plugin_dir_url(__FILE__) . 'charts.css', [], filemtime( plugin_dir_path(__FILE__) . 'charts.css' ) );
 
         wp_enqueue_style( 'datatable_css', '//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css', [], '1.13.4' );
         wp_enqueue_script( 'datatable_js', '//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js', ['jquery'], '1.13.4', true );
@@ -91,11 +91,11 @@ abstract class Zume_Simulator_Chart_Base
                 window.site_info = {
                     'site_url': '<?php echo site_url(); ?>',
                     'rest_url': '<?php echo esc_url_raw( rest_url() ); ?>',
-                    'total_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_stats/v1/total',
-                    'range_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_stats/v1/range',
-                    'map_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_stats/v1/map',
-                    'list_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_stats/v1/list',
-                    'elements_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_stats/v1/training_elements',
+                    'total_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_simulator/v1/total',
+                    'range_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_simulator/v1/range',
+                    'map_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_simulator/v1/map',
+                    'list_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_simulator/v1/list',
+                    'elements_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_simulator/v1/training_elements',
                     'plugin_uri': '<?php echo plugin_dir_url( __DIR__ ); ?>',
                     'nonce': '<?php echo wp_create_nonce( 'wp_rest' ); ?>',
                     'current_user_login': '<?php echo wp_get_current_user()->user_login; ?>',
@@ -139,10 +139,10 @@ abstract class Zume_Simulator_Chart_Base
                           </div>
                           <div class="z-card-footer ${key}">
                               <div class="grid-x">
-                                  <div class="cell small-6 z-card-sub-left hover zume-list ${key}">
+                                  <div class="cell small-6 z-card-sub-left hover zume-simulator-list ${key}">
                                       STATS
                                   </div>
-                                  <div class="cell small-6 z-card-sub-right hover zume-map ${key}">
+                                  <div class="cell small-6 z-card-sub-right hover zume-simulator-map ${key}">
                                       MAP
                                   </div>
                               </div>
@@ -172,7 +172,7 @@ abstract class Zume_Simulator_Chart_Base
                 window.template_single_list = ({key, valence, label, value, description}) => {
                     return `
                         <div class="grid-x">
-                        <div class="cell z-card zume-list ${key} ${valence} hover">
+                        <div class="cell z-card zume-simulator-list ${key} ${valence} hover">
                             <div class="z-card-single">
                                 <div class="z-icon"><i class="fi-list-bullet" ></i></div>
                                 <div class="z-card-title ${key}">
@@ -192,7 +192,7 @@ abstract class Zume_Simulator_Chart_Base
                 window.template_single_map = ({key, valence, label, value, description}) => {
                     return `
                         <div class="grid-x">
-                        <div class="cell z-card zume-map ${key} ${valence} hover">
+                        <div class="cell z-card zume-simulator-map ${key} ${valence} hover">
                             <div class="z-card-single">
                                 <div class="z-icon"><i class="fi-map" ></i></div>
                                 <div class="z-card-title ${key}">
@@ -254,7 +254,7 @@ abstract class Zume_Simulator_Chart_Base
                     return `
                     <div class="grid-x">
                       <div class="cell z-card  ${key}">
-                          <div class="z-card-main zume-list ${hover} ${key}" >
+                          <div class="z-card-main zume-simulator-list ${hover} ${key}" >
                               <div class="z-card-title ${key}">
                                   ${label}
                               </div>
@@ -297,23 +297,23 @@ abstract class Zume_Simulator_Chart_Base
                 }
 
                 window.load_list = ( data ) => {
-                    jQuery('.zume-list.'+data.key).click(function(){
+                    jQuery('.zume-simulator-list.'+data.key).click(function(){
                         jQuery('#modal-large').foundation('open')
                         jQuery('#modal-large-title').empty().html(`${data.label} <span style="float:right; margin-right: 2em;"><button class="button small">Take Action</button> <button class="button small ">Take Action</button></span> <hr>`)
                         jQuery('#modal-large-content').empty().html('<span class="loading-spinner active"></span>')
 
                         window.API_get( window.site_info.list_url, ( data_list ) => {
-                            jQuery('#modal-large-content').empty().html('<table class="hover"><tbody id="zume-list-modal"></tbody></table>')
-                            jQuery('#zume-list-modal').append( `<tr><td></td><td><strong>Name</strong></td><td><strong>Registered</strong></td></tr>`)
+                            jQuery('#modal-large-content').empty().html('<table class="hover"><tbody id="zume-simulator-list-modal"></tbody></table>')
+                            jQuery('#zume-simulator-list-modal').append( `<tr><td></td><td><strong>Name</strong></td><td><strong>Registered</strong></td></tr>`)
                             jQuery.each(data_list, function(i,v)  {
-                                jQuery('#zume-list-modal').append( `<tr><td><input type="checkbox" /></td><td><a href="#">${ v.display_name }</a></td><td>${v.user_registered}</td></tr>`)
+                                jQuery('#zume-simulator-list-modal').append( `<tr><td><input type="checkbox" /></td><td><a href="#">${ v.display_name }</a></td><td>${v.user_registered}</td></tr>`)
                             })
                             jQuery('.loading-spinner').removeClass('active')
                         })
                     })
                 }
                 window.load_map = ( data ) => {
-                    jQuery('.zume-map.'+data.key).click(function(){
+                    jQuery('.zume-simulator-map.'+data.key).click(function(){
                         jQuery('#modal-full').foundation('open')
                         jQuery('#modal-full-title').empty().html(`${data.label}<hr>`)
                         window.API_get( window.site_info.map_url, { key: data.key }, ( data_map ) => {

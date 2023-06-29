@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Zúme - Simulator
  * Plugin URI: https://github.com/ZumeProject/zume-simulator
- * Description: Zúme - Simulator is for reporting metrics on the Zume Critical Path.
+ * Description: Zúme - Simulator is for reporting metrics on the Zume Simulator.
  * Text Domain: zume-simulator
  * Domain Path: /languages
  * Version:  0.1

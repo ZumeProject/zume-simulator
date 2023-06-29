@@ -23,7 +23,7 @@ jobs:
       - name: Build project
         run: |
           mkdir zume-simulator
-          cp -r zume-simulator.php admin charts languages spinner.svg version-control.json LICENSE SECURITY.md zume-simulator/
+          cp -r zume-simulator.php api charts images version-control.json LICENSE SECURITY.md zume-simulator/
           zip -r zume-simulator.zip zume-simulator
       - name: Create Release
         id: create_release
