@@ -21,12 +21,10 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
-            add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
+            add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
     }
-
-
 
     public function wp_head() {
         $user_list = $this->user_list();
@@ -438,7 +436,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     ]
                 });
 
-                jQuery.get('https://zume5.training/coaching/wp-json/zume_simulation/v1/location', function(data){
+                jQuery.get( window.site_url+'location', function(data){
                     // console.log(data)
                     window.user_location = data
 

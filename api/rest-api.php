@@ -3,7 +3,7 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 class Zume_Simulator_Stats_Endpoints
 {
-    public $namespace = 'zume_simulation/v1';
+    public $namespace = 'zume_simulator/v1';
     private static $_instance = null;
     public static function instance() {
         if ( is_null( self::$_instance ) ) {
@@ -19,7 +19,6 @@ class Zume_Simulator_Stats_Endpoints
     }
     public function add_api_routes() {
         $namespace = $this->namespace;
-
 
         register_rest_route(
             $namespace, '/location', [
@@ -54,6 +53,8 @@ class Zume_Simulator_Stats_Endpoints
     public function journey_log( WP_REST_Request $request ) {
         return $request->get_params() ;
     }
+
+
 
     public function authorize_url( $authorized ){
         if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {

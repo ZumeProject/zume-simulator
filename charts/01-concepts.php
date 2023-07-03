@@ -18,19 +18,17 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'concepts', 'disciple_tools' );
+        $this->base_title = __( 'simulator', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator" === $url_path ) {
-            add_action( 'wp_enqueue_scripts', [ $this, 'scripts' ], 99 );
+            add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
     }
 
     public function base_menu( $content ) {
         $content .= '<li>ZÚME SIMULATOR</li>';
-        $content .= '<li><hr></li>';
-        $content .= '<li>This plugin is for development only. It is a collection of tools to simulate and test the zume training system</li>';
         $content .= '<li><hr></li>';
         $content .= '<li><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
@@ -47,58 +45,13 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                 chart.empty().html(`
                         <div id="zume-simulator-path">
                             <div class="grid-x">
-                                <div class="cell"><h1>Concepts and Visualization of Zúme System</h1></div>
+                                <div class="cell"><h2>SIMULATOR</h2></div>
                             </div>
                             <hr>
                             <span class="loading-spinner active"></span>
                             <div class="grid-x">
                                 <div class="cell small-12">
-                                    <h1 style="background-color: lightgrey; padding: 1em;"><strong>FUNNEL RELATIONSHIPS</strong></h1>
-                                    <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/funnel-relationships.png' ?>" />
-                                </div>
-                                <div class="cell"><hr></div>
-                                <div class="cell small-12">
-                                    <h1 style="background-color: lightgrey; padding: 1em;"><strong>STAGE SUMMARIES</strong></h1>
-                                    <div class="grid-x grid-padding-x grid-margin-x grid-margin-y">
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-anonymous.png' ?>" />
-                                        </div>
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-registrant.png' ?>" />
-                                        </div>
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-active.png' ?>" />
-                                        </div>
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-post.png' ?>" />
-                                        </div>
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-s1.png' ?>" />
-                                        </div>
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-s2.png' ?>" />
-                                        </div>
-                                        <div class="cell small-4 center tile">
-                                            <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/stage-s3.png' ?>" />
-                                        </div>
-                                    </div>
-                                    <style>.cell.tile { border: 1px solid grey; border-radius: 10px; padding: 1em; }</style>
-                                </div>
-                                <div class="cell"><hr></div>
-                                <div class="cell small-12">
-                                    <h1 style="background-color: lightgrey; padding: 1em;"><strong>DIFFICULTY OVER TIME</strong></h1>
-                                    <img src="<?php  echo plugin_dir_url(__DIR__) . 'images/difficulty-vs-time.png' ?>" />
-                                </div>
-                                <div class="cell"><hr></div>
-                                <div class="cell">
-                                    <h1 style="background-color: lightgrey; padding: 1em;"><strong>VALENCE</strong></h1>
-                                    <div class="grid-x" style="color:white;text-align:center;font-size:2.5em;">
-                                        <div class="cell small-2 valence-darkred">-20%</div>
-                                        <div class="cell small-2 valence-red">-10%</div>
-                                        <div class="cell small-4 valence-grey">On Track</div>
-                                        <div class="cell small-2 valence-green">+10%</div>
-                                        <div class="cell small-2 valence-darkgreen">+20%</div>
-                                    </div>
+                                    This plugin is for development only. It is a collection of tools to simulate and test the zume training system
                                 </div>
                             </div>
                         </div>

@@ -48,28 +48,14 @@ abstract class Zume_Simulator_Chart_Base
     }
 
     public function base_scripts() {
-        wp_localize_script(
-            'dt_'.$this->base_slug.'_script', 'wpMetricsBase', [
-                'slug' => $this->base_slug,
-                'root' => esc_url_raw( rest_url() ),
-                'plugin_uri' => plugin_dir_url( __DIR__ ),
-                'nonce' => wp_create_nonce( 'wp_rest' ),
-                'current_user_login' => wp_get_current_user()->user_login,
-                'current_user_id' => get_current_user_id()
-            ]
-        );
-    }
-
-    public function scripts() {
         wp_register_script( 'amcharts-core', 'https://www.amcharts.com/lib/4/core.js', false, '4' );
         wp_register_script( 'amcharts-charts', 'https://www.amcharts.com/lib/4/charts.js', false, '4' );
         wp_register_script( 'amcharts-animated', 'https://www.amcharts.com/lib/4/themes/animated.js', [ 'amcharts-core' ], '4' );
 
-        wp_enqueue_style( 'zume_simulator_charts', plugin_dir_url(__FILE__) . 'charts.css', [], filemtime( plugin_dir_path(__FILE__) . 'charts.css' ) );
+        wp_enqueue_style( 'zume_charts', plugin_dir_url(__FILE__) . 'charts.css', [], filemtime( plugin_dir_path(__FILE__) . 'charts.css' ) );
 
         wp_enqueue_style( 'datatable_css', '//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css', [], '1.13.4' );
         wp_enqueue_script( 'datatable_js', '//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js', ['jquery'], '1.13.4', true );
-
     }
 
     public function has_permission(){
