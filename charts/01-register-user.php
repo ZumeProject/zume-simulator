@@ -73,11 +73,25 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                                     <input type="text" id="user-username" placeholder="username">
                                     <label for="user-password">Password</label>
                                     <input type="text" id="user-password" placeholder="password">
+                                    <label for="user-days_ago">Number of Days Ago</label>
+                                    <select id="days_ago">
+                                        <option value="0">today</option>
+                                        <option value="3">3 Days Ago</option>
+                                        <option value="7">7 Days Ago</option>
+                                        <option value="10">10 Days Ago</option>
+                                        <option value="14">14 Days Ago</option>
+                                        <option value="18">18 Days Ago</option>
+                                        <option value="24">24 Days Ago</option>
+                                        <option value="30">30 Days Ago</option>
+                                        <option value="60">60 Days Ago</option>
+                                        <option value="90">90 Days Ago</option>
+                                        <option value="100">100 Days Ago</option>
+                                    </select>
                                     <label for="user-locale">Language</label>
                                     ${dt_language_select}
                                     <label for="user-locale">Location</label>
                                     ${dt_country_select}
-                                    <button class="button" id="register-user">Register User</button>
+                                    <br><br><button class="button" id="register-user">Register User</button>
                                     <div id="results"></div>
                                 </div>
                             </div>
@@ -113,13 +127,15 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                     let password = jQuery('#user-password').val()
                     let locale = jQuery('#user-locale').val()
                     let location = jQuery('#location').val()
+                    let days_ago = jQuery('#days_ago').val()
                     let data = {
                         email: email,
                         name: name,
                         username: username,
                         password: password,
                         locale: locale,
-                        location: location
+                        location: location,
+                        days_ago: days_ago
                     }
                     jQuery('.loading-spinner').addClass('active')
 
@@ -149,6 +165,9 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
             }
             .zume-cards {
                 max-width: 700px;
+            }
+            #location {
+                width: 100% !important;
             }
         </style>
         <?php

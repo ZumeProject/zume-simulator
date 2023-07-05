@@ -34,6 +34,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
         <script>
             window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_simulator/v1/'
             window.user_id = '<?php echo get_current_user_id() ?>'
+            let selectors = `<?php echo zume_simulator_selectors() ?>`
 
             //  0 = Anonymous
             //  1 = Registrant
@@ -50,7 +51,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     // Anonymous
                     {
                         "value": 0,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from an anonymous anonymous)"
                     },
                     {
@@ -79,7 +80,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     },
                     {
                         "value": 1,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from a pre-training person)"
                     },
                     {
@@ -98,7 +99,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     // Active Training
                     {
                         "value": 2,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from a pre-training person)"
                     },
                     {
@@ -287,7 +288,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     },
                     {
                         "value": 3,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from a pre-training person)"
                     },
 
@@ -301,7 +302,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     },
                     {
                         "value": 4,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from a pre-training person)"
                     },
 
@@ -315,7 +316,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     },
                     {
                         "value": 5,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from a pre-training person)"
                     },
 
@@ -329,7 +330,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     },
                     {
                         "value": 6,
-                        "subtype": "got_a_coach",
+                        "subtype": "requested_a_coach",
                         "description": "Get a Coach Form (from a pre-training person)"
                     },
 
@@ -338,24 +339,10 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
             jQuery(document).ready(function(){
                 "use strict";
                 let chart = jQuery('#chart')
-                let list = `<?php echo $user_list ?>`
                 chart.empty().html(`
                         <div id="zume-simulator">
                             <div>
-                                <select id="user_id" style="width:200px;">
-                                    <option value="${window.user_id}">Me</option>
-                                    ${list}
-                                </select>
-                                <select id="days_ago" style="width:200px;">
-                                    <option value="0">today</option>
-                                    <option value="3">3 Days Ago</option>
-                                    <option value="7">7 Days Ago</option>
-                                    <option value="10">10 Days Ago</option>
-                                    <option value="14">14 Days Ago</option>
-                                    <option value="18">18 Days Ago</option>
-                                    <option value="24">24 Days Ago</option>
-                                    <option value="30">30 Days Ago</option>
-                                </select>
+                                ${selectors}
                                 <span style="font-weight: bold; font-size: 1.5em;" id="location"><span class="loading-spinner active"></span></span>
                             </div>
                             <table class="hover" id="datatable">
@@ -436,41 +423,73 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     ]
                 });
 
-                jQuery.get( window.site_url+'location', function(data){
-                    // console.log(data)
-                    window.user_location = data
+                let buttons = jQuery('.button.add')
+                buttons.on('click', function(){
+                    console.log('click')
+                    let subtype = jQuery(this).data('subtype')
+                    let value = jQuery(this).data('value')
+                    let days_ago = jQuery('#days_ago').val()
+                    let user_id = jQuery('#user_id').val()
 
-                    let buttons = jQuery('.button.add')
-                    buttons.on('click', function(){
-                        let subtype = jQuery(this).data('subtype')
-                        let value = jQuery(this).data('value')
-                        let days_ago = jQuery('#days_ago').val()
-                        let user_id = jQuery('#user_id').val()
+                    // let log_data = {
+                    //     type: 'zume',
+                    //     subtype: subtype,
+                    //     value: value,
+                    //     grid_id: data.grid_id,
+                    //     label: data.label,
+                    //     lat: data.lat,
+                    //     lng: data.lng,
+                    //     level: data.level,
+                    //     user_id: user_id,
+                    //     days_ago: days_ago,
+                    // }
+                    // console.log(log_data)
+                    makePostRequest( 'POST', 'log', log_data ).then( (response) => {
+                        console.log(response)
 
-                        let log_data = {
-                            type: 'zume',
-                            subtype: subtype,
-                            value: value,
-                            grid_id: data.grid_id,
-                            label: data.label,
-                            lat: data.lat,
-                            lng: data.lng,
-                            level: data.level,
-                            user_id: user_id,
-                            days_ago: days_ago,
-                        }
-                        console.log(log_data)
-                        makePostRequest( 'POST', 'log', log_data ).then( (response) => {
-                            console.log(response)
-
-                        })
                     })
-
-                    jQuery('#location').html(window.user_location.label)
-
-                    buttons.removeAttr('disabled')
-                    jQuery('.loading-spinner').removeClass('active')
                 })
+
+                // jQuery('#location').html(window.user_location.label)
+
+                buttons.removeAttr('disabled')
+                jQuery('.loading-spinner').removeClass('active')
+
+                // jQuery.get( window.site_url+'location', function(data){
+                //     // console.log(data)
+                //     window.user_location = data
+                //
+                //     let buttons = jQuery('.button.add')
+                //     buttons.on('click', function(){
+                //         let subtype = jQuery(this).data('subtype')
+                //         let value = jQuery(this).data('value')
+                //         let days_ago = jQuery('#days_ago').val()
+                //         let user_id = jQuery('#user_id').val()
+                //
+                //         let log_data = {
+                //             type: 'zume',
+                //             subtype: subtype,
+                //             value: value,
+                //             grid_id: data.grid_id,
+                //             label: data.label,
+                //             lat: data.lat,
+                //             lng: data.lng,
+                //             level: data.level,
+                //             user_id: user_id,
+                //             days_ago: days_ago,
+                //         }
+                //         console.log(log_data)
+                //         makePostRequest( 'POST', 'log', log_data ).then( (response) => {
+                //             console.log(response)
+                //
+                //         })
+                //     })
+                //
+                //     jQuery('#location').html(window.user_location.label)
+                //
+                //     buttons.removeAttr('disabled')
+                //     jQuery('.loading-spinner').removeClass('active')
+                // })
 
                 function makePostRequest(type, url, data, base = "zume_simulator/v1/") {
                     //make sure base has a trailing slash if url does not start with one

@@ -20,7 +20,13 @@ class Zume_Simulator_Stats_Endpoints
     public function add_api_routes() {
         $namespace = $this->namespace;
 
-
+        register_rest_route(
+            $namespace, '/register_user', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'register_user' ],
+                'permission_callback' => '__return_true'
+            ]
+        );
         register_rest_route(
             $namespace, '/log', [
                 'methods'  => [ 'GET', 'POST' ],
@@ -29,31 +35,16 @@ class Zume_Simulator_Stats_Endpoints
             ]
         );
         register_rest_route(
-            $namespace, '/journey_log', [
+            $namespace, '/user_progress', [
                 'methods'  => [ 'GET', 'POST' ],
-                'callback' => [ $this, 'journey_log' ],
-                'permission_callback' => '__return_true'
-            ]
-        );
-        register_rest_route(
-            $namespace, '/register_user', [
-                'methods'  => [ 'GET', 'POST' ],
-                'callback' => [ $this, 'register_user' ],
+                'callback' => [ $this, 'user_progress' ],
                 'permission_callback' => '__return_true'
             ]
         );
 
+
     }
 
-    public function log( WP_REST_Request $request ) {
-        return Zume_Simulator_Query::log( dt_recursive_sanitize_array( $request->get_params() ) );
-    }
-    public function location( WP_REST_Request $request ) {
-        return DT_Ipstack_API::get_location_grid_meta_from_current_visitor();
-    }
-    public function journey_log( WP_REST_Request $request ) {
-        return $request->get_params() ;
-    }
 
     public function register_user( WP_REST_Request $request ){
         $params = $request->get_params();
@@ -89,7 +80,7 @@ class Zume_Simulator_Stats_Endpoints
                 $user_roles,
                  null,
                 $locale ?? null,
-                true,
+                false,
                 $params['password'],
                 [],
                 false
@@ -127,6 +118,21 @@ class Zume_Simulator_Stats_Endpoints
             ];
             $contact_location = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
 
+            dt_report_insert( [
+                'type' => 'zume',
+                'subtype' => 'registration',
+                'post_id' => $contact_id,
+                'value' => 0,
+                'grid_id' => $grid_row['grid_id'],
+                'label' => str_replace( ',', ', ', $params['location'] ),
+                'lat' => $grid_row['latitude'],
+                'lng' => $grid_row['longitude'],
+                'level' => 'city',
+                'user_id' => $user_id,
+                'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
+                'hash' => hash('sha256', maybe_serialize($params)  . time() ),
+            ] );
+
             return [
                 'user_id' => $user_id,
                 'contact_id' => $contact_id,
@@ -138,6 +144,40 @@ class Zume_Simulator_Stats_Endpoints
         }
     }
 
+    public function log( WP_REST_Request $request ) {
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+
+        $location = DT_Mapbox_API::forward_lookup( $params['location'] );
+        $geocoder = new Location_Grid_Geocoder();
+        $grid_row = $geocoder->get_grid_id_by_lnglat( $location['features'][0]['center'][0], $location['features'][0]['center'][1] );
+
+        $time = strtotime( 'Today -'.$params['days_ago'].' days' );
+        $contact_id = Disciple_Tools_Users::get_contact_for_user($params['user_id']);
+
+        return dt_report_insert( [
+            'type' => 'zume',
+            'subtype' => $params['key'],
+            'post_id' => $contact_id,
+            'value' => $params['stage'],
+            'grid_id' => $grid_row['grid_id'],
+            'label' => str_replace( ',', ', ', $params['location'] ),
+            'lat' => $grid_row['latitude'],
+            'lng' => $grid_row['longitude'],
+            'level' => 'city',
+            'user_id' => $params['user_id'],
+            'time_end' => $time,
+            'hash' => hash('sha256', maybe_serialize($params)  . time() ),
+        ] );
+
+    }
+
+    public function user_progress( WP_REST_Request $request ) {
+        global $wpdb;
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+        $user_id = (int) $params['user_id'];
+        $sql = "SELECT id, user_id, subtype, REPLACE(label,', ',',') as label FROM wp_dt_reports WHERE user_id = {$user_id} AND type = 'zume' ORDER BY time_end DESC";
+        return $wpdb->get_results( $sql, ARRAY_A );
+    }
 
 
     public function authorize_url( $authorized ){

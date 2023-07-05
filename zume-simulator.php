@@ -211,11 +211,47 @@ if ( ! function_exists('zume_location_select_sample' ) ) {
         ];
         shuffle( $list );
 
-        $html = '<select name="location" id="location">';
+        $html = '<select name="location" id="location" style=" width:200px;">';
         foreach( $list as $item ){
             $html .= '<option value="' . $item . '">' . str_replace( ',', ', ', $item ) . '</option>';
         }
         $html .= '</select>';
         return $html;
     }
+}
+
+function zume_simulator_selectors() {
+    global $wpdb;
+    $users = $wpdb->get_results(
+        "SELECT ID, display_name
+                    FROM $wpdb->users
+                    JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id AND $wpdb->usermeta.meta_key = 'wp_capabilities'
+                    ORDER BY ID DESC
+                    LIMIT 100
+                    ", ARRAY_A
+    );
+
+    $html = '<select id="user_id" style=" width:150px;">';
+    foreach( $users as $user ) {
+        $html .= '<option value="' . $user['ID'] . '">' . $user['display_name'] . '</option>';
+    }
+    $html .= '</select>';
+
+    $html .= zume_location_select_sample();
+
+    $html .= '<select id="days_ago" style=" width:150px;">
+                <option value="0">today</option>
+                <option value="3">3 Days Ago</option>
+                <option value="7">7 Days Ago</option>
+                <option value="10">10 Days Ago</option>
+                <option value="14">14 Days Ago</option>
+                <option value="18">18 Days Ago</option>
+                <option value="24">24 Days Ago</option>
+                <option value="30">30 Days Ago</option>
+                <option value="60">60 Days Ago</option>
+                <option value="90">90 Days Ago</option>
+                <option value="100">100 Days Ago</option>
+            </select>';
+
+    return $html;
 }
