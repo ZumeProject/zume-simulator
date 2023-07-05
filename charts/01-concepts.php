@@ -18,7 +18,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'simulator', 'disciple_tools' );
+        $this->base_title = __( 'register user', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator" === $url_path ) {
@@ -39,9 +39,17 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
         $this->js_api();
         ?>
         <script>
+
             jQuery(document).ready(function(){
                 "use strict";
+                window.API_post = (url, data, callback ) => {
+                    return jQuery.post(url, data, callback);
+                }
+
                 let chart = jQuery('#chart')
+
+                let dt_language_select = `<?php echo dt_language_select(); ?>`
+                let dt_country_select = `<?php echo zume_location_select_sample(); ?>`
                 chart.empty().html(`
                         <div id="zume-simulator-path">
                             <div class="grid-x">
@@ -54,8 +62,75 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                                     This plugin is for development only. It is a collection of tools to simulate and test the zume training system
                                 </div>
                             </div>
+                            <hr>
+                            <div class="grid-x">
+                                <div class="cell small-12">
+                                    <label for="user-name">Display Name</label>
+                                    <input type="text" id="user-name" placeholder="display name">
+                                    <label for="user-email">Email</label>
+                                    <input type="text" id="user-email" placeholder="email">
+                                    <label for="user-username">User Name</label>
+                                    <input type="text" id="user-username" placeholder="username">
+                                    <label for="user-password">Password</label>
+                                    <input type="text" id="user-password" placeholder="password">
+                                    <label for="user-locale">Language</label>
+                                    ${dt_language_select}
+                                    <label for="user-locale">Location</label>
+                                    ${dt_country_select}
+                                    <button class="button" id="register-user">Register User</button>
+                                    <div id="results"></div>
+                                </div>
+                            </div>
                         </div>
                     `)
+
+                function makeid(length) {
+                    let result = '';
+                    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                    const charactersLength = characters.length;
+                    let counter = 0;
+                    while (counter < length) {
+                        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                        counter += 1;
+                    }
+                    return result;
+                }
+
+                let username = makeid(8)
+                let email = username + '@emailtest.com'
+                let password = username + '_password'
+
+                jQuery('#user-email').val(email)
+                jQuery('#user-username').val(username)
+                jQuery('#user-name').val(username)
+                jQuery('#user-password').val(password)
+
+                jQuery('#register-user').on('click', function(e){
+                    e.preventDefault()
+                    let email = jQuery('#user-email').val()
+                    let name = jQuery('#user-name').val()
+                    let username = jQuery('#user-username').val()
+                    let password = jQuery('#user-password').val()
+                    let locale = jQuery('#user-locale').val()
+                    let location = jQuery('#location').val()
+                    let data = {
+                        email: email,
+                        name: name,
+                        username: username,
+                        password: password,
+                        locale: locale,
+                        location: location
+                    }
+                    jQuery('.loading-spinner').addClass('active')
+
+                    window.API_post( '/wp-json/zume_simulator/v1/register_user', data, function(data){
+                        console.log(data)
+                        jQuery('#results').empty().html(`SUCCESS<br><br><a href="/contacts/${data.contact_id}" target="_blank">View This User</a>`)
+
+                        jQuery('.loading-spinner').removeClass('active')
+                    })
+
+                })
 
                 jQuery('.loading-spinner').delay(3000).removeClass('active')
             })

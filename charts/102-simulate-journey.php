@@ -117,11 +117,11 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                 <h2>Anonymous</h2>
                             </div>
                             <div class="cell small-5">
-                                <button class="button large">Registered</button>
+                                <button class="button large" data-key="registration" data-stage="0">Registered</button>
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Joined Online Training</button>
+                                <button class="button large alt-color" data-key="got_a_coach" data-stage="1">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration" data-stage="1">Joined Online Training</button>
                             </div>
                             <div class="cell small-2">
 
@@ -134,13 +134,13 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                 <h2>Registrant</h2>
                             </div>
                             <div class="cell small-5">
-                               <button class="button large">Made a Plan</button>
+                               <button class="button large" data-key="made_a_plan">Made a Plan</button>
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Set Profile</button>
-                                <button class="button large alt-color">Invited Friends</button>
-                                <button class="button large alt-color">Joined Online Training</button>
+                                <button class="button large alt-color" data-key="registration">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration">Set Profile</button>
+                                <button class="button large alt-color" data-key="registration">Invited Friends</button>
+                                <button class="button large alt-color" data-key="registration">Joined Online Training</button>
                             </div>
                             <div class="cell small-2">
 
@@ -157,10 +157,10 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                <button class="button large">Completed 25 of 32 Training Points</button>
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Set Profile</button>
-                                <button class="button large alt-color">Invited Friends</button>
-                                <button class="button large alt-color">Made 3-Month Plan</button>
+                                <button class="button large alt-color" data-key="registration">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration">Set Profile</button>
+                                <button class="button large alt-color" data-key="registration">Invited Friends</button>
+                                <button class="button large alt-color" data-key="registration">Made 3-Month Plan</button>
                             </div>
                             <div class="cell small-2">
 
@@ -174,12 +174,12 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                 <h2>Post-Training Trainee</h2>
                             </div>
                             <div class="cell small-5">
-                               <button class="button large">Made First Lifestyle Report</button>
+                               <button class="button large" data-key="registration">Made First Lifestyle Report</button>
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Set Profile</button>
-                                <button class="button large alt-color">Completed 3-Month Plan</button>
+                                <button class="button large alt-color" data-key="registration">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration">Set Profile</button>
+                                <button class="button large alt-color" data-key="registration">Completed 3-Month Plan</button>
                             </div>
                             <div class="cell small-2">
 
@@ -193,12 +193,12 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                 <h2>Stage 1 - Partial Practitioner</h2>
                             </div>
                             <div class="cell small-5">
-                               <button class="button large">Completed MAWL Checklist</button>
+                               <button class="button large" data-key="registration">Completed MAWL Checklist</button>
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Report Churches</button>
-                                <button class="button large alt-color">Join Affinity Hub</button>
+                                <button class="button large alt-color" data-key="registration">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration">Report Churches</button>
+                                <button class="button large alt-color" data-key="registration">Join Affinity Hub</button>
                             </div>
                             <div class="cell small-2">
 
@@ -211,12 +211,12 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                                 <h2>Stage 2 - Completed Practitioner</h2>
                             </div>
                             <div class="cell small-5">
-                               <button class="button large">Seeing Generational Fruit</button>
+                               <button class="button large" data-key="registration">Seeing Generational Fruit</button>
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Report Churches</button>
-                                <button class="button large alt-color">Join Affinity Hub</button>
+                                <button class="button large alt-color" data-key="registration">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration">Report Churches</button>
+                                <button class="button large alt-color" data-key="registration">Join Affinity Hub</button>
                             </div>
                             <div class="cell small-2">
 
@@ -232,11 +232,11 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             <div class="cell small-5">
                             </div>
                             <div class="cell small-5 left-border">
-                                <button class="button large alt-color">Coach Request</button>
-                                <button class="button large alt-color">Report Churches</button>
-                                <button class="button large alt-color">Coach Others</button>
-                                <button class="button large alt-color">Join Affinity Hub</button>
-                                <button class="button large alt-color">Provide Hub Leadership</button>
+                                <button class="button large alt-color" data-key="registration">Coach Request</button>
+                                <button class="button large alt-color" data-key="registration">Report Churches</button>
+                                <button class="button large alt-color" data-key="registration">Coach Others</button>
+                                <button class="button large alt-color" data-key="registration">Join Affinity Hub</button>
+                                <button class="button large alt-color" data-key="registration">Provide Hub Leadership</button>
                             </div>
                             <div class="cell small-2">
 
@@ -272,7 +272,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
 
                 jQuery('.loading-spinner').removeClass('active')
 
-                function makePostRequest(type, url, data, base = "zume_simulation/v1/") {
+                function makePostRequest(type, url, data, base = "zume_simulator/v1/") {
                     //make sure base has a trailing slash if url does not start with one
                     if ( !base.endsWith('/') && !url.startsWith('/')){
                         base += '/'

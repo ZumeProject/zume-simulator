@@ -20,13 +20,7 @@ class Zume_Simulator_Stats_Endpoints
     public function add_api_routes() {
         $namespace = $this->namespace;
 
-        register_rest_route(
-            $namespace, '/location', [
-                'methods'  => [ 'GET', 'POST' ],
-                'callback' => [ $this, 'location' ],
-                'permission_callback' => '__return_true'
-            ]
-        );
+
         register_rest_route(
             $namespace, '/log', [
                 'methods'  => [ 'GET', 'POST' ],
@@ -41,6 +35,13 @@ class Zume_Simulator_Stats_Endpoints
                 'permission_callback' => '__return_true'
             ]
         );
+        register_rest_route(
+            $namespace, '/register_user', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'register_user' ],
+                'permission_callback' => '__return_true'
+            ]
+        );
 
     }
 
@@ -52,6 +53,89 @@ class Zume_Simulator_Stats_Endpoints
     }
     public function journey_log( WP_REST_Request $request ) {
         return $request->get_params() ;
+    }
+
+    public function register_user( WP_REST_Request $request ){
+        $params = $request->get_params();
+
+//        if ( ! current_user_can('manage_options' ) ) {
+//            return new WP_Error( 'unauthorized', 'You are not authorized to create users', [ 'status' => 401 ] );
+//        }
+
+        if ( isset( $params['email'], $params['name'], $params['username'], $params['password'] ) ){
+            $user_roles = [ 'multiplier' ];
+
+            if ( empty( $params['name'] ) ) {
+                $params['name'] = $params['username'];
+            }
+
+            if ( isset( $params['user-optional-fields'] ) ) {
+                $optional_fields = $params['user-optional-fields'];
+            }
+            if ( isset( $params['locale'] ) ) {
+                $locale = $params['locale'];
+            }
+
+
+            $user_object = wp_get_current_user();
+            $user_object->add_cap( 'create_users' );
+            $user_object->add_cap( 'create_contacts' );
+            $user_object->add_cap( 'access_contacts' );
+
+            $user_id = Disciple_Tools_Users::create_user(
+                $params['username'],
+                $params['email'],
+                $params['name'],
+                $user_roles,
+                 null,
+                $locale ?? null,
+                true,
+                $params['password'],
+                [],
+                false
+            );
+
+            if ( is_wp_error( $user_id ) ) {
+                return $user_id;
+            }
+
+            $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
+
+            $location = DT_Mapbox_API::forward_lookup( $params['location'] );
+            $location_grid = [
+                'label' => $params['location'],
+                'level' => 'city',
+                'lng' => $location['features'][0]['center'][0],
+                'lat' => $location['features'][0]['center'][1],
+            ];
+            $geocoder = new Location_Grid_Geocoder();
+            $grid_row = $geocoder->get_grid_id_by_lnglat( $location_grid['lng'], $location_grid['lat'] );
+            $location_grid['grid_id'] = $grid_row['grid_id'];
+            $add_location = Location_Grid_Meta::add_user_location_grid_meta( $user_id, $location_grid );
+
+            $fields = [
+                'location_grid_meta' => [
+                    'values' => [
+                        [
+                            'label' => $params['location'],
+                            'level' => 'city',
+                            'lng' => $location['features'][0]['center'][0],
+                            'lat' => $location['features'][0]['center'][1],
+                        ]
+                    ],
+                ]
+            ];
+            $contact_location = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
+
+            return [
+                'user_id' => $user_id,
+                'contact_id' => $contact_id,
+                'location' => $add_location,
+                'contact_location' => $contact_location,
+            ];
+        } else {
+            return new WP_Error( 'missing_error', 'Missing fields', [ 'status' => 400 ] );
+        }
     }
 
 

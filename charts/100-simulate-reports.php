@@ -472,7 +472,7 @@ class Zume_Simulator_Coaching_Types extends Zume_Simulator_Chart_Base
                     jQuery('.loading-spinner').removeClass('active')
                 })
 
-                function makePostRequest(type, url, data, base = "zume_simulation/v1/") {
+                function makePostRequest(type, url, data, base = "zume_simulator/v1/") {
                     //make sure base has a trailing slash if url does not start with one
                     if ( !base.endsWith('/') && !url.startsWith('/')){
                         base += '/'

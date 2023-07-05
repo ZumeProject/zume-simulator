@@ -76,14 +76,8 @@ add_filter( 'dt_plugins', function ( $plugins ){
     return $plugins;
 });
 
-/**
- * Singleton class for setting up the plugin.
- *
- * @since  0.1
- * @access public
- */
-class Zume_Simulator {
 
+class Zume_Simulator {
     private static $_instance = null;
     public static function instance() {
         if ( is_null( self::$_instance ) ) {
@@ -91,8 +85,10 @@ class Zume_Simulator {
         }
         return self::$_instance;
     }
-
     private function __construct() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            return;
+        }
         $is_rest = dt_is_rest();
 
         if ( $is_rest ) {
@@ -108,75 +104,118 @@ class Zume_Simulator {
             add_filter( 'plugin_row_meta', [ $this, 'plugin_description_links' ], 10, 4 );
         }
     }
-
     public function plugin_description_links( $links_array, $plugin_file_name, $plugin_data, $status ) {
         if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
             // You can still use `array_unshift()` to add links at the beginning.
 
-            $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>'; // @todo replace with your links.
-            // @todo add other links here
+            $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
+
         }
 
         return $links_array;
     }
-
-    /**
-     * Loads the translation files.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
     public function i18n() {
         $domain = 'zume-simulator';
         load_plugin_textdomain( $domain, false, trailingslashit( dirname( plugin_basename( __FILE__ ) ) ). 'languages' );
     }
-
-    /**
-     * Magic method to output a string if trying to use the object as a string.
-     *
-     * @since  0.1
-     * @access public
-     * @return string
-     */
     public function __toString() {
         return 'zume-simulator';
     }
-
-    /**
-     * Magic method to keep the object from being cloned.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
     public function __clone() {
         _doing_it_wrong( __FUNCTION__, 'Whoah, partner!', '0.1' );
     }
-
-    /**
-     * Magic method to keep the object from being unserialized.
-     *
-     * @since  0.1
-     * @access public
-     * @return void
-     */
     public function __wakeup() {
         _doing_it_wrong( __FUNCTION__, 'Whoah, partner!', '0.1' );
     }
-
-    /**
-     * Magic method to prevent a fatal error when calling a method that doesn't exist.
-     *
-     * @param string $method
-     * @param array $args
-     * @return null
-     * @since  0.1
-     * @access public
-     */
     public function __call( $method = '', $args = array() ) {
         _doing_it_wrong( 'zume_simulator::' . esc_html( $method ), 'Method does not exist.', '0.1' );
         unset( $method, $args );
         return null;
+    }
+}
+
+if ( ! function_exists('zume_location_select_sample' ) ) {
+    function zume_location_select_sample() {
+        $list = [
+            "Hong Kong,Hong Kong",
+            "Singapore,Singapore",
+            "Bangkok,Thailand",
+            "London,UK",
+            "Macau,Macau",
+            "Kuala Lumpur,Malaysia",
+            "Shenzhen,China",
+            "New York City,USA",
+            "Antalya,Turkey",
+            "Paris,France",
+            "Istanbul,Turkey",
+            "Rome,Italy",
+            "Dubai,UAE",
+            "Guangzhou,China",
+            "Phuket,Thailand",
+            "Mecca,Saudi Arabia",
+            "Pattaya,Thailand",
+            "Taipei City,Taiwan",
+            "Prague,Czech Republic",
+            "Shanghai,China",
+            "Las Vegas,USA"	,
+            "Miami,USA",
+            "Barcelona,Spain",
+            "Moscow,Russia",
+            "Beijing,China",
+            "Los Angeles,USA",
+            "Budapest,Hungary",
+            "Vienna,Austria",
+            "Amsterdam,Netherlands",
+            "Sofia,Bulgaria",
+            "Madrid,Spain",
+            "Orlando,USA",
+            "Ho Chi Minh City,Vietnam",
+            "Lima,Peru",
+            "Berlin,Germany",
+            "Tokyo,Japan",
+            "Warsaw,Poland",
+            "Chennai,India",
+            "Cairo,Egypt	",
+            "Nairobi,Kenya",
+            "Hangzhou,China",
+            "Milan,Italy",
+            "San Francisco,USA",
+            "Buenos Aires,Argentina",
+            "Venice,Italy",
+            "Mexico City,Mexico",
+            "Dublin,Ireland",
+            "Seoul,South Korea",
+            "Mugla,Turkey",
+            "Mumbai,India",
+            "Denpasar,Indonesia",
+            "Delhi,India",
+            "Toronto,Canada",
+            "Zhuhai,China",
+            "St Petersburg,Russia",
+            "Burgas,Bulgaria",
+            "Sydney,Australia",
+            "Djerba,Tunisia",
+            "Munich,Germany",
+            "Johannesburg,South Africa",
+            "Cancun,Mexico",
+            "Edirne,Turkey",
+            "Suzhou,China	",
+            "Bucharest,Romania",
+            'Punta Cana,Dominican Republic',
+            "Agra,India",
+            "Jaipur,India",
+            "Brussels,Belgium",
+            "Nice,France",
+            "Chiang Mai,Thailand",
+            "Sharm el-Sheikh,Egypt",
+        ];
+        shuffle( $list );
+
+        $html = '<select name="location" id="location">';
+        foreach( $list as $item ){
+            $html .= '<option value="' . $item . '">' . str_replace( ',', ', ', $item ) . '</option>';
+        }
+        $html .= '</select>';
+        return $html;
     }
 }
