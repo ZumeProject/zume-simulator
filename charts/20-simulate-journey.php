@@ -143,38 +143,37 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             </div>
                             <div class="cell small-5">
                                <button class="button large completed_training" data-key="completed_training" data-stage="2">Completed 25 of 32 Training Points</button><br>
-                               <button class="button large training_session_1" data-key="training_session_1" data-stage="2">1</button>
-                               <button class="button large training_session_2" data-key="training_session_2" data-stage="2">2</button>
-                               <button class="button large training_session_3" data-key="training_session_3" data-stage="2">3</button>
-                               <button class="button large training_session_4" data-key="training_session_4" data-stage="2">4</button>
-                               <button class="button large training_session_5" data-key="training_session_5" data-stage="2">5</button>
-                               <button class="button large training_session_6" data-key="training_session_6" data-stage="2">6</button>
-                               <button class="button large training_session_7" data-key="training_session_7" data-stage="2">7</button>
-                               <button class="button large training_session_8" data-key="training_session_8" data-stage="2">8</button>
-                               <button class="button large training_session_9" data-key="training_session_9" data-stage="2">9</button>
-                               <button class="button large training_session_10" data-key="training_session_10" data-stage="2">10</button>
-                               <button class="button large training_session_11" data-key="training_session_11" data-stage="2">11</button>
-                               <button class="button large training_session_12" data-key="training_session_12" data-stage="2">12</button>
-                               <button class="button large training_session_13" data-key="training_session_13" data-stage="2">13</button>
-                               <button class="button large training_session_14" data-key="training_session_14" data-stage="2">14</button>
-                               <button class="button large training_session_15" data-key="training_session_15" data-stage="2">15</button>
-                               <button class="button large training_session_16" data-key="training_session_16" data-stage="2">16</button>
-                               <button class="button large training_session_17" data-key="training_session_17" data-stage="2">17</button>
-                               <button class="button large training_session_18" data-key="training_session_18" data-stage="2">18</button>
-                               <button class="button large training_session_19" data-key="training_session_19" data-stage="2">19</button>
-                               <button class="button large training_session_20" data-key="training_session_20" data-stage="2">20</button>
-                               <button class="button large training_session_21" data-key="training_session_21" data-stage="2">21</button>
-                               <button class="button large training_session_22" data-key="training_session_22" data-stage="2">22</button>
-                               <button class="button large training_session_23" data-key="training_session_23" data-stage="2">23</button>
-                               <button class="button large training_session_24" data-key="training_session_24" data-stage="2">24</button>
-                               <button class="button large training_session_25" data-key="training_session_25" data-stage="2">25</button>
-                               <button class="button large training_session_26" data-key="training_session_26" data-stage="2">26</button>
-                               <button class="button large training_session_27" data-key="training_session_27" data-stage="2">27</button>
-                               <button class="button large training_session_28" data-key="training_session_28" data-stage="2">28</button>
-                               <button class="button large training_session_29" data-key="training_session_29" data-stage="2">29</button>
-                               <button class="button large training_session_30" data-key="training_session_30" data-stage="2">30</button>
-                               <button class="button large training_session_31" data-key="training_session_31" data-stage="2">31</button>
-                               <button class="button large training_session_32" data-key="training_session_32" data-stage="2">32</button>
+                               <button class="button large training_item_01" data-key="training_item_01" data-stage="2">1</button>
+                               <button class="button large training_item_02" data-key="training_item_02" data-stage="2">2</button>
+                               <button class="button large training_item_03" data-key="training_item_03" data-stage="2">3</button>
+                               <button class="button large training_item_04" data-key="training_item_04" data-stage="2">4</button>
+                               <button class="button large training_item_05" data-key="training_item_05" data-stage="2">5</button>
+                               <button class="button large training_item_06" data-key="training_item_06" data-stage="2">6</button>
+                               <button class="button large training_item_07" data-key="training_item_07" data-stage="2">7</button>
+                               <button class="button large training_item_08" data-key="training_item_08" data-stage="2">8</button>
+                               <button class="button large training_item_09" data-key="training_item_09" data-stage="2">9</button>
+                               <button class="button large training_item_10" data-key="training_item_10" data-stage="2">10</button>
+                               <button class="button large training_item_11" data-key="training_item_11" data-stage="2">11</button>
+                               <button class="button large training_item_12" data-key="training_item_12" data-stage="2">12</button>
+                               <button class="button large training_item_13" data-key="training_item_13" data-stage="2">13</button>
+                               <button class="button large training_item_14" data-key="training_item_14" data-stage="2">14</button>
+                               <button class="button large training_item_15" data-key="training_item_15" data-stage="2">15</button>
+                               <button class="button large training_item_16" data-key="training_item_16" data-stage="2">16</button>
+                               <button class="button large training_item_17" data-key="training_item_17" data-stage="2">17</button>
+                               <button class="button large training_item_18" data-key="training_item_18" data-stage="2">18</button>
+                               <button class="button large training_item_19" data-key="training_item_19" data-stage="2">19</button>
+                               <button class="button large training_item_20" data-key="training_item_20" data-stage="2">20</button>
+                               <button class="button large training_item_21" data-key="training_item_21" data-stage="2">21</button>
+                               <button class="button large training_item_22" data-key="training_item_22" data-stage="2">22</button>
+                               <button class="button large training_item_23" data-key="training_item_23" data-stage="2">23</button>
+                               <button class="button large training_item_24" data-key="training_item_24" data-stage="2">24</button>
+                               <button class="button large training_item_25" data-key="training_item_25" data-stage="2">25</button>
+                               <button class="button large training_item_26" data-key="training_item_26" data-stage="2">26</button>
+                               <button class="button large training_item_27" data-key="training_item_27" data-stage="2">27</button>
+                               <button class="button large training_item_28" data-key="training_item_28" data-stage="2">28</button>
+                               <button class="button large training_item_29" data-key="training_item_29" data-stage="2">29</button>
+                               <button class="button large training_item_30" data-key="training_item_30" data-stage="2">30</button>
+                               <button class="button large training_item_31" data-key="training_item_31" data-stage="2">31</button>
                             </div>
                             <div class="cell small-5 left-border">
                                 <button class="button large alt-color requested_a_coach" data-key="requested_a_coach" data-stage="2">Coach Request</button>

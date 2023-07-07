@@ -3,6 +3,7 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 class Zume_Simulator_Stats_Endpoints
 {
+    public $permissions = ['manage_dt'];
     public $namespace = 'zume_simulator/v1';
     private static $_instance = null;
     public static function instance() {
@@ -24,34 +25,44 @@ class Zume_Simulator_Stats_Endpoints
             $namespace, '/register_user', [
                 'methods'  => [ 'GET', 'POST' ],
                 'callback' => [ $this, 'register_user' ],
-                'permission_callback' => '__return_true'
+                'permission_callback' => function () {
+                    return $this->has_permission();
+                }
             ]
         );
         register_rest_route(
             $namespace, '/log', [
                 'methods'  => [ 'GET', 'POST' ],
                 'callback' => [ $this, 'log' ],
-                'permission_callback' => '__return_true'
+                'permission_callback' => function () {
+                    return $this->has_permission();
+                }
             ]
         );
         register_rest_route(
             $namespace, '/user_progress', [
                 'methods'  => [ 'GET', 'POST' ],
                 'callback' => [ $this, 'user_progress' ],
-                'permission_callback' => '__return_true'
+                'permission_callback' => function () {
+                    return $this->has_permission();
+                }
             ]
         );
-
+        register_rest_route(
+            $namespace, '/reset_tracking', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'reset_tracking' ],
+                'permission_callback' => function () {
+                    return $this->has_permission();
+                }
+            ]
+        );
 
     }
 
 
     public function register_user( WP_REST_Request $request ){
         $params = $request->get_params();
-
-//        if ( ! current_user_can('manage_options' ) ) {
-//            return new WP_Error( 'unauthorized', 'You are not authorized to create users', [ 'status' => 401 ] );
-//        }
 
         if ( isset( $params['email'], $params['name'], $params['username'], $params['password'] ) ){
             $user_roles = [ 'multiplier' ];
@@ -66,7 +77,6 @@ class Zume_Simulator_Stats_Endpoints
             if ( isset( $params['locale'] ) ) {
                 $locale = $params['locale'];
             }
-
 
             $user_object = wp_get_current_user();
             $user_object->add_cap( 'create_users' );
@@ -179,7 +189,20 @@ class Zume_Simulator_Stats_Endpoints
         return $wpdb->get_results( $sql, ARRAY_A );
     }
 
+    public function reset_tracking( WP_REST_Request $request ) {
+        global $wpdb;
+        return $wpdb->delete( 'wp_dt_reports',  [ 'type' => 'zume' ] );
+    }
 
+    public function has_permission(){
+        $pass = false;
+        foreach ( $this->permissions as $permission ){
+            if ( current_user_can( $permission ) ){
+                $pass = true;
+            }
+        }
+        return $pass;
+    }
     public function authorize_url( $authorized ){
         if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
             $authorized = true;
