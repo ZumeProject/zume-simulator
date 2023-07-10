@@ -231,18 +231,36 @@ class Zume_Simulator_Stats_Endpoints
             $results[$index]['timestamp'] = date( 'd-m-Y H:i:s',  $value['timestamp'] );
         }
 
-        // get highest stage
+        $contact_id = Disciple_Tools_Users::get_contact_for_user($user_id);
+        if ( $contact_id ) {
+            $contact = DT_Posts::get_post( 'contacts', (int) $contact_id, false, false, true );
+        }
+
+        // has coach
+        $count = 0;
+        $has_coach = false;
+        $stage = 0;
+        if ( count($results) > 0 ) {
+            $count = count($results);
+            foreach( $results as $index => $value ) {
+                if( $value['value'] > $stage ) {
+                    $stage = $value['value'];
+                }
+                if( $value['subtype'] == 'requested_a_coach' ) {
+                    $has_coach = true;
+                }
+            }
+        }
+
 
         $profile = [
-            'user_id' => [
-                'key' => $user_id,
-                'label' => 'User ID',
-            ],
-            'stage' => [
-                'key' => 0,
-                'label' => 'Stage',
-            ],
-
+            'name' => $contact['name'],
+            'user_id' => $user_id,
+            'stage' => $stage,
+            'has_coach' => $has_coach,
+            'earliest' => $results[0]['timestamp'],
+            'latest' => $results[count($results)-1]['timestamp'],
+            'record_count' => $count,
         ];
 
         return $profile;

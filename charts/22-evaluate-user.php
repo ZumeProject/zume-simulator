@@ -74,12 +74,8 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                             </div>
                         </div>
                         <div class="grid-x grid-padding-x">
-                            <div class="cell medium-6" id="list">
-
-                            </div>
-                            <div class="cell medium-6" id="user_state" style="border-left: 1px solid lightgrey;">
-
-                            </div>
+                            <div class="cell medium-6" id="list"></div>
+                            <div class="cell medium-6" id="user_state" style="border-left: 1px solid lightgrey;"></div>
                         </div>
                     </div>
                     `)
@@ -115,7 +111,7 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                                 <div class="cell medium-1">
                                     <h4>${item.value}</h4>
                                 </div>
-                                <div class="cell medium-3">
+                                <div class="cell medium-4">
                                     <h4>${item.subtype}</h4>
                                 </div>
                                 <div class="cell medium-3">
@@ -132,8 +128,9 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                 function get_user_state(data) {
                     makeRequest('POST', 'user_state', data, window.site_info.rest_root ).done( function( data ) {
                         console.log(data)
+                        jQuery('#user_state').empty()
                         jQuery.each( data, function(i,v) {
-                            jQuery('#user_state').append(`<h2>${v.label}: ${v.key}</h2>`)
+                            jQuery('#user_state').append(`<h2><span style="text-transform:uppercase">${i}</span>: ${v}</h2>`)
                         })
                         jQuery('.loading-spinner').removeClass('active')
                     })
