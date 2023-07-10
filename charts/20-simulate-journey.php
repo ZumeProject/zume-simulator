@@ -52,7 +52,6 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
         </style>
 
         <script>
-            window.site_url = '<?php echo site_url() ?>' + '/wp-json/zume_simulator/v1/'
             window.user_id = '<?php echo get_current_user_id() ?>'
 
             //  0 = Anonymous
@@ -279,9 +278,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                         "key": jQuery(this).data('key'),
                     }
                     jQuery(this).addClass('done')
-                    makePostRequest('POST', 'log', data )
-                        .then((response) => {
-                            console.log(response)
+                    makeRequest('POST', 'log', data, window.site_info.rest_root ).done( function( data ) {
                             jQuery('.loading-spinner').removeClass('active')
                         })
                         .catch((error) => {
@@ -291,9 +288,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                 })
 
                 function get_user_progress( user_id ) {
-                    makePostRequest('POST', 'user_progress', {user_id: user_id} )
-                        .then((response) => {
-                            console.log(response)
+                    makeRequest('POST', 'user_progress', {user_id: user_id} , window.site_info.rest_root ).done( function( response ) {
                             if (response.length == 0) {
                                 jQuery('.loading-spinner').removeClass('active')
                                 jQuery('.button').removeClass('done')
@@ -316,30 +311,6 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     jQuery('.button').removeClass('done')
                     get_user_progress( jQuery(this).val() )
                 })
-
-
-
-                function makePostRequest(type, url, data, base = "zume_simulator/v1/") {
-                    //make sure base has a trailing slash if url does not start with one
-                    if ( !base.endsWith('/') && !url.startsWith('/')){
-                        base += '/'
-                    }
-                    const options = {
-                        type: type,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        url: url.startsWith("http") ? url : `${wpApiShare.root}${base}${url}`,
-                        beforeSend: (xhr) => {
-                            xhr.setRequestHeader("X-WP-Nonce", wpApiShare.nonce);
-                        },
-                    };
-
-                    if (data && !window.lodash.isEmpty(data)) {
-                        options.data = type === "GET" ? data : JSON.stringify(data);
-                    }
-
-                    return jQuery.ajax(options);
-                }
 
                 jQuery("#user_id option:first").attr('selected','selected');
                 get_user_progress( jQuery('#user_id option:first').val() )

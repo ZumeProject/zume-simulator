@@ -57,6 +57,24 @@ class Zume_Simulator_Stats_Endpoints
                 }
             ]
         );
+        register_rest_route(
+            $namespace, '/lookup', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'lookup' ],
+                'permission_callback' => function () {
+                    return $this->has_permission();
+                }
+            ]
+        );
+        register_rest_route(
+            $namespace, '/user_state', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'user_state' ],
+                'permission_callback' => function () {
+                    return $this->has_permission();
+                }
+            ]
+        );
 
     }
 
@@ -178,6 +196,56 @@ class Zume_Simulator_Stats_Endpoints
             'time_end' => $time,
             'hash' => hash('sha256', maybe_serialize($params)  . time() ),
         ] );
+
+    }
+
+    public function lookup( WP_REST_Request $request ) {
+        global $wpdb;
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+
+        $user_id = (int) $params['user_id'];
+        $days_ago = (int) $params['days_ago'];
+
+        $sql = "SELECT * FROM wp_dt_reports WHERE user_id = {$user_id} AND type = 'zume' ORDER BY time_end";
+        $results = $wpdb->get_results( $sql, ARRAY_A );
+
+        foreach( $results as $index => $value ) {
+//            $results[$index]['time_end'] = date( 'Y-m-d H:i:s', $value['time_end'] );
+            $results[$index]['timestamp'] = date( 'd-m-Y H:i:s',  $value['timestamp'] );
+        }
+
+        return $results;
+
+    }
+    public function user_state( WP_REST_Request $request ) {
+        global $wpdb;
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+
+        $user_id = (int) $params['user_id'];
+        $days_ago = (int) $params['days_ago'];
+
+        $sql = "SELECT * FROM wp_dt_reports WHERE user_id = {$user_id} AND type = 'zume' ORDER BY time_end";
+        $results = $wpdb->get_results( $sql, ARRAY_A );
+
+        foreach( $results as $index => $value ) {
+            $results[$index]['timestamp'] = date( 'd-m-Y H:i:s',  $value['timestamp'] );
+        }
+
+        // get highest stage
+
+        $profile = [
+            'user_id' => [
+                'key' => $user_id,
+                'label' => 'User ID',
+            ],
+            'stage' => [
+                'key' => 0,
+                'label' => 'Stage',
+            ],
+
+        ];
+
+        return $profile;
 
     }
 

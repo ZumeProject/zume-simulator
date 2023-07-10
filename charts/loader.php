@@ -30,6 +30,8 @@ class Zume_Simulator_Metrics_Base {
 
             require_once ('20-simulate-journey.php');
 //            require_once ('21-simulate-reports.php');
+            require_once ('22-evaluate-user.php');
+
 
             require_once ('100-reset-tracking.php');
 

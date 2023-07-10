@@ -139,7 +139,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                     }
                     jQuery('.loading-spinner').addClass('active')
 
-                    window.API_post( '/wp-json/zume_simulator/v1/register_user', data, function(data){
+                    makeRequest('POST', 'register_user', data, window.site_info.rest_root ).done( function( data ) {
                         console.log(data)
                         jQuery('#results').empty().html(`SUCCESS<br><br><a href="/contacts/${data.contact_id}" target="_blank">View This User</a>`)
 
