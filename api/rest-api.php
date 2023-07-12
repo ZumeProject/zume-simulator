@@ -13,7 +13,7 @@ class Zume_Simulator_Stats_Endpoints
         return self::$_instance;
     }
     public function __construct() {
-        if ( $this->dt_is_rest() ) {
+        if ( dt_is_rest() ) {
             add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
             add_filter( 'dt_allow_rest_access', [ $this, 'authorize_url' ], 10, 1 );
         }
@@ -26,16 +26,7 @@ class Zume_Simulator_Stats_Endpoints
                 'methods'  => [ 'GET', 'POST' ],
                 'callback' => [ $this, 'register_user' ],
                 'permission_callback' => function () {
-                    return $this->has_permission();
-                }
-            ]
-        );
-        register_rest_route(
-            $namespace, '/log', [
-                'methods'  => [ 'GET', 'POST' ],
-                'callback' => [ $this, 'log' ],
-                'permission_callback' => function () {
-                    return $this->has_permission();
+                    return dt_has_permissions($this->permissions);
                 }
             ]
         );
@@ -44,7 +35,7 @@ class Zume_Simulator_Stats_Endpoints
                 'methods'  => [ 'GET', 'POST' ],
                 'callback' => [ $this, 'user_progress' ],
                 'permission_callback' => function () {
-                    return $this->has_permission();
+                    return dt_has_permissions($this->permissions);
                 }
             ]
         );
@@ -53,31 +44,11 @@ class Zume_Simulator_Stats_Endpoints
                 'methods'  => [ 'GET', 'POST' ],
                 'callback' => [ $this, 'reset_tracking' ],
                 'permission_callback' => function () {
-                    return $this->has_permission();
+                    return dt_has_permissions($this->permissions);
                 }
             ]
         );
-        register_rest_route(
-            $namespace, '/lookup', [
-                'methods'  => [ 'GET', 'POST' ],
-                'callback' => [ $this, 'lookup' ],
-                'permission_callback' => function () {
-                    return $this->has_permission();
-                }
-            ]
-        );
-        register_rest_route(
-            $namespace, '/user_state', [
-                'methods'  => [ 'GET', 'POST' ],
-                'callback' => [ $this, 'user_state' ],
-                'permission_callback' => function () {
-                    return $this->has_permission();
-                }
-            ]
-        );
-
     }
-
 
     public function register_user( WP_REST_Request $request ){
         $params = $request->get_params();
@@ -147,8 +118,8 @@ class Zume_Simulator_Stats_Endpoints
             $contact_location = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
 
             dt_report_insert( [
-                'type' => 'zume',
-                'subtype' => 'registration',
+                'type' => 'zume_system',
+                'subtype' => 'registered',
                 'post_id' => $contact_id,
                 'value' => 0,
                 'grid_id' => $grid_row['grid_id'],
@@ -172,146 +143,24 @@ class Zume_Simulator_Stats_Endpoints
         }
     }
 
-    public function log( WP_REST_Request $request ) {
-        $params = dt_recursive_sanitize_array( $request->get_params() );
-
-        $location = DT_Mapbox_API::forward_lookup( $params['location'] );
-        $geocoder = new Location_Grid_Geocoder();
-        $grid_row = $geocoder->get_grid_id_by_lnglat( $location['features'][0]['center'][0], $location['features'][0]['center'][1] );
-
-        $time = strtotime( 'Today -'.$params['days_ago'].' days' );
-        $contact_id = Disciple_Tools_Users::get_contact_for_user($params['user_id']);
-
-        return dt_report_insert( [
-            'type' => 'zume',
-            'subtype' => $params['key'],
-            'post_id' => $contact_id,
-            'value' => $params['stage'],
-            'grid_id' => $grid_row['grid_id'],
-            'label' => str_replace( ',', ', ', $params['location'] ),
-            'lat' => $grid_row['latitude'],
-            'lng' => $grid_row['longitude'],
-            'level' => 'city',
-            'user_id' => $params['user_id'],
-            'time_end' => $time,
-            'hash' => hash('sha256', maybe_serialize($params)  . time() ),
-        ] );
-
-    }
-
-    public function lookup( WP_REST_Request $request ) {
-        global $wpdb;
-        $params = dt_recursive_sanitize_array( $request->get_params() );
-
-        $user_id = (int) $params['user_id'];
-        $days_ago = (int) $params['days_ago'];
-
-        $sql = "SELECT * FROM wp_dt_reports WHERE user_id = {$user_id} AND type = 'zume' ORDER BY time_end";
-        $results = $wpdb->get_results( $sql, ARRAY_A );
-
-        foreach( $results as $index => $value ) {
-//            $results[$index]['time_end'] = date( 'Y-m-d H:i:s', $value['time_end'] );
-            $results[$index]['timestamp'] = date( 'd-m-Y H:i:s',  $value['timestamp'] );
-        }
-
-        return $results;
-
-    }
-    public function user_state( WP_REST_Request $request ) {
-        global $wpdb;
-        $params = dt_recursive_sanitize_array( $request->get_params() );
-
-        $user_id = (int) $params['user_id'];
-        $days_ago = (int) $params['days_ago'];
-
-        $sql = "SELECT * FROM wp_dt_reports WHERE user_id = {$user_id} AND type = 'zume' ORDER BY time_end";
-        $results = $wpdb->get_results( $sql, ARRAY_A );
-
-        foreach( $results as $index => $value ) {
-            $results[$index]['timestamp'] = date( 'd-m-Y H:i:s',  $value['timestamp'] );
-        }
-
-        $contact_id = Disciple_Tools_Users::get_contact_for_user($user_id);
-        if ( $contact_id ) {
-            $contact = DT_Posts::get_post( 'contacts', (int) $contact_id, false, false, true );
-        }
-
-        // has coach
-        $count = 0;
-        $has_coach = false;
-        $stage = 0;
-        if ( count($results) > 0 ) {
-            $count = count($results);
-            foreach( $results as $index => $value ) {
-                if( $value['value'] > $stage ) {
-                    $stage = $value['value'];
-                }
-                if( $value['subtype'] == 'requested_a_coach' ) {
-                    $has_coach = true;
-                }
-            }
-        }
-
-
-        $profile = [
-            'name' => $contact['name'],
-            'user_id' => $user_id,
-            'stage' => $stage,
-            'has_coach' => $has_coach,
-            'earliest' => $results[0]['timestamp'],
-            'latest' => $results[count($results)-1]['timestamp'],
-            'record_count' => $count,
-        ];
-
-        return $profile;
-
-    }
-
-    public function user_progress( WP_REST_Request $request ) {
-        global $wpdb;
-        $params = dt_recursive_sanitize_array( $request->get_params() );
-        $user_id = (int) $params['user_id'];
-        $sql = "SELECT id, user_id, subtype, REPLACE(label,', ',',') as label FROM wp_dt_reports WHERE user_id = {$user_id} AND type = 'zume' ORDER BY time_end DESC";
-        return $wpdb->get_results( $sql, ARRAY_A );
-    }
-
     public function reset_tracking( WP_REST_Request $request ) {
         global $wpdb;
-        return $wpdb->delete( 'wp_dt_reports',  [ 'type' => 'zume' ] );
+        return $wpdb->query( "DELETE FROM $wpdb->dt_reports WHERE type = 'zume_system' OR type = 'zume_training' OR type = 'zume_coaching';" );
     }
 
-    public function has_permission(){
-        $pass = false;
-        foreach ( $this->permissions as $permission ){
-            if ( current_user_can( $permission ) ){
-                $pass = true;
-            }
-        }
-        return $pass;
-    }
     public function authorize_url( $authorized ){
         if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
             $authorized = true;
         }
         return $authorized;
     }
-    public function dt_is_rest( $namespace = null ) {
-        // https://github.com/DiscipleTools/disciple-tools-theme/blob/a6024383e954cec2ac4e7a1a31fb4601c940f485/dt-core/global-functions.php#L60
-        // Added here so that in non-dt sites there is no dependency.
-        $prefix = rest_get_url_prefix();
-        if ( defined( 'REST_REQUEST' ) && REST_REQUEST
-            || isset( $_GET['rest_route'] )
-            && strpos( trim( sanitize_text_field( wp_unslash( $_GET['rest_route'] ) ), '\\/' ), $prefix, 0 ) === 0 ) {
-            return true;
-        }
-        $rest_url    = wp_parse_url( site_url( $prefix ) );
-        $current_url = wp_parse_url( add_query_arg( array() ) );
-        $is_rest = strpos( $current_url['path'], $rest_url['path'], 0 ) === 0;
-        if ( $namespace ){
-            return $is_rest && strpos( $current_url['path'], $namespace ) != false;
-        } else {
-            return $is_rest;
-        }
+    public function user_progress( WP_REST_Request $request ) {
+        global $wpdb;
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+        $user_id = (int) $params['user_id'];
+        $sql = "SELECT id, user_id, type, subtype, REPLACE(label,', ',',') as label FROM wp_dt_reports WHERE user_id = {$user_id} AND type LIKE 'zume%' ORDER BY time_end DESC";
+        return $wpdb->get_results( $sql, ARRAY_A );
     }
+
 }
 Zume_Simulator_Stats_Endpoints::instance();

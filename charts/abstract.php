@@ -77,6 +77,7 @@ abstract class Zume_Simulator_Chart_Base
                 window.site_info = {
                     'map_key': '<?php echo DT_Mapbox_API::get_key(); ?>',
                     'rest_root': 'zume_simulator/v1/',
+                    'system_root': 'zume_system/v1/',
                     'site_url': '<?php echo site_url(); ?>',
                     'rest_url': '<?php echo esc_url_raw( rest_url() ); ?>',
                     'total_url': '<?php echo esc_url_raw( rest_url() ); ?>zume_simulator/v1/total',

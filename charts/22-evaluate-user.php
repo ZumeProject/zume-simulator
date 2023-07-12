@@ -88,14 +88,17 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                         "days_ago": jQuery('#days_ago').val(),
                     }
                     jQuery(this).addClass('done')
-                    get_user_progress(data)
                     get_user_state(data)
                 })
 
-                function get_user_progress( data ) {
-                    makeRequest('POST', 'lookup', data, window.site_info.rest_root ).done( function( data ) {
+                function get_user_state(data) {
+                    makeRequest('POST', 'user_state', data, window.site_info.system_root ).done( function( data ) {
                         console.log(data)
+
                         jQuery('#list').html( list_template( data ) )
+
+                        jQuery('#user_state').html( state_template( data ) )
+
                         jQuery('.loading-spinner').removeClass('active')
                     })
                         .catch((error) => {
@@ -103,47 +106,43 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                             jQuery('.loading-spinner').removeClass('active')
                         })
                 }
+                function state_template( data ) {
+                    let html = ''
+                    jQuery.each( data.profile, function( i,v ) {
+                        html += `<h4><span style="text-transform:uppercase">${i}</span>: ${v}</h4>`
+                    })
+                    html += `<hr>`
+                    jQuery.each( data.state, function( i,v ) {
+                        html += `<h4><span style="text-transform:uppercase">${i}</span>: ${v}</h4>`
+                    })
+                    html += `<h4><span style="text-transform:uppercase">Activity Count</span>: ${data.activity_count}</h4>`
+                    html += `<hr>`
+                    jQuery.each( data.training_progress, function( i,v ) {
+                        html += `<h4><span style="text-transform:uppercase">${v.title}</span>: ${v.completed}</h4>`
+                    })
+                    return html
+                }
                 function list_template( data ) {
                     let html = ''
-                    data.forEach( function( item ) {
+                    data.activity.forEach( function( item ) {
                         html += `
-                            <div class="grid-x grid-padding-x">
+                            <div class="grid-x grid-padding-x ">
                                 <div class="cell medium-1">
                                     <h4>${item.value}</h4>
                                 </div>
-                                <div class="cell medium-4">
-                                    <h4>${item.subtype}</h4>
+                                <div class="cell medium-6">
+                                    <h4>${item.type} | ${item.subtype}</h4>
                                 </div>
                                 <div class="cell medium-3">
-                                    <h4>${item.label}</h4>
-                                </div>
-                                <div class="cell medium-3">
-                                    <h4>${item.time_end}<br>${item.timestamp}</h4>
+                                    <h4>${item.time_end}</h4>
                                 </div>
                             </div>
                         `
                     })
                     return html
                 }
-                function get_user_state(data) {
-                    makeRequest('POST', 'user_state', data, window.site_info.rest_root ).done( function( data ) {
-                        console.log(data)
-                        jQuery('#user_state').empty()
-                        jQuery.each( data, function(i,v) {
-                            jQuery('#user_state').append(`<h2><span style="text-transform:uppercase">${i}</span>: ${v}</h2>`)
-                        })
-                        jQuery('.loading-spinner').removeClass('active')
-                    })
-                        .catch((error) => {
-                            console.log(error)
-                            jQuery('.loading-spinner').removeClass('active')
-                        })
-                }
-
-
 
                 jQuery("#user_id option:first").attr('selected','selected');
-                // get_user_progress( jQuery('#user_id option:first').val() )
                 jQuery('.loading-spinner').removeClass('active')
             })
         </script>
