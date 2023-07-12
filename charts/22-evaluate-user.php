@@ -117,9 +117,8 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                     })
                     html += `<h4><span style="text-transform:uppercase">Activity Count</span>: ${data.activity_count}</h4>`
                     html += `<hr>`
-                    jQuery.each( data.training_progress, function( i,v ) {
-                        html += `<h4><span style="text-transform:uppercase">${v.title}</span>: ${v.completed}</h4>`
-                    })
+                    html += `<h4><span style="text-transform:uppercase">Suggested Next Steps</span></h4>`
+
                     return html
                 }
                 function list_template( data ) {

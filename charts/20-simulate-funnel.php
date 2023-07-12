@@ -62,7 +62,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                 color: black;
             }
             .button.zume.done {
-                background-color: #39ea29;
+                background-color: #39ea29 !important;
             }
             .button.zume.done:hover {
                 background-color: #25951b;
@@ -92,13 +92,13 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                 jQuery.each( window.training_items, function(i,v){
                     host_buttons_html += `<div class="primary button-group expanded no-gaps"><a class="button zume button-grey clear">${v.title}</a>`
                     jQuery.each(v.host, function(ih, vh ) {
-                        host_buttons_html += `<button class="button zume ${vh.type}${v.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
+                        host_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
                     })
                     host_buttons_html += `</div><br>`
 
                     mawl_buttons_html += `<div class="primary button-group expanded no-gaps"><button class="button zume button-grey clear">${v.title}</button>`
                     jQuery.each(v.mawl, function(ih, vh ) {
-                        mawl_buttons_html += `<button class="button zume ${vh.type}${v.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
+                        mawl_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
                     })
                     mawl_buttons_html += `</div><br>`
                 })
@@ -256,12 +256,13 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     if ( ! type ) {
                         type = 'zume'
                     }
+                    let subtype = button.data('subtype')
                     let data = {
                         "user_id": jQuery('#user_id').val(),
                         "days_ago": jQuery('#days_ago').val(),
                         "location": jQuery('#location').val(),
                         "type": type,
-                        "subtype": button.data('subtype'),
+                        "subtype": subtype,
                         "stage": button.data('stage')
                     }
                     console.log(data)
@@ -274,6 +275,43 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             console.log(error)
                             jQuery('.loading-spinner').removeClass('active')
                         })
+
+                    if ( type === 'zume_coaching' ) {
+
+                        if ( subtype.match(/.launching/) ) {
+
+                            data.subtype = subtype.replace(/.launching/, '_watching')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                            data.subtype = subtype.replace(/.launching/, '_assisting')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                            data.subtype = subtype.replace(/.launching/, '_modeling')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                        }
+                        else if ( subtype.match(/.watching/) ) {
+
+                            data.subtype = subtype.replace(/.watching/, '_assisting')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                            data.subtype = subtype.replace(/.watching/, '_modeling')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+                        }
+                        else if ( subtype.match(/.assisting/) ) {
+
+                            data.subtype = subtype.replace(/.assisting/, '_modeling')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                        }
+
+                    }
                 })
 
                 function get_user_progress( user_id ) {
