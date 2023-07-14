@@ -118,16 +118,17 @@ class Zume_Simulator_Stats_Endpoints
             $contact_location = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
 
             dt_report_insert( [
-                'type' => 'zume_system',
-                'subtype' => 'registered',
-                'post_id' => $contact_id,
-                'value' => 0,
-                'grid_id' => $grid_row['grid_id'],
-                'label' => str_replace( ',', ', ', $params['location'] ),
-                'lat' => $grid_row['latitude'],
-                'lng' => $grid_row['longitude'],
-                'level' => 'city',
                 'user_id' => $user_id,
+                'post_id' => $contact_id,
+                'post_type' => 'zume',
+                'type' => 'system',
+                'subtype' => 'registered',
+                'value' => 0,
+                'lng' => $grid_row['longitude'],
+                'lat' => $grid_row['latitude'],
+                'level' => 'city',
+                'label' => str_replace( ',', ', ', $params['location'] ),
+                'grid_id' => $grid_row['grid_id'],
                 'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
                 'hash' => hash('sha256', maybe_serialize($params)  . time() ),
             ] );

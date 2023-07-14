@@ -90,6 +90,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                 let host_buttons_html = ''
                 let mawl_buttons_html = ''
                 jQuery.each( window.training_items, function(i,v){
+
                     host_buttons_html += `<div class="primary button-group expanded no-gaps"><a class="button zume button-grey clear">${v.title}</a>`
                     jQuery.each(v.host, function(ih, vh ) {
                         host_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
@@ -98,9 +99,10 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
 
                     mawl_buttons_html += `<div class="primary button-group expanded no-gaps"><button class="button zume button-grey clear">${v.title}</button>`
                     jQuery.each(v.mawl, function(ih, vh ) {
-                        mawl_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
+                        mawl_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="">${vh.label}</button>`
                     })
                     mawl_buttons_html += `</div><br>`
+
                 })
 
                 chart.empty().html(`
@@ -121,11 +123,14 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
 
                         <div class="grid-x grid-padding-x">
 
-                            <div class="cell small-7">
+                            <div class="cell small-5">
                                 <h2>KEY FUNNEL STEPS</h2>
                             </div>
-                            <div class="cell small-5 left-border">
+                            <div class="cell small-2 left-border">
                                 <h2>CTAs</h2>
+                            </div>
+                            <div class="cell small-5 left-border">
+                                <h2>COACHING</h2>
                             </div>
                             <div class="cell">
                                 <hr>
@@ -135,12 +140,12 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                              <div class="cell">
                                 <h2>Anonymous (0)</h2>
                             </div>
-                            <div class="cell small-7">
-                                <button class="button zume zume_systemregistered" data-top="zume_system" data-subtype="registered" data-stage="0">Registered</button>
+                            <div class="cell small-5">
+                                <button class="button zume systemregistered" data-top="system" data-subtype="registered" data-stage="0">Registered</button>
                             </div>
-                            <div class="cell small-5 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="0">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemjoined_online_training" data-top="zume_system" data-subtype="joined_online_training" data-stage="0">Joined Online Training</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="0">Coach Request</button><br>
+                                <button class="button zume alt-color systemjoined_online_training" data-top="system" data-subtype="joined_online_training" data-stage="0">Joined Online Training</button>
                             </div>
                              <div class="cell">
                                 <hr>
@@ -149,14 +154,14 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             <div class="cell">
                                 <h2>Registrant (1)</h2>
                             </div>
-                            <div class="cell small-7">
-                               <button class="button zume zume_systemmade_a_plan" data-top="zume_system" data-subtype="made_a_plan" data-stage="1">Made a Plan</button>
+                            <div class="cell small-5">
+                               <button class="button zume systemmade_a_plan" data-top="system" data-subtype="made_a_plan" data-stage="1">Made a Plan</button>
                             </div>
-                            <div class="cell small-5 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="1">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemset_profile" data-top="zume_system" data-subtype="set_profile" data-stage="1">Set Profile</button><br>
-                                <button class="button zume alt-color zume_systeminvited_friends" data-top="zume_system" data-subtype="invited_friends" data-stage="1">Invited Friends</button><br>
-                                <button class="button zume alt-color zume_systemjoined_online_training" data-top="zume_system" data-subtype="joined_online_training" data-stage="1">Joined Online Training</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="1">Coach Request</button><br>
+                                <button class="button zume alt-color systemset_profile" data-top="system" data-subtype="set_profile" data-stage="1">Set Profile</button><br>
+                                <button class="button zume alt-color systeminvited_friends" data-top="system" data-subtype="invited_friends" data-stage="1">Invited Friends</button><br>
+                                <button class="button zume alt-color systemjoined_online_training" data-top="system" data-subtype="joined_online_training" data-stage="1">Joined Online Training</button>
                             </div>
                              <div class="cell">
                                 <hr>
@@ -166,14 +171,19 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             <div class="cell">
                                 <h2>Active Training Trainee (2)</h2>
                             </div>
-                            <div class="cell small-7">
+                            <div class="cell small-5">
+                                <h4>User Self-Evaluation Progress</h4>
                                 ${host_buttons_html}
                             </div>
-                            <div class="cell small-5 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="2">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemset_profile" data-top="zume_system" data-subtype="set_profile" data-stage="2">Set Profile</button><br>
-                                <button class="button zume alt-color zume_systeminvited_friends" data-top="zume_system" data-subtype="invited_friends" data-stage="2">Invited Friends</button><br>
-                                <button class="button zume alt-color zume_systemmade_3_month_plan" data-top="zume_system" data-subtype="made_3_month_plan" data-stage="2">Made 3-Month Plan</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="2">Coach Request</button><br>
+                                <button class="button zume alt-color systemset_profile" data-top="system" data-subtype="set_profile" data-stage="2">Set Profile</button><br>
+                                <button class="button zume alt-color systeminvited_friends" data-top="system" data-subtype="invited_friends" data-stage="2">Invited Friends</button><br>
+                                <button class="button zume alt-color systemmade_3_month_plan" data-top="system" data-subtype="made_3_month_plan" data-stage="2">Made 3-Month Plan</button>
+                            </div>
+                            <div class="cell small-5">
+                                <h4>Coaching MAWL Progress</h4>
+                                 ${mawl_buttons_html}
                             </div>
                              <div class="cell">
                                 <hr>
@@ -183,13 +193,13 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             <div class="cell">
                                 <h2>Post-Training Trainee (3)</h2>
                             </div>
-                            <div class="cell small-7">
-                               <button class="button zume zume_systemmade_first_lifestyle_report" data-top="zume_system" data-subtype="made_first_lifestyle_report" data-stage="3">Made First Lifestyle Report</button>
+                            <div class="cell small-5">
+                               <button class="button zume systemmade_first_lifestyle_report" data-top="system" data-subtype="made_first_lifestyle_report" data-stage="3">Made First Lifestyle Report</button>
                             </div>
-                            <div class="cell small-5 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="3">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemset_profile" data-top="zume_system" data-subtype="set_profile" data-stage="3">Set Profile</button><br>
-                                <button class="button zume alt-color zume_systemcompleted_3_month_plan" data-top="zume_system" data-subtype="completed_3_month_plan" data-stage="3">Completed 3-Month Plan</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="3">Coach Request</button><br>
+                                <button class="button zume alt-color systemset_profile" data-top="system" data-subtype="set_profile" data-stage="3">Set Profile</button><br>
+                                <button class="button zume alt-color systemcompleted_3_month_plan" data-top="system" data-subtype="completed_3_month_plan" data-stage="3">Completed 3-Month Plan</button>
                             </div>
                              <div class="cell">
                                 <hr>
@@ -199,13 +209,13 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             <div class="cell">
                                 <h2>Stage 1 - Partial Practitioner (4)</h2>
                             </div>
-                            <div class="cell small-7">
-                                ${mawl_buttons_html}
+                            <div class="cell small-5">
+                                <button class="button zume systemcompleted_mawl" data-top="system" data-subtype="completed_mawl" data-stage="4">Full MAWL Skills</button>
                             </div>
-                            <div class="cell small-5 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="4">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemsubmitted_church_report" data-top="zume_system" data-subtype="submitted_church_report" data-stage="4">Report Churches</button><br>
-                                <button class="button zume alt-color zume_systemjoined_affinity_hub" data-top="zume_system" data-subtype="joined_affinity_hub" data-stage="4">Join Affinity Hub</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="4">Coach Request</button><br>
+                                <button class="button zume alt-color systemsubmitted_church_report" data-top="system" data-subtype="submitted_progress_report" data-stage="4">Report Churches</button><br>
+                                <button class="button zume alt-color systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-stage="4">Join Affinity Hub</button>
                             </div>
                              <div class="cell">
                                 <hr>
@@ -214,13 +224,13 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             <div class="cell">
                                 <h2>Stage 2 - Completed Practitioner (5)</h2>
                             </div>
-                            <div class="cell small-7">
-                               <button class="button zume seeing_generational_fruit" data-top="zume_system" data-subtype="seeing_generational_friuit" data-stage="5">Seeing Generational Fruit</button>
+                            <div class="cell small-5">
+                               <button class="button zume systemseeing_generational_fruit" data-top="system" data-subtype="seeing_generational_fruit" data-stage="5">Seeing Generational Fruit</button>
                             </div>
-                            <div class="cell small-5 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="5">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemsubmitted_church_report" data-top="zume_system" data-subtype="submitted_church_report" data-stage="5">Report Churches</button><br>
-                                <button class="button zume alt-color zume_systemjoined_affinity_hub" data-top="zume_system" data-subtype="joined_affinity_hub" data-stage="5">Join Affinity Hub</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="5">Coach Request</button><br>
+                                <button class="button zume alt-color systemsubmitted_church_report" data-top="system" data-subtype="submitted_progress_report" data-stage="5">Report Churches</button><br>
+                                <button class="button zume alt-color systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-stage="5">Join Affinity Hub</button>
                             </div>
 
                              <div class="cell">
@@ -233,12 +243,12 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             </div>
                             <div class="cell small-5">
                             </div>
-                            <div class="cell small-7 left-border">
-                                <button class="button zume alt-color zume_systemrequested_a_coach" data-top="zume_system" data-subtype="requested_a_coach" data-stage="6">Coach Request</button><br>
-                                <button class="button zume alt-color zume_systemsubmitted_church_report" data-top="zume_system" data-subtype="submitted_church_report" data-stage="6">Report Churches</button><br>
-                                <button class="button zume alt-color zume_systemcoaching_others" data-top="zume_system" data-subtype="coaching_others" data-stage="6">Coach Others</button><br>
-                                <button class="button zume alt-color zume_systemjoined_affinity_hub" data-top="zume_system" data-subtype="joined_affinity_hub" data-stage="6">Join Affinity Hub</button><br>
-                                <button class="button zume alt-color zume_systemproviding_hub_leadership" data-top="zume_system" data-subtype="providing_hub_leadership" data-stage="6">Provide Hub Leadership</button>
+                            <div class="cell small-2 left-border">
+                                <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="6">Coach Request</button><br>
+                                <button class="button zume alt-color systemsubmitted_church_report" data-top="system" data-subtype="submitted_progress_report" data-stage="6">Report Churches</button><br>
+                                <button class="button zume alt-color systemcoaching_others" data-top="system" data-subtype="coaching_others" data-stage="6">Coach Others</button><br>
+                                <button class="button zume alt-color systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-stage="6">Join Affinity Hub</button><br>
+                                <button class="button zume alt-color systemproviding_hub_leadership" data-top="system" data-subtype="providing_hub_leadership" data-stage="6">Provide Hub Leadership</button>
                             </div>
 
                              <div class="cell">
@@ -249,69 +259,76 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     </div>
                     `)
 
+                makeRequest('POST', 'user_location', data, window.site_info.system_root ).done( function( data ) {
+                    console.log(data)
+                    window.user_location = data
+                    jQuery('.loading-spinner').removeClass('active')
+                })
+
                 jQuery('.button.zume').on('click', function(event) {
                     jQuery('.loading-spinner').addClass('active')
                     let button = jQuery(this)
                     let type = button.data('top')
-                    if ( ! type ) {
-                        type = 'zume'
-                    }
+
                     let subtype = button.data('subtype')
                     let data = {
                         "user_id": jQuery('#user_id').val(),
                         "days_ago": jQuery('#days_ago').val(),
-                        "location": jQuery('#location').val(),
+                        "lng": window.user_location.lng,
+                        "lat": window.user_location.lat,
+                        "level": window.user_location.level,
+                        "label": window.user_location.label,
+                        "grid_id": window.user_location.grid_id,
                         "type": type,
                         "subtype": subtype,
                         "stage": button.data('stage')
                     }
+
                     console.log(data)
                     jQuery(this).addClass('done')
+
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
                             console.log(data)
                             jQuery('.loading-spinner').removeClass('active')
                         })
-                        .catch((error) => {
-                            console.log(error)
-                            jQuery('.loading-spinner').removeClass('active')
-                        })
 
-                    if ( type === 'zume_coaching' ) {
+                    // if ( type === 'zume_coaching' ) {
+                    //
+                    //     if ( subtype.match(/.launching/) ) {
+                    //
+                    //         data.subtype = subtype.replace(/.launching/, '_watching')
+                    //         jQuery('.'+type+data.subtype).addClass('done')
+                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
+                    //
+                    //         data.subtype = subtype.replace(/.launching/, '_assisting')
+                    //         jQuery('.'+type+data.subtype).addClass('done')
+                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
+                    //
+                    //         data.subtype = subtype.replace(/.launching/, '_modeling')
+                    //         jQuery('.'+type+data.subtype).addClass('done')
+                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
+                    //
+                    //     }
+                    //     else if ( subtype.match(/.watching/) ) {
+                    //
+                    //         data.subtype = subtype.replace(/.watching/, '_assisting')
+                    //         jQuery('.'+type+data.subtype).addClass('done')
+                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
+                    //
+                    //         data.subtype = subtype.replace(/.watching/, '_modeling')
+                    //         jQuery('.'+type+data.subtype).addClass('done')
+                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
+                    //     }
+                    //     else if ( subtype.match(/.assisting/) ) {
+                    //
+                    //         data.subtype = subtype.replace(/.assisting/, '_modeling')
+                    //         jQuery('.'+type+data.subtype).addClass('done')
+                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
+                    //
+                    //     }
 
-                        if ( subtype.match(/.launching/) ) {
+                    // }
 
-                            data.subtype = subtype.replace(/.launching/, '_watching')
-                            jQuery('.'+type+data.subtype).addClass('done')
-                            makeRequest('POST', 'log', data, window.site_info.system_root )
-
-                            data.subtype = subtype.replace(/.launching/, '_assisting')
-                            jQuery('.'+type+data.subtype).addClass('done')
-                            makeRequest('POST', 'log', data, window.site_info.system_root )
-
-                            data.subtype = subtype.replace(/.launching/, '_modeling')
-                            jQuery('.'+type+data.subtype).addClass('done')
-                            makeRequest('POST', 'log', data, window.site_info.system_root )
-
-                        }
-                        else if ( subtype.match(/.watching/) ) {
-
-                            data.subtype = subtype.replace(/.watching/, '_assisting')
-                            jQuery('.'+type+data.subtype).addClass('done')
-                            makeRequest('POST', 'log', data, window.site_info.system_root )
-
-                            data.subtype = subtype.replace(/.watching/, '_modeling')
-                            jQuery('.'+type+data.subtype).addClass('done')
-                            makeRequest('POST', 'log', data, window.site_info.system_root )
-                        }
-                        else if ( subtype.match(/.assisting/) ) {
-
-                            data.subtype = subtype.replace(/.assisting/, '_modeling')
-                            jQuery('.'+type+data.subtype).addClass('done')
-                            makeRequest('POST', 'log', data, window.site_info.system_root )
-
-                        }
-
-                    }
                 })
 
                 function get_user_progress( user_id ) {
@@ -340,14 +357,6 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     get_user_progress( jQuery(this).val() )
                 })
 
-                makeRequest('POST', 'user_location', [], window.site_info.system_root ).done( function( data ) {
-                    console.log(data)
-                    jQuery('.loading-spinner').removeClass('active')
-                })
-                .catch((error) => {
-                    console.log(error)
-                    jQuery('.loading-spinner').removeClass('active')
-                })
 
                 jQuery("#user_id option:first").attr('selected','selected');
                 get_user_progress( jQuery('#user_id option:first').val() )
