@@ -97,6 +97,9 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     })
                     host_buttons_html += `</div><br>`
 
+                    if ( v.mawl.length === 0 ) {
+                        return
+                    }
                     mawl_buttons_html += `<div class="primary button-group expanded no-gaps"><button class="button zume button-grey clear">${v.title}</button>`
                     jQuery.each(v.mawl, function(ih, vh ) {
                         mawl_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="">${vh.label}</button>`
@@ -259,7 +262,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     </div>
                     `)
 
-                makeRequest('POST', 'user_location', data, window.site_info.system_root ).done( function( data ) {
+                makeRequest('POST', 'user_location', {}, window.site_info.system_root ).done( function( data ) {
                     console.log(data)
                     window.user_location = data
                     jQuery('.loading-spinner').removeClass('active')
@@ -292,42 +295,42 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             jQuery('.loading-spinner').removeClass('active')
                         })
 
-                    // if ( type === 'zume_coaching' ) {
-                    //
-                    //     if ( subtype.match(/.launching/) ) {
-                    //
-                    //         data.subtype = subtype.replace(/.launching/, '_watching')
-                    //         jQuery('.'+type+data.subtype).addClass('done')
-                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
-                    //
-                    //         data.subtype = subtype.replace(/.launching/, '_assisting')
-                    //         jQuery('.'+type+data.subtype).addClass('done')
-                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
-                    //
-                    //         data.subtype = subtype.replace(/.launching/, '_modeling')
-                    //         jQuery('.'+type+data.subtype).addClass('done')
-                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
-                    //
-                    //     }
-                    //     else if ( subtype.match(/.watching/) ) {
-                    //
-                    //         data.subtype = subtype.replace(/.watching/, '_assisting')
-                    //         jQuery('.'+type+data.subtype).addClass('done')
-                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
-                    //
-                    //         data.subtype = subtype.replace(/.watching/, '_modeling')
-                    //         jQuery('.'+type+data.subtype).addClass('done')
-                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
-                    //     }
-                    //     else if ( subtype.match(/.assisting/) ) {
-                    //
-                    //         data.subtype = subtype.replace(/.assisting/, '_modeling')
-                    //         jQuery('.'+type+data.subtype).addClass('done')
-                    //         makeRequest('POST', 'log', data, window.site_info.system_root )
-                    //
-                    //     }
+                    if ( type === 'zume_coaching' ) {
 
-                    // }
+                        if ( subtype.match(/.launching/) ) {
+
+                            data.subtype = subtype.replace(/.launching/, '_watching')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                            data.subtype = subtype.replace(/.launching/, '_assisting')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                            data.subtype = subtype.replace(/.launching/, '_modeling')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                        }
+                        else if ( subtype.match(/.watching/) ) {
+
+                            data.subtype = subtype.replace(/.watching/, '_assisting')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                            data.subtype = subtype.replace(/.watching/, '_modeling')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+                        }
+                        else if ( subtype.match(/.assisting/) ) {
+
+                            data.subtype = subtype.replace(/.assisting/, '_modeling')
+                            jQuery('.'+type+data.subtype).addClass('done')
+                            makeRequest('POST', 'log', data, window.site_info.system_root )
+
+                        }
+
+                    }
 
                 })
 

@@ -91,26 +91,14 @@ class Zume_Simulator_Stats_Endpoints
 
             $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
 
-            $location = DT_Mapbox_API::forward_lookup( $params['location'] );
-            $location_grid = [
-                'label' => $params['location'],
-                'level' => 'city',
-                'lng' => $location['features'][0]['center'][0],
-                'lat' => $location['features'][0]['center'][1],
-            ];
-            $geocoder = new Location_Grid_Geocoder();
-            $grid_row = $geocoder->get_grid_id_by_lnglat( $location_grid['lng'], $location_grid['lat'] );
-            $location_grid['grid_id'] = $grid_row['grid_id'];
-            $add_location = Location_Grid_Meta::add_user_location_grid_meta( $user_id, $location_grid );
-
             $fields = [
                 'location_grid_meta' => [
                     'values' => [
                         [
-                            'label' => $params['location'],
-                            'level' => 'city',
-                            'lng' => $location['features'][0]['center'][0],
-                            'lat' => $location['features'][0]['center'][1],
+                            'label' => $params['label'],
+                            'level' => $params['level'],
+                            'lng' => $params['lng'],
+                            'lat' => $params['lat'],
                         ]
                     ],
                 ]
@@ -124,11 +112,11 @@ class Zume_Simulator_Stats_Endpoints
                 'type' => 'system',
                 'subtype' => 'registered',
                 'value' => 0,
-                'lng' => $grid_row['longitude'],
-                'lat' => $grid_row['latitude'],
-                'level' => 'city',
-                'label' => str_replace( ',', ', ', $params['location'] ),
-                'grid_id' => $grid_row['grid_id'],
+                'lng' => $params['lng'],
+                'lat' => $params['lat'],
+                'level' => $params['level'],
+                'label' => $params['label'],
+                'grid_id' => $params['grid_id'],
                 'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
                 'hash' => hash('sha256', maybe_serialize($params)  . time() ),
             ] );
@@ -136,7 +124,6 @@ class Zume_Simulator_Stats_Endpoints
             return [
                 'user_id' => $user_id,
                 'contact_id' => $contact_id,
-                'location' => $add_location,
                 'contact_location' => $contact_location,
             ];
         } else {
@@ -144,23 +131,23 @@ class Zume_Simulator_Stats_Endpoints
         }
     }
 
-    public function reset_tracking( WP_REST_Request $request ) {
-        global $wpdb;
-        return $wpdb->query( "DELETE FROM $wpdb->dt_reports WHERE type = 'zume_system' OR type = 'zume_training' OR type = 'zume_coaching';" );
-    }
 
-    public function authorize_url( $authorized ){
-        if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
-            $authorized = true;
-        }
-        return $authorized;
-    }
     public function user_progress( WP_REST_Request $request ) {
         global $wpdb;
         $params = dt_recursive_sanitize_array( $request->get_params() );
         $user_id = (int) $params['user_id'];
         $sql = "SELECT id, user_id, type, subtype, REPLACE(label,', ',',') as label FROM wp_dt_reports WHERE user_id = {$user_id} AND type LIKE 'zume%' ORDER BY time_end DESC";
         return $wpdb->get_results( $sql, ARRAY_A );
+    }
+    public function reset_tracking( WP_REST_Request $request ) {
+        global $wpdb;
+        return $wpdb->query( "DELETE FROM $wpdb->dt_reports WHERE type = 'zume_system' OR type = 'zume_training' OR type = 'zume_coaching';" );
+    }
+    public function authorize_url( $authorized ){
+        if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
+            $authorized = true;
+        }
+        return $authorized;
     }
 
 }

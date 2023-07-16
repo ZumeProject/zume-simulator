@@ -49,7 +49,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                 let chart = jQuery('#chart')
 
                 let dt_language_select = `<?php echo dt_language_select(); ?>`
-                let dt_country_select = `<?php echo zume_location_select_sample(); ?>`
+                let dt_country_select = `<?php echo $this->location_select_sample(); ?>`
                 chart.empty().html(`
                         <div id="zume-simulator-path">
                             <div class="grid-x">
@@ -126,7 +126,8 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                     let username = jQuery('#user-username').val()
                     let password = jQuery('#user-password').val()
                     let locale = jQuery('#user-locale').val()
-                    let location = jQuery('#location').val()
+                    let location = jQuery('#location')
+
                     let days_ago = jQuery('#days_ago').val()
                     let data = {
                         email: email,
@@ -134,7 +135,11 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                         username: username,
                         password: password,
                         locale: locale,
-                        location: location,
+                        lng: location.find(':selected').data('lng'),
+                        lat: location.find(':selected').data('lat'),
+                        level: location.find(':selected').data('level'),
+                        label: location.find(':selected').data('label'),
+                        grid_id: location.find(':selected').data('grid-id'),
                         days_ago: days_ago
                     }
                     jQuery('.loading-spinner').addClass('active')
@@ -172,6 +177,67 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
         </style>
         <?php
     }
+
+    public function location_select_sample() {
+        $list = $this->_dev_location_list();
+        shuffle( $list );
+
+        $html = '<select name="location" id="location" style=" width:200px;">';
+        foreach( $list as $item ){
+            $html .= '<option value="'.$item['grid_id'].'" data-lng="'.$item['lng'].'" data-lat="'.$item['lat'].'" data-level="'.$item['level'].'" data-label="'.$item['label'].'" data-grid-id="'.$item['grid_id'].'">' . $item['label'] . '</option>';
+        }
+        $html .= '</select>';
+        return $html;
+    }
+    public function  _dev_location_list( $grid_id = null ) {
+        $list = array(
+            array('lng' => '-119.699','lat' => '37.0744','level' => 'region','label' => 'California, United States','grid_id' => '100364453'),
+            array('lng' => '-114.757','lat' => '54.6427','level' => 'region','label' => 'Alberta, Canada','grid_id' => '100041940'),
+            array('lng' => '-105.605','lat' => '39.1902','level' => 'region','label' => 'Colorado, United States','grid_id' => '100364539'),
+            array('lng' => '-100','lat' => '31','level' => 'region','label' => 'Texas, United States of America','grid_id' => '100366941'),
+            array('lng' => '-99.1456','lat' => '19.4194','level' => 'region','label' => 'Ciudad de México, México','grid_id' => '100245639'),
+            array('lng' => '-99.1456','lat' => '19.4194','level' => 'region','label' => 'Mexico City, Mexico','grid_id' => '100245639'),
+            array('lng' => '-90.5131','lat' => '14.6414','level' => 'region','label' => 'Guatemala, Guatemala','grid_id' => '100132337'),
+            array('lng' => '-85.9823','lat' => '35.9886','level' => 'region','label' => 'Tennessee, United States','grid_id' => '100366703'),
+            array('lng' => '-79.3897','lat' => '35.5569','level' => 'region','label' => 'North Carolina, United States','grid_id' => '100366162'),
+            array('lng' => '-71.5783','lat' => '43.6899','level' => 'region','label' => 'New Hampshire, United States','grid_id' => '100366017'),
+            array('lng' => '-3.25','lat' => '37.25','level' => 'region','label' => 'Granada, Spain','grid_id' => '100075268'),
+            array('lng' => '7.75','lat' => '10.3333','level' => 'region','label' => 'Kaduna, Nigeria','grid_id' => '100254189'),
+            array('lng' => '16.3731','lat' => '48.2083','level' => 'region','label' => 'Wien, Österreich','grid_id' => '100003596'),
+            array('lng' => '19.0408','lat' => '47.4983','level' => 'region','label' => 'Budapest, Hungary','grid_id' => '100134485'),
+            array('lng' => '32.5764','lat' => '-25.9153','level' => 'region','label' => 'Maputo, Mozambique','grid_id' => '100249267'),
+            array('lng' => '32.5764','lat' => '-25.9153','level' => 'region','label' => 'Maputo, Mozambique','grid_id' => '100249533'),
+            array('lng' => '36.8172','lat' => '-1.28325','level' => 'region','label' => 'Nairobi, Kenya','grid_id' => '100234685'),
+            array('lng' => '42.9545','lat' => '14.7979','level' => 'region','label' => 'Al Hudaydah, Yemen','grid_id' => '100380173'),
+            array('lng' => '44.0167','lat' => '13.5667','level' => 'region','label' => 'Ta\'izz, Yemen','grid_id' => '100380435'),
+            array('lng' => '44.0333','lat' => '36.1833','level' => 'region','label' => 'Erbil Governorate, Iraq','grid_id' => '100222764'),
+            array('lng' => '44.2','lat' => '15.35','level' => 'region','label' => 'Sana\'a, Yemen','grid_id' => '100380228'),
+            array('lng' => '44.2','lat' => '15.35','level' => 'region','label' => 'صنعاء اليمن','grid_id' => '100380228'),
+            array('lng' => '44.2059','lat' => '15.3539','level' => 'region','label' => 'Sana\'a, Yemen','grid_id' => '100380228'),
+            array('lng' => '45.3333','lat' => '14.2667','level' => 'region','label' => 'Al Bayda\', Yemen','grid_id' => '100380143'),
+            array('lng' => '74.3142','lat' => '31.5657','level' => 'region','label' => 'Punjab, Pakistan','grid_id' => '100260114'),
+            array('lng' => '74.5667','lat' => '42.8667','level' => 'region','label' => 'Бишкек, Киргизия','grid_id' => '100235155'),
+            array('lng' => '85.13','lat' => '25.37','level' => 'region','label' => 'Bihar, India','grid_id' => '100219470'),
+            array('lng' => '102.51','lat' => '18.14','level' => 'region','label' => 'Vientiane, Laos','grid_id' => '100238955'),
+            array('lng' => '104.322','lat' => '15.12','level' => 'region','label' => 'Si Sa Ket, Thailand','grid_id' => '100344410'),
+            array('lng' => '112.629','lat' => '31.358','level' => 'region','label' => 'Hubei, People\'s Republic of China','grid_id' => '100052035'),
+            array('lng' => '115.138','lat' => '-8.36917','level' => 'region','label' => 'Bali, Indonesia','grid_id' => '100134675'),
+            array('lng' => '115.138','lat' => '-8.36917','level' => 'region','label' => 'Bali, Indonesia','grid_id' => '100148999'),
+            array('lng' => '121.466','lat' => '25.012','level' => 'region','label' => '台湾新北市','grid_id' => '100352885'),
+            array('lng' => '127','lat' => '37.5833','level' => 'region','label' => '서울특별시, 대한민국','grid_id' => '100238808')
+        );
+
+        if ( $grid_id ) {
+            foreach ( $list as $item ) {
+                if ( $item['grid_id'] == $grid_id ) {
+                    return $item;
+                }
+            }
+        } else {
+            return $list;
+        }
+    }
+
 
 }
 new Zume_Simulator_Path_Goals();
