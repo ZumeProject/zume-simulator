@@ -19,17 +19,19 @@ class Zume_Simulator_Metrics_Base {
 
         $url_path = dt_get_url_path(true);
 
+
+
         // top
-        if ( str_contains( $url_path, $this->base_slug ) !== false ) {
+        if ( str_contains( $url_path, $this->base_slug ) !== false || dt_is_rest() ) {
             add_filter('dt_templates_for_urls', [$this, 'dt_templates_for_urls']);
             add_filter('dt_metrics_menu', [$this, 'dt_metrics_menu'], 99);
 
             require_once ('abstract.php');
-
             require_once ('01-register-user.php');
 
             require_once ('20-simulate-funnel.php');
-            require_once ('22-evaluate-user.php');
+            require_once ('23-simulate-next-step.php');
+            require_once ('25-user-state.php');
 
             require_once ('100-reset-tracking.php');
 

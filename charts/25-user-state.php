@@ -17,7 +17,7 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'evaluate', 'disciple_tools' );
+        $this->base_title = __( 'user state', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
@@ -67,29 +67,32 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                                 <span class="loading-spinner active"></span>
                             </div>
                             <div class="cell medium-3 right">
-                                <h2>Evaluate User</h2>
+                                <h2>User State</h2>
                             </div>
                             <div class="cell">
                                 <hr>
                             </div>
                         </div>
                         <div class="grid-x grid-padding-x">
-                            <div class="cell medium-6" id="list"></div>
-                            <div class="cell medium-6" id="user_state" style="border-left: 1px solid lightgrey;"></div>
+                            <div class="cell medium-6" id="user_state"></div>
+                            <div class="cell medium-6" id="list" style="border-left: 1px solid lightgrey;"></div>
                         </div>
                     </div>
                     `)
 
                 jQuery('.button').on('click', function(event) {
                     event.preventDefault()
+                    load_user()
+                })
+                function load_user() {
                     jQuery('.loading-spinner').addClass('active')
                     let data = {
                         "user_id": jQuery('#user_id').val(),
                         "days_ago": jQuery('#days_ago').val(),
                     }
-                    jQuery(this).addClass('done')
                     get_user_state(data)
-                })
+                }
+                load_user()
 
                 function get_user_state(data) {
                     makeRequest('POST', 'user_state', data, window.site_info.system_root ).done( function( data ) {
@@ -117,7 +120,6 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                     })
                     html += `<h4><span style="text-transform:uppercase">Activity Count</span>: ${data.activity_count}</h4>`
                     html += `<hr>`
-                    html += `<h4><span style="text-transform:uppercase">Suggested Next Steps</span></h4>`
 
                     return html
                 }

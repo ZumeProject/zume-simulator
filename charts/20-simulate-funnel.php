@@ -102,7 +102,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     }
                     mawl_buttons_html += `<div class="primary button-group expanded no-gaps"><button class="button zume button-grey clear">${v.title}</button>`
                     jQuery.each(v.mawl, function(ih, vh ) {
-                        mawl_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="">${vh.label}</button>`
+                        mawl_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
                     })
                     mawl_buttons_html += `</div><br>`
 
@@ -284,7 +284,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                         "grid_id": window.user_location.grid_id,
                         "type": type,
                         "subtype": subtype,
-                        "stage": button.data('stage')
+                        "value": button.data('stage')
                     }
 
                     console.log(data)
@@ -295,7 +295,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                             jQuery('.loading-spinner').removeClass('active')
                         })
 
-                    if ( type === 'zume_coaching' ) {
+                    if ( type === 'coaching' ) {
 
                         if ( subtype.match(/.launching/) ) {
 

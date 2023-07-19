@@ -30,7 +30,6 @@ abstract class Zume_Simulator_Chart_Base
                 add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             }
         }
-
     }
 
     public function base_menu( $content ) {
@@ -333,6 +332,4 @@ abstract class Zume_Simulator_Chart_Base
         </script>
         <?php
     }
-
-
 }
