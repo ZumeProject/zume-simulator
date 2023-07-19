@@ -28,10 +28,10 @@ class Zume_Simulator_Metrics_Base {
 
             require_once ('abstract.php');
             require_once ('01-register-user.php');
+            require_once ('02-user-state.php');
 
             require_once ('20-simulate-funnel.php');
             require_once ('23-simulate-next-step.php');
-            require_once ('25-user-state.php');
 
             require_once ('100-reset-tracking.php');
 

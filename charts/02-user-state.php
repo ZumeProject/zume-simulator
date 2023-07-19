@@ -17,7 +17,7 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'user state', 'disciple_tools' );
+        $this->base_title = __( 'evaluate user state', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {

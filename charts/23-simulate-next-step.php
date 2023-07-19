@@ -17,7 +17,7 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'simulate next steps', 'disciple_tools' );
+        $this->base_title = __( 'simulate encouragement system', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
@@ -51,6 +51,7 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
             }
             .button.zume {
                 border-radius: 0 !important;
+                /*margin-bottom: 0 !important;*/
             }
             .button.zume.button-grey {
                 background-color: lightgrey;
@@ -77,27 +78,25 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                 let chart = jQuery('#chart')
                 window.training_items = [<?php echo json_encode( zume_training_items() ) ?>][0]
                 let host_buttons_html = ''
-                let mawl_buttons_html = ''
-
+                host_buttons_html += `<button class="button zume expanded trainingcompleted" data-top="training" data-subtype="completed" data-set="set4" data-stage="2">Training Completed</button>`
                 jQuery.each( window.training_items, function(i,v){
-
                     host_buttons_html += `<div class="primary button-group expanded no-gaps"><a class="button zume button-grey clear">${v.title}</a>`
                     jQuery.each(v.host, function(ih, vh ) {
                         if ( 'Heard' === vh.label ) {
-                            host_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-stage="2">${vh.label}</button>`
+                            host_buttons_html += `<button class="button zume ${vh.type}${vh.subtype}" data-top="${vh.type}"  data-subtype="${vh.subtype}" data-set="set3" data-stage="2">${vh.label}</button>`
                         }
                     })
-                    host_buttons_html += `</div><br>`
-
+                    host_buttons_html += `</div>`
                 })
+                host_buttons_html += `<button class="button zume expanded trainingcompleted" data-top="training" data-subtype="completed" data-set="set4" data-stage="2">Training Completed</button>`
 
                 chart.empty().html(`
                         <div class="grid-x">
-                            <div class="cell medium-9">
+                            <div class="cell medium-6">
                                 <span class="loading-spinner active"></span>
                             </div>
-                            <div class="cell medium-3 right">
-                                <h2>Simulate Next Steps</h2>
+                            <div class="cell medium-6 right">
+                                <h2>SIMULATE ENCOURAGEMENT SYSTEM</h2>
                             </div>
                             <div class="cell">
                                 <hr>
@@ -105,47 +104,33 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                         </div>
 
                         <div class="grid-x grid-padding-x">
-                            <div class="cell small-6">
-                                <div id="funnel" style="height:980px; padding: 1em; overflow: hidden scroll; border: 1px solid lightgrey;">
+                            <div class="cell small-4">
+                                <div id="funnel" style="height:${window.innerHeight - 225}px; padding: 1em; overflow: hidden scroll; border: 1px solid lightgrey;">
                                     <div class="grid-x grid-padding-x">
 
-                                        <div class="cell small-8">
-                                            <h2>KEY FUNNEL STEPS</h2>
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <h2>CTAs</h2>
+                                        <div class="cell ">
+                                            <h2>FUNNEL STEPS</h2>
                                         </div>
 
                                         <div class="cell">
                                             <hr>
                                         </div>
 
-
                                          <div class="cell">
-                                            <h2>Anonymous (0)</h2>
+                                            <h2>(0) Anonymous</h2>
                                         </div>
-                                        <div class="cell small-8">
-                                            <button class="button zume systemregistered" data-top="system" data-subtype="registered" data-stage="0">Registered</button>
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="0">Coach Request</button><br>
-                                            <button class="button zume alt-color systemjoined_online_training" data-top="system" data-subtype="joined_online_training" data-stage="0">Joined Online Training</button>
+                                        <div class="cell ">
+                                            <button class="button zume  expanded systemregistered" data-top="system" data-subtype="registered" data-set="set2" data-stage="0">Registered</button>
                                         </div>
                                          <div class="cell">
                                             <hr>
                                         </div>
 
                                         <div class="cell">
-                                            <h2>Registrant (1)</h2>
+                                            <h2>(1) Registrant</h2>
                                         </div>
-                                        <div class="cell small-8">
-                                           <button class="button zume systemmade_a_plan" data-top="system" data-subtype="made_a_plan" data-stage="1">Made a Plan</button>
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="1">Coach Request</button><br>
-                                            <button class="button zume alt-color systemset_profile" data-top="system" data-subtype="set_profile" data-stage="1">Set Profile</button><br>
-                                            <button class="button zume alt-color systeminvited_friends" data-top="system" data-subtype="invited_friends" data-stage="1">Invited Friends</button><br>
-                                            <button class="button zume alt-color systemjoined_online_training" data-top="system" data-subtype="joined_online_training" data-stage="1">Joined Online Training</button>
+                                        <div class="cell ">
+                                           <button class="button zume expanded systemmade_a_plan" data-top="system" data-subtype="made_a_plan" data-set="set3" data-stage="1">Made a Plan</button>
                                         </div>
                                          <div class="cell">
                                             <hr>
@@ -153,32 +138,21 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
 
 
                                         <div class="cell">
-                                            <h2>Active Training Trainee (2)</h2>
+                                            <h2>(2) Active Training Trainee</h2>
                                         </div>
-                                        <div class="cell small-8">
+                                        <div class="cell ">
                                             ${host_buttons_html}
                                         </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="2">Coach Request</button><br>
-                                            <button class="button zume alt-color systemset_profile" data-top="system" data-subtype="set_profile" data-stage="2">Set Profile</button><br>
-                                            <button class="button zume alt-color systeminvited_friends" data-top="system" data-subtype="invited_friends" data-stage="2">Invited Friends</button><br>
-                                            <button class="button zume alt-color systemmade_3_month_plan" data-top="system" data-subtype="made_3_month_plan" data-stage="2">Made 3-Month Plan</button>
-                                        </div>
                                         <div class="cell">
                                             <hr>
                                         </div>
 
 
                                         <div class="cell">
-                                            <h2>Post-Training Trainee (3)</h2>
+                                            <h2>(3) Post-Training Trainee</h2>
                                         </div>
-                                        <div class="cell small-8">
-                                           <button class="button zume systemmade_first_lifestyle_report" data-top="system" data-subtype="made_first_lifestyle_report" data-stage="3">Made First Lifestyle Report</button>
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="3">Coach Request</button><br>
-                                            <button class="button zume alt-color systemset_profile" data-top="system" data-subtype="set_profile" data-stage="3">Set Profile</button><br>
-                                            <button class="button zume alt-color systemcompleted_3_month_plan" data-top="system" data-subtype="completed_3_month_plan" data-stage="3">Completed 3-Month Plan</button>
+                                        <div class="cell ">
+                                           <button class="button zume expanded systemmade_first_lifestyle_report" data-top="system" data-subtype="made_first_lifestyle_report" data-set="set1"  data-stage="3">Made First Lifestyle Report</button>
                                         </div>
                                          <div class="cell">
                                             <hr>
@@ -186,30 +160,20 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
 
 
                                         <div class="cell">
-                                            <h2>Stage 1 - Partial Practitioner (4)</h2>
+                                            <h2>(4) Stage 1 - Partial Practitioner</h2>
                                         </div>
-                                        <div class="cell small-8">
-                                            <button class="button zume systemcompleted_mawl" data-top="system" data-subtype="completed_mawl" data-stage="4">Full MAWL Skills</button>
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="4">Coach Request</button><br>
-                                            <button class="button zume alt-color systemsubmitted_church_report" data-top="system" data-subtype="submitted_progress_report" data-stage="4">Report Churches</button><br>
-                                            <button class="button zume alt-color systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-stage="4">Join Affinity Hub</button>
+                                        <div class="cell ">
+                                            <button class="button zume expanded systemcompleted_mawl" data-top="system" data-subtype="completed_mawl" data-set="set1"  data-stage="4">Full MAWL Skills</button>
                                         </div>
                                          <div class="cell">
                                             <hr>
                                         </div>
 
                                         <div class="cell">
-                                            <h2>Stage 2 - Completed Practitioner (5)</h2>
+                                            <h2>(5) Stage 2 - Completed Practitioner</h2>
                                         </div>
-                                        <div class="cell small-8">
-                                           <button class="button zume systemseeing_generational_fruit" data-top="system" data-subtype="seeing_generational_fruit" data-stage="5">Seeing Generational Fruit</button>
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="5">Coach Request</button><br>
-                                            <button class="button zume alt-color systemsubmitted_church_report" data-top="system" data-subtype="submitted_progress_report" data-stage="5">Report Churches</button><br>
-                                            <button class="button zume alt-color systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-stage="5">Join Affinity Hub</button>
+                                        <div class="cell ">
+                                           <button class="button zume expanded systemseeing_generational_fruit" data-top="system" data-subtype="seeing_generational_fruit" data-set="set1"  data-stage="5">Seeing Generational Fruit</button>
                                         </div>
 
                                          <div class="cell">
@@ -218,16 +182,9 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
 
 
                                         <div class="cell">
-                                            <h2>Stage 3 - Multiplying Practitioner (6)</h2>
+                                            <h2>(6) Stage 3 - Multiplying Practitioner</h2>
                                         </div>
-                                        <div class="cell small-8">
-                                        </div>
-                                        <div class="cell small-4 left-border">
-                                            <button class="button zume alt-color systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-stage="6">Coach Request</button><br>
-                                            <button class="button zume alt-color systemsubmitted_church_report" data-top="system" data-subtype="submitted_progress_report" data-stage="6">Report Churches</button><br>
-                                            <button class="button zume alt-color systemcoaching_others" data-top="system" data-subtype="coaching_others" data-stage="6">Coach Others</button><br>
-                                            <button class="button zume alt-color systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-stage="6">Join Affinity Hub</button><br>
-                                            <button class="button zume alt-color systemproviding_hub_leadership" data-top="system" data-subtype="providing_hub_leadership" data-stage="6">Provide Hub Leadership</button>
+                                        <div class="cell ">
                                         </div>
 
                                          <div class="cell">
@@ -237,40 +194,181 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                                     </div>
                                 </div>
                             </div>
-                            <div class="cell small-6">
-                                <h2>Encouragement Action</h2>
+                            <div class="cell small-4">
+                                <div style=" padding: 1em; height:${window.innerHeight - 225}px; border: 1px solid lightgrey; overflow: hidden scroll;">
+                                    <div class="grid-x grid-padding-x">
+
+                                            <div class="cell ">
+                                                <h2>CTAS</h2>
+                                            </div>
+
+                                            <div class="cell">
+                                                <hr>
+                                            </div>
+
+                                            <div class="cell">
+                                                <h2>Training</h2>
+                                            </div>
+                                            <div class="cell small-5">
+                                            </div>
+                                            <div class="cell">
+                                                <button class="button zume alt-color expanded systemrequested_a_coach" data-top="system" data-subtype="requested_a_coach" data-set="set5"  data-stage="0">Requested a Coach</button>
+                                                <button class="button zume alt-color expanded systemjoined_online_training" data-top="system" data-subtype="joined_online_training" data-set="set1"  data-stage="0">Joined Online Training</button>
+                                                <button class="button zume alt-color expanded systemset_profile" data-top="system" data-subtype="set_profile" data-set="set5"  data-stage="1">Set Profile</button>
+                                                <button class="button zume alt-color expanded systeminvited_friends" data-top="system" data-subtype="invited_friends" data-set="set5"  data-stage="1">Invited Friends</button>
+                                                <button class="button zume alt-color expanded systemmade_3_month_plan" data-top="system" data-subtype="made_3_month_plan" data-set="set5"  data-stage="2">Made 3-Month Plan</button>
+                                            </div>
+
+                                            <div class="cell">
+                                                <h2>Practice</h2>
+                                            </div>
+                                            <div class="cell small-5">
+                                            </div>
+                                            <div class="cell">
+                                                <button class="button zume alt-color expanded systemcompleted_3_month_plan" data-top="system" data-subtype="completed_3_month_plan" data-set="set1"  data-stage="3">Complete 3-Month Plan</button>
+                                                <button class="button zume alt-color expanded systemsubmitted_progress_report" data-top="system" data-subtype="submitted_progress_report" data-set="set1"  data-stage="4">Report Churches</button>
+                                                <button class="button zume alt-color expanded systemjoined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-set="set1"  data-stage="4">Join Affinity Hub</button>
+                                                <button class="button zume alt-color expanded systemcoaching_others" data-top="system" data-subtype="coaching_others" data-set="set1"  data-stage="6">Coach Others</button>
+                                                <button class="button zume alt-color expanded systemproviding_hub_leadership" data-top="system" data-subtype="providing_hub_leadership" data-set="set1"  data-stage="6">Provide Hub Leadership</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="cell small-4">
                                 <div id="report"></div>
                             </div>
                         </div>
                     </div>
                     `)
 
+                window.sets = {
+                    'set1': {
+                        'cta': [ '{{Not Configured}}' ],
+                        'time': [ '{{Not Configured}}' ],
+                        'reset': [ '{{Not Configured}}' ],
+                    },
+                    'set2': {
+                        'cta': [
+                            'Make a Plan',
+                            'Request Coach',
+                            'Join Online Training'
+                        ],
+                        'time': [
+                            '1 day after event',
+                            '2 days after event',
+                            '3 days after event',
+                            '4 days after event',
+                            '5 days after event',
+                            '6 days after event',
+                            '7 days after event',
+                            '2 weeks after event',
+                            '3 weeks after event',
+                            '4 weeks after event',
+                            '2 months after event',
+                            '3 months after event'
+                        ],
+                        'reset': [
+                            'Plan created'
+                        ],
+                    },
+                    'set3': {
+                        'cta': [
+                            'Request Coach',
+                            'Set Profile',
+                            'Invite Friends'
+                        ],
+                        'time': [
+                            '1 day before planned training',
+                            '1 days after planned training',
+                            '2 weeks after event with no checkin',
+                            '3 weeks after event with no checkin',
+                            '4 weeks after event with no checkin',
+                            '5 weeks after event with no checkin',
+                            '6 weeks after event with no checkin',
+                        ],
+                        'reset': [
+                            'Training checkins'
+                        ],
+                    },
+                    'set4': {
+                        'cta': [
+                            'Request Coach',
+                            'Set Profile',
+                            'Completed 3-Month Plan',
+                            'Report as Practitioner'
+                        ],
+                        'time': [
+                            '1 week after completed training',
+                            '2 weeks after completed training',
+                            '3 weeks after completed training',
+                            '4 weeks after completed training',
+                            '5 weeks after completed training',
+                            '6 weeks after completed training',
+                            '7 weeks after completed training',
+                            '8 weeks after completed training',
+                            '9 weeks after completed training',
+                            '10 weeks after completed training',
+                            '11 weeks after completed training',
+                            '12 weeks after completed training',
+                        ],
+                        'reset': [
+                            'Completed 3-Month Plan',
+                            'Makes first practitioner report',
+
+                        ],
+                    },
+                    'set5': {
+                        'cta': [
+                            'Set Profile',
+                        ],
+                        'time': [
+                            'Immediately after event, coach notification',
+                            'Immediately after event, challenge to set profile',
+                            '1 day after request ??',
+                            '2 day after request ?? ',
+                            '3 day after request ??',
+                        ],
+                        'reset': [
+                            'Coach establishes communication'
+                        ],
+                    },
+                }
+
 
                 jQuery('.button.zume').on('click', function(event) {
                     jQuery('.loading-spinner').addClass('active')
                     let button = jQuery(this)
+                    button.addClass('done')
                     let type = button.data('top')
-
                     let subtype = button.data('subtype')
+                    let set = button.data('set')
 
+                    jQuery('#report').html( `
+                            <h2>LAST ACTION</h2>${type} | <strong>${subtype}</strong>
+                            <hr>
+                            <h2>NEXT ENCOURAGEMENT SYSTEM ACTION</h2><br>
+                            <div id="ctas-list" class="grid-x"></div><br>
+                            <div id="time-list" class="grid-x"></div><br>
+                            <div id="reset-list" class="grid-x"></div><hr>
+                    `)
 
-                    jQuery('#report').html(  'Current Stage: ' + button.data('stage') + '<br>Last Action: ' + type + ' | ' + subtype + '<hr><div id="ctas" class="grid-x"></div><hr><div id="date-list" class="grid-x"></div>' )
-
-                    // Priority CTAs
-                    let ctas = ['Get a Coach', 'Complete Profile', 'Invite Friends', 'Make a Plan']
-                    let ctaList = '<div class="cell"><h4>PRIORITY SITE CTAs</h4></div>'
-                    jQuery.each(ctas, function(ih, vh ) {
-                        ctaList += `<div class="cell small-6">${vh}</div><div class="cell small-6">Priority CTA</div>`
+                    let ctaList = '<div class="cell"><h4>PRIORITY CTAs IN SITE</h4></div>'
+                    jQuery.each(window.sets[set].cta, function(ih, vh ) {
+                        ctaList += `<div class="cell small-8">${vh}</div><div class="cell small-4"></div>`
                     })
-                    jQuery('#ctas').append(ctaList)
+                    jQuery('#ctas-list').append(ctaList)
 
-                    // Email Schedule
-                    let time = ['1 Day', '2 Days', '3 Days', '4 Days', '5 Days', '6 Days', '7 Days', '2 Weeks', '3 Weeks', '4 Weeks', '2 Months', '3 Months']
-                    let list = '<div class="cell"><h4>EMAIL SCHEDULE</h4></div>'
-                    jQuery.each(time, function(ih, vh ) {
-                        list += `<div class="cell small-6">${vh}</div><div class="cell small-6"> Action to be taken</div>`
+                    let emailList = '<div class="cell"><h4>EMAIL TIMELINE</h4></div>'
+                    jQuery.each(window.sets[set].time, function(ih, vh ) {
+                        emailList += `<div class="cell small-8">${vh}</div><div class="cell small-4"></div>`
                     })
-                    jQuery('#date-list').append(list)
+                    jQuery('#time-list').append(emailList)
+
+                    let resetdList = '<div class="cell"><h4>RESET TIMELINE ACTION</h4></div>'
+                    jQuery.each(window.sets[set].reset, function(ih, vh ) {
+                        resetdList += `<div class="cell small-8">${vh}</div><div class="cell small-4"></div>`
+                    })
+                    jQuery('#reset-list').append(resetdList)
 
                     jQuery('.loading-spinner').removeClass('active')
                 })
