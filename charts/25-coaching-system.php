@@ -1,10 +1,10 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
+class Zume_Simulator_Coaching_System extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
-    public $base_slug = 'simulate_funnel'; // lowercase
+    public $base_slug = 'simulate_coaching'; // lowercase
     public $slug = '';
     public $title;
     public $base_title;
@@ -17,7 +17,7 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'simulate funnel', 'disciple_tools' );
+        $this->base_title = __( 'simulate coaching', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
@@ -291,9 +291,9 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
                     jQuery(this).addClass('done')
 
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
-                            console.log(data)
-                            jQuery('.loading-spinner').removeClass('active')
-                        })
+                        console.log(data)
+                        jQuery('.loading-spinner').removeClass('active')
+                    })
 
                     if ( type === 'coaching' ) {
 
@@ -336,18 +336,18 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
 
                 function get_user_progress( user_id ) {
                     makeRequest('POST', 'user_progress', {user_id: user_id} , window.site_info.rest_root ).done( function( response ) {
-                            console.log(response)
-                            if (response.length == 0) {
-                                    jQuery('.loading-spinner').removeClass('active')
-                                    jQuery('.button').removeClass('done')
-                                    return
-                            }
-                            jQuery.each(response, function(index, value) {
-                                jQuery('.'+value.type+value.subtype).addClass('done')
-                            })
-                            jQuery('#location').val(response[0].label)
+                        console.log(response)
+                        if (response.length == 0) {
                             jQuery('.loading-spinner').removeClass('active')
+                            jQuery('.button').removeClass('done')
+                            return
+                        }
+                        jQuery.each(response, function(index, value) {
+                            jQuery('.'+value.type+value.subtype).addClass('done')
                         })
+                        jQuery('#location').val(response[0].label)
+                        jQuery('.loading-spinner').removeClass('active')
+                    })
                         .catch((error) => {
                             console.log(error)
                             jQuery('.loading-spinner').removeClass('active')
@@ -369,4 +369,4 @@ class Zume_Simulator_Test_Journey extends Zume_Simulator_Chart_Base
         <?php
     }
 }
-new Zume_Simulator_Test_Journey();
+new Zume_Simulator_Coaching_System();

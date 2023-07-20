@@ -49,6 +49,7 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
             #location {
                 display:none;
             }
+
         </style>
 
         <script>
@@ -73,6 +74,56 @@ class Zume_Simulator_Evaluate extends Zume_Simulator_Chart_Base
                                 <hr>
                             </div>
                         </div>
+<!--                        <div class="grid-x grid-padding-x">-->
+<!--                            <div class="cell medium-4">-->
+<!--                                <div class="z-card">-->
+<!--                                   <div class="z-card-single">-->
+<!--                                        <div class="z-card-title">-->
+<!--                                            STAGE-->
+<!--                                        </div>-->
+<!--                                        <div class="z-card-value">-->
+<!--                                            Registered-->
+<!--                                        </div>-->
+<!--                                        <div class="z-card-description">-->
+<!--                                            Current stage the user is at in the funnel-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="cell medium-4">-->
+<!--                                <div class="z-card">-->
+<!--                                   <div class="z-card-single">-->
+<!--                                        <div class="z-card-title">-->
+<!--                                            PRIMARY NEXT STEP-->
+<!--                                        </div>-->
+<!--                                        <div class="z-card-value">-->
+<!--                                            Make a Plan-->
+<!--                                        </div>-->
+<!--                                        <div class="z-card-description">-->
+<!--                                            Next key step to take to make progress in the funnel-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="cell medium-4">-->
+<!--                                <div class="z-card">-->
+<!--                                   <div class="z-card-single">-->
+<!--                                        <div class="z-card-title">-->
+<!--                                            SECONDARY ACTION-->
+<!--                                        </div>-->
+<!--                                        <div class="z-card-value">-->
+<!--                                           Get a Coach-->
+<!--                                        </div>-->
+<!--                                        <div class="z-card-description">-->
+<!--                                            An alternate action to offer if the primary next step is not taken.-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="cell">-->
+<!--                                <hr>-->
+<!--                            </div>-->
+<!--                        </div>-->
                         <div class="grid-x grid-padding-x">
                             <div class="cell medium-6" id="user_state"></div>
                             <div class="cell medium-6" id="list" style="border-left: 1px solid lightgrey;"></div>

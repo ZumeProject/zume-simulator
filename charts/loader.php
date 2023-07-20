@@ -33,6 +33,8 @@ class Zume_Simulator_Metrics_Base {
             require_once ('20-simulate-funnel.php');
             require_once ('23-simulate-next-step.php');
 
+            require_once ('25-coaching-system.php');
+
             require_once ('100-reset-tracking.php');
 
         }

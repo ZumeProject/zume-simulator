@@ -78,7 +78,6 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                 let chart = jQuery('#chart')
                 window.training_items = [<?php echo json_encode( zume_training_items() ) ?>][0]
                 let host_buttons_html = ''
-                host_buttons_html += `<button class="button zume expanded trainingcompleted" data-top="training" data-subtype="completed" data-set="set4" data-stage="2">Training Completed</button>`
                 jQuery.each( window.training_items, function(i,v){
                     host_buttons_html += `<div class="primary button-group expanded no-gaps"><a class="button zume button-grey clear">${v.title}</a>`
                     jQuery.each(v.host, function(ih, vh ) {
@@ -88,7 +87,6 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                     })
                     host_buttons_html += `</div>`
                 })
-                host_buttons_html += `<button class="button zume expanded trainingcompleted" data-top="training" data-subtype="completed" data-set="set4" data-stage="2">Training Completed</button>`
 
                 chart.empty().html(`
                         <div class="grid-x">
@@ -141,7 +139,7 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                                             <h2>(2) Active Training Trainee</h2>
                                         </div>
                                         <div class="cell ">
-                                            ${host_buttons_html}
+                                            <button class="button zume expanded trainingcompleted" data-top="training" data-subtype="completed" data-set="set4" data-stage="2">Training Completed</button>
                                         </div>
                                         <div class="cell">
                                             <hr>
@@ -207,7 +205,7 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                                             </div>
 
                                             <div class="cell">
-                                                <h2>Training</h2>
+                                                <h2>Trainee</h2>
                                             </div>
                                             <div class="cell small-5">
                                             </div>
@@ -220,7 +218,16 @@ class Zume_Simulator_Next_Step extends Zume_Simulator_Chart_Base
                                             </div>
 
                                             <div class="cell">
-                                                <h2>Practice</h2>
+                                                <h2>Training Elements</h2>
+                                            </div>
+                                            <div class="cell small-5">
+                                            </div>
+                                            <div class="cell">
+                                                ${host_buttons_html}
+                                            </div>
+
+                                            <div class="cell">
+                                                <h2>Practitioner</h2>
                                             </div>
                                             <div class="cell small-5">
                                             </div>

@@ -152,6 +152,9 @@ function zume_simulator_selectors() {
     }
     $html .= '</select>';
 
+    return $html;
+}
+function zume_time_selector() {
     $html .= '<select id="days_ago" style=" width:150px;">
                 <option value="0">today</option>
                 <option value="3">3 Days Ago</option>
