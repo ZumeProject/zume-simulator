@@ -54,12 +54,12 @@ class Zume_System_Encouragement_API
         $list = [
             '' => [
                 'cta' => [ '[[Not Configured}}' ],
-                'time' => [ '[[Not Configured}}' ],
+                'plan' => [ '[[Not Configured}}' ],
                 'reset' => [ '[[Not Configured}}' ],
             ],
             'set1' => [
                 'cta' => [ '[[Not Configured}}' ],
-                'time' => [ '[[Not Configured}}' ],
+                'plan' => [ '[[Not Configured}}' ],
                  'reset' => [ '[[Not Configured}}' ],
              ],
              'set2' => [
@@ -68,7 +68,7 @@ class Zume_System_Encouragement_API
                     'Request Coach',
                     'Join Online Training'
                 ],
-                'time' => [
+                'plan' => [
                     '1 day after event',
                     '2 days after event',
                     '3 days after event',
@@ -92,7 +92,7 @@ class Zume_System_Encouragement_API
                     'Set Profile',
                     'Invite Friends'
                 ],
-                'time' => [
+                'plan' => [
                     '1 day before planned training',
                     '1 days after planned training',
                     '2 weeks after event with no checkin',
@@ -112,7 +112,7 @@ class Zume_System_Encouragement_API
                     'Completed 3-Month Plan',
                     'Report as Practitioner'
                 ],
-                'time' => [
+                'plan' => [
                     '1 week after completed training',
                     '2 weeks after completed training',
                     '3 weeks after completed training',
@@ -135,7 +135,7 @@ class Zume_System_Encouragement_API
                 'cta' => [
                     'Set Profile',
                 ],
-                'time' => [
+                'plan' => [
                     'Immediately after event, coach notification',
                     'Immediately after event, challenge to set profile',
                     '1 day after request ??',
@@ -150,7 +150,7 @@ class Zume_System_Encouragement_API
 
        return [
            'cta' => [ '[[Not Configured}}' ],
-           'time' => [ '[[Not Configured}}' ],
+           'plan' => [ '[[Not Configured}}' ],
            'reset' => [ '[[Not Configured}}' ],
        ];
     }

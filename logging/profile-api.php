@@ -1,7 +1,7 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_System_State_API
+class Zume_System_Profile_API
 {
     public $namespace = 'zume_system/v1';
     private static $_instance = null;
@@ -30,7 +30,7 @@ class Zume_System_State_API
     public function add_api_routes()
     {
         register_rest_route(
-            $this->namespace, '/user_state', [
+            $this->namespace, '/user_profile', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'request_sorter'],
                 'permission_callback' => '__return_true'
@@ -49,29 +49,32 @@ class Zume_System_State_API
     }
     public function user( $params) {
         global $wpdb;
+        if ( ! isset( $params['days_ago'] ) ) {
+            $params['days_ago'] = 0;
+        }
 
         // setup vars
         $user_id = (int) $params['user_id'];
-        $days_ago = (int) $params['days_ago'];
+        $location = $this->_get_location( $params );
+        $days_ago = (int) $params['days_ago'] ?? 0;
         $days_ago_timestamp = time();
         if ( $days_ago > 0 ) {
             $days_ago_timestamp = strtotime( 'Today -'.$days_ago.' days' );
         }
-        $count = 0;
         $has_coach = false;
         $has_set_profile = false;
         $has_invited_friends = false;
         $has_a_plan = false;
         $stage = 0;
-        $training_items = zume_training_items();
-        $training_completed = 0;
+        $completions = [];
 
         // query
-        $sql = "SELECT * FROM wp_dt_reports
-                WHERE user_id = {$user_id}
-                AND post_type = 'zume'
-                AND time_end <= {$days_ago_timestamp}
-                ORDER BY time_end";
+        $sql = "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
+                FROM wp_dt_reports r
+                WHERE r.user_id = {$user_id}
+                AND r.post_type = 'zume'
+                AND r.time_end <= {$days_ago_timestamp}
+                ORDER BY r.time_end";
         $results = $wpdb->get_results( $sql, ARRAY_A );
 
         // get contact
@@ -82,7 +85,6 @@ class Zume_System_State_API
 
         // modify results
         if ( count($results) > 0 ) {
-            $count = count($results);
             foreach( $results as $index => $value ) {
                 if( $value['value'] > $stage ) {
                     $stage = $value['value'];
@@ -106,11 +108,14 @@ class Zume_System_State_API
                 if( $value['subtype'] == 'plan_created' ) {
                     $has_a_plan = true;
                 }
+
+                $completions[$value['log_key']] = true ;
             }
         }
 
-        // build profile
-        $profile = [
+
+
+        return [
             'profile' => [
                 'name' => $contact['name'],
                 'user_id' => $user_id,
@@ -118,7 +123,7 @@ class Zume_System_State_API
                 'first_event' => $results[0]['timestamp'],
                 'last_event' => $results[count($results)-1]['timestamp'],
                 'language' => 'en',
-                'location' => $results[count($results)-1]['label'],
+                'location' => $location,
             ],
             'state' => [
                 'stage' => $stage,
@@ -126,18 +131,92 @@ class Zume_System_State_API
                 'has_set_profile' => $has_set_profile,
                 'has_invited_friends' => $has_invited_friends,
                 'has_a_plan' => $has_a_plan,
+                'has_3_month_plan' => false,
+                'has_affinity_hub' => false,
             ],
-            'training_completed' => $training_completed,
-            'training_progress' => $training_items,
-            'activity' => $results,
-            'activity_count' => $count,
+            'encouragements' => [
+                [
+                    'label' => 'Register',
+                    'key' => 'registered',
+                    'link' => '/set-profile',
+                ],
+                [
+                    'label' => 'Get a Coach',
+                    'key' => 'requested_a_coach',
+                    'link' => '/invite-friends',
+                ],
+                [
+                    'label' => 'Join Online Training',
+                    'key' => 'joined_online_training',
+                    'link' => '/create-plan',
+                ],
+
+            ],
+            'completions' => $completions
         ];
 
         return $profile;
     }
     public function guest( $params ) {
 
-        return [];
+        $location = $this->_get_location( $params );
+
+        return [
+            'profile' => [
+                'name' => 'Guest',
+                'user_id' => 0,
+                'contact_id' => 0,
+                'language' => 'en',
+                'location' => $location,
+            ],
+            'state' => [
+                'stage' => 0,
+                'has_coach' => false,
+                'has_set_profile' => false,
+                'has_invited_friends' => false,
+                'has_a_plan' => false,
+                'has_3_month_plan' => false,
+                'has_affinity_hub' => false,
+            ],
+            'encouragements' => [
+                [
+                    'label' => 'Set Profile',
+                    'key' => 'set_profile',
+                    'link' => '/set-profile',
+                ],
+                [
+                    'label' => 'Invite Friends',
+                    'key' => 'invited_friends',
+                    'link' => '/invite-friends',
+                ],
+                [
+                    'label' => 'Create Plan',
+                    'key' => 'plan_created',
+                    'link' => '/create-plan',
+                ],
+                [
+                    'label' => 'Start Training',
+                    'key' => 'start_training',
+                    'link' => '/start-training',
+                ],
+            ],
+            'completions' => []
+        ];
+    }
+    public function _get_location( $params ) {
+        if ( empty( $params['location'] ?? null ) ) {
+            // @todo replace with location lookup system
+            $location = [
+                'lng' => -119.699,
+                'lat' => 37.0744,
+                'level' => 'region',
+                'label' => 'California, United States',
+                'grid_id' => 100364453
+            ];
+        } else {
+            $location = $params['location'];
+        }
+        return $location;
     }
 }
-Zume_System_State_API::instance();
+Zume_System_Profile_API::instance();

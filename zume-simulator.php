@@ -86,18 +86,14 @@ class Zume_Simulator {
         return self::$_instance;
     }
     private function __construct() {
-        if ( ! current_user_can( 'manage_options' ) ) {
-            return;
-        }
-        $is_rest = dt_is_rest();
+        require_once( 'logging/loader.php' );
 
-        if ( $is_rest ) {
+        if ( dt_is_rest() ) {
             require_once ('api/queries.php');
             require_once( 'api/rest-api.php' );
         }
 
         require_once( 'charts/loader.php' );
-        require_once( 'logging/loader.php' );
 
         $this->i18n();
 
@@ -153,7 +149,7 @@ function zume_simulator_selectors() {
     return $html;
 }
 function zume_time_selector() {
-    $html .= '<select id="days_ago" style=" width:150px;">
+    $html = '<select id="days_ago" style=" width:150px;">
                 <option value="0">today</option>
                 <option value="3">3 Days Ago</option>
                 <option value="7">7 Days Ago</option>
