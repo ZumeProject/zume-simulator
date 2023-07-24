@@ -86,12 +86,9 @@ class Zume_Simulator {
         return self::$_instance;
     }
     private function __construct() {
-        if ( ! current_user_can( 'manage_options' ) ) {
-            return;
-        }
-        $is_rest = dt_is_rest();
+        require_once( 'logging/loader.php' );
 
-        if ( $is_rest ) {
+        if ( dt_is_rest() ) {
             require_once ('api/queries.php');
             require_once( 'api/rest-api.php' );
         }
@@ -107,11 +104,8 @@ class Zume_Simulator {
     public function plugin_description_links( $links_array, $plugin_file_name, $plugin_data, $status ) {
         if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
             // You can still use `array_unshift()` to add links at the beginning.
-
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
-
         }
-
         return $links_array;
     }
     public function i18n() {
@@ -152,7 +146,10 @@ function zume_simulator_selectors() {
     }
     $html .= '</select>';
 
-    $html .= '<select id="days_ago" style=" width:150px;">
+    return $html;
+}
+function zume_time_selector() {
+    $html = '<select id="days_ago" style=" width:150px;">
                 <option value="0">today</option>
                 <option value="3">3 Days Ago</option>
                 <option value="7">7 Days Ago</option>
