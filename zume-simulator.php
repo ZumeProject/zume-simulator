@@ -97,6 +97,7 @@ class Zume_Simulator {
         }
 
         require_once( 'charts/loader.php' );
+        require_once( 'logging/loader.php' );
 
         $this->i18n();
 
@@ -107,11 +108,8 @@ class Zume_Simulator {
     public function plugin_description_links( $links_array, $plugin_file_name, $plugin_data, $status ) {
         if ( strpos( $plugin_file_name, basename( __FILE__ ) ) ) {
             // You can still use `array_unshift()` to add links at the beginning.
-
             $links_array[] = '<a href="https://disciple.tools">Disciple.Tools Community</a>';
-
         }
-
         return $links_array;
     }
     public function i18n() {
