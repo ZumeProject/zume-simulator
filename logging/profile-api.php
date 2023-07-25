@@ -48,118 +48,23 @@ class Zume_System_Profile_API
 
     }
     public function user( $params) {
-        global $wpdb;
-        if ( ! isset( $params['days_ago'] ) ) {
-            $params['days_ago'] = 0;
-        }
+        $user_id = (int) $params['user_id'] ?? get_current_user_id();
+        $location = $params['location'] ?? self::_get_location( $user_id );
 
-        // setup vars
-        $user_id = (int) $params['user_id'];
-        $location = $this->_get_location( $params );
-        $days_ago = (int) $params['days_ago'] ?? 0;
-        $days_ago_timestamp = time();
-        if ( $days_ago > 0 ) {
-            $days_ago_timestamp = strtotime( 'Today -'.$days_ago.' days' );
-        }
-        $has_coach = false;
-        $has_set_profile = false;
-        $has_invited_friends = false;
-        $has_a_plan = false;
-        $stage = 0;
-        $completions = [];
-
-        // query
-        $sql = "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
-                FROM wp_dt_reports r
-                WHERE r.user_id = {$user_id}
-                AND r.post_type = 'zume'
-                AND r.time_end <= {$days_ago_timestamp}
-                ORDER BY r.time_end";
-        $results = $wpdb->get_results( $sql, ARRAY_A );
-
-        // get contact
-        $contact_id = Disciple_Tools_Users::get_contact_for_user($user_id);
-        if ( $contact_id ) {
-            $contact = DT_Posts::get_post( 'contacts', (int) $contact_id, false, false, true );
-        }
-
-        // modify results
-        if ( count($results) > 0 ) {
-            foreach( $results as $index => $value ) {
-                if( $value['value'] > $stage ) {
-                    $stage = $value['value'];
-                }
-                if( $value['subtype'] == 'requested_a_coach' ) {
-                    $has_coach = true;
-                }
-                $results[$index]['timestamp'] = date( 'd-m-Y H:i:s',  $value['timestamp'] );
-                $results[$index]['time_end'] = date( 'D j, M Y',  $value['time_end'] );
-
-                if ( isset( $training_items[$value['subtype']]['completed'] ) && ! $training_items[$value['subtype']]['completed'] ) {
-                    $training_items[$value['subtype']]['completed'] = true;
-                    $training_completed++;
-                }
-                if( $value['subtype'] == 'set_profile' ) {
-                    $has_set_profile = true;
-                }
-                if( $value['subtype'] == 'invited_friends' ) {
-                    $has_invited_friends = true;
-                }
-                if( $value['subtype'] == 'plan_created' ) {
-                    $has_a_plan = true;
-                }
-
-                $completions[$value['log_key']] = true ;
-            }
-        }
-
-
+        $log = self::_query_user_log( $user_id );
 
         return [
-            'profile' => [
-                'name' => $contact['name'],
-                'user_id' => $user_id,
-                'contact_id' => $contact_id,
-                'first_event' => $results[0]['timestamp'],
-                'last_event' => $results[count($results)-1]['timestamp'],
-                'language' => 'en',
-                'location' => $location,
-            ],
-            'state' => [
-                'stage' => $stage,
-                'has_coach' => $has_coach,
-                'has_set_profile' => $has_set_profile,
-                'has_invited_friends' => $has_invited_friends,
-                'has_a_plan' => $has_a_plan,
-                'has_3_month_plan' => false,
-                'has_affinity_hub' => false,
-            ],
-            'encouragements' => [
-                [
-                    'label' => 'Register',
-                    'key' => 'registered',
-                    'link' => '/set-profile',
-                ],
-                [
-                    'label' => 'Get a Coach',
-                    'key' => 'requested_a_coach',
-                    'link' => '/invite-friends',
-                ],
-                [
-                    'label' => 'Join Online Training',
-                    'key' => 'joined_online_training',
-                    'link' => '/create-plan',
-                ],
-
-            ],
-            'completions' => $completions
+            'profile' => self::_get_profile( $user_id ),
+            'location' => $location,
+            'stage' => self::_get_stage( $user_id, $log ),
+            'state' => self::_get_state( $user_id, $log ),
+            'encouragements' => self::_get_encouragements( $user_id, $log ),
+            'completions' => self::_get_completions( $user_id, $log )
         ];
-
-        return $profile;
     }
     public function guest( $params ) {
 
-        $location = $this->_get_location( $params );
+        $location = self::_get_location( $params );
 
         return [
             'profile' => [
@@ -203,7 +108,27 @@ class Zume_System_Profile_API
             'completions' => []
         ];
     }
-    public function _get_location( $params ) {
+    public static function _get_profile( $user_id ) {
+
+        $name = '';
+        $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
+        $contact = [];
+        if ( $contact_id ) {
+            $contact = DT_Posts::get_post( 'contacts', (int) $contact_id, false, false, true );
+            $name = $contact['name'] ?? '';
+        } else {
+            $user = get_user_by( 'ID', $user_id );
+            $name = $user->display_name;
+        }
+
+        return [
+            'name' => $name,
+            'user_id' => $user_id,
+            'contact_id' => $contact_id,
+            'language' => 'en',
+        ];
+    }
+    public static function _get_location( $params ) {
         if ( empty( $params['location'] ?? null ) ) {
             // @todo replace with location lookup system
             $location = [
@@ -217,6 +142,151 @@ class Zume_System_Profile_API
             $location = $params['location'];
         }
         return $location;
+    }
+    public static function _get_stage( $user_id, $log = NULL ) {
+
+        if ( ! is_null( $log ) ) {
+            $log = self::_query_user_log( $user_id );
+        }
+
+        $funnel = zume_funnel_stages();
+        $stage = $funnel[0];
+
+        if ( count($log) > 0 ) {
+
+            $funnel_steps = [
+                1 => false,
+                2 => false,
+                3 => false,
+                4 => false,
+                5 => false,
+                6 => false,
+            ];
+
+            foreach( $log as $index => $value ) {
+                if ( 'registered' == $value['subtype'] ) {
+                    $funnel_steps[1] = true;
+                }
+                if ( 'plan_created' == $value['subtype'] ) {
+                    $funnel_steps[2] = true;
+                }
+                if ( 'training_completed' == $value['subtype'] ) {
+                    $funnel_steps[3] = true;
+                }
+                if ( 'first_practitioner_report' == $value['subtype'] ) {
+                    $funnel_steps[4] = true;
+                }
+                if ( 'mawl_completed' == $value['subtype'] ) {
+                    $funnel_steps[5] = true;
+                }
+                if ( 'seeing_generational_fruit' == $value['subtype'] ) {
+                    $funnel_steps[6] = true;
+                }
+            }
+
+            if ( $funnel_steps[6] ) {
+                $stage = $funnel[6];
+            } else if ( $funnel_steps[5] ) {
+                $stage = $funnel[5];
+            } else if ( $funnel_steps[4] ) {
+                $stage = $funnel[4];
+            } else if ( $funnel_steps[3] ) {
+                $stage = $funnel[3];
+            } else if ( $funnel_steps[2] ) {
+                $stage = $funnel[2];
+            } else if ( $funnel_steps[1] ) {
+                $stage = $funnel[1];
+            } else {
+                $stage = $funnel[0];
+            }
+
+        }
+        return $stage;
+    }
+    public static function _query_user_log( $user_id ) {
+        global $wpdb;
+        $sql = $wpdb->prepare( "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
+                FROM $wpdb->dt_reports r
+                WHERE r.user_id = %s
+                AND r.post_type = 'zume'
+                ", $user_id );
+        return $wpdb->get_results( $sql, ARRAY_A );
+    }
+    public static function _get_encouragements( $user_id, $log = NULL ) {
+        $encouragements = Zume_System_Encouragement_API::_get_encouragements( $user_id );
+
+        // reduce encouragements to only those that are not completed
+        return [
+            [
+                'label' => 'Register',
+                'key' => 'registered',
+                'link' => '/set-profile',
+            ],
+            [
+                'label' => 'Get a Coach',
+                'key' => 'requested_a_coach',
+                'link' => '/invite-friends',
+            ],
+            [
+                'label' => 'Join Online Training',
+                'key' => 'joined_online_training',
+                'link' => '/create-plan',
+            ],
+
+        ];
+    }
+    public static function _get_state( $user_id, $log = NULL ) {
+        if ( ! is_null( $log ) ) {
+            $log = self::_query_user_log( $user_id );
+        }
+
+        $data = [
+            'has_registered' => false,
+            'has_a_plan' => false,
+            'has_coach' => false,
+            'has_set_profile' => false,
+            'has_invited_friends' => false,
+            'has_3_month_plan' => false,
+        ];
+
+        foreach( $log as $index => $value ) {
+
+            if( $value['subtype'] == 'registered' ) {
+                $data['has_registered'] = true;
+            }
+            if( $value['subtype'] == 'plan_created' ) {
+                $data['has_a_plan'] = true;
+            }
+
+            if( $value['subtype'] == 'requested_a_coach' ) {
+                $data['has_coach'] = true;
+            }
+            if( $value['subtype'] == 'set_profile' ) {
+                $data['has_set_profile'] = true;
+            }
+            if( $value['subtype'] == 'invited_friends' ) {
+                $data['has_invited_friends'] = true;
+            }
+            if( $value['subtype'] == 'completed_3_month_plan' ) {
+                $data['has_3_month_plan'] = true;
+            }
+
+        }
+
+        return $data;
+    }
+    public static function _get_completions( $user_id, $log = NULL ) {
+        if ( ! is_null( $log ) ) {
+            $log = self::_query_user_log( $user_id );
+        }
+
+        $data = [];
+
+        foreach( $log as $index => $value ) {
+            $data[$value['log_key']] = true ;
+        }
+
+        return $data;
     }
 }
 Zume_System_Profile_API::instance();

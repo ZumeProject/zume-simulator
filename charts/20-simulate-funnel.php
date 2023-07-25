@@ -107,7 +107,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                 Configure: :
                                 ${user_selector} ${time_selector}
                                 <span class="loading-spinner active"></span>
-                                <span class="loading-spinner active"></span>
                             </div>
                             <div class="cell medium-6 right">
                                 <h2>SIMULATE FUNNEL</h2>
@@ -300,46 +299,28 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 window.set = ''
 
 
-
-                /* user location */
-                window.get_user_location = ( user_id ) => {
-                    makeRequest('POST', 'user_location', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
-                        console.log('user_location')
-                        console.log(data)
-                        window.user_location = data
-                    })
-                }
-                window.get_user_location( user_id )
-                /* end user location */
-
-
-
-
-                /* user state */
+                /* user profile */
                 window.get_user_profile = ( user_id ) => {
-                    makeRequest('POST', 'user_profile', {user_id: user_id} , window.site_info.system_root ).done( function( data ) {
+                    makeRequest('POST', 'user_profile', { user_id: user_id } , window.site_info.system_root ).done( function( data ) {
                         console.log('user_profile')
                         console.log(data)
                         window.user_profile = data
 
-                        if (data.length == 0) {
-                            jQuery('.loading-spinner').removeClass('active')
-                            jQuery('.button').removeClass('done')
-                            return
-                        }
-
-                        // set funnel buttons
-                        jQuery.each(data.completions, function(index, value) {
-                            jQuery('.'+index).addClass('done')
-                        })
+                        let user_profile = jQuery('#user_profile')
+                        user_profile.empty()
 
                         // set user state column
-                        let stateList = '<div class="cell"><h2>USER STATE</h2><BR></div>'
+                        let profileList = '<div class="cell"><h2>USER PROFILE</h2><BR></div>'
+                        jQuery.each(data.profile, function(ih, vh ) {
+                            profileList += `<span style="text-transform:uppercase;">${ih} </span>: ${vh}<br>`
+                        })
+                        user_profile.append(profileList)
+
+                        let stateList = '<hr>'
                         jQuery.each(data.state, function(ih, vh ) {
                             stateList += `<span style="text-transform:uppercase;">${ih} </span>: ${vh}<br>`
                         })
-                        jQuery('#user_profile').html(stateList)
-
+                        user_profile.append(stateList)
 
                         jQuery('.loading-spinner').removeClass('active')
                     })
@@ -354,7 +335,17 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 /* end user state */
 
 
+                window.get_user_completions = ( user_id ) => {
+                    makeRequest('POST', 'user_completions', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
+                        console.log('user_completions')
+                        console.log(data)
 
+                        jQuery.each(data, function(index, value) {
+                            jQuery('.'+index).addClass('done')
+                        })
+                    })
+                }
+                window.get_user_completions( user_id )
 
 
                 /* user encouragement */
@@ -413,11 +404,11 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     let data = {
                         "user_id": user_id,
                         "days_ago": jQuery('#days_ago').val(),
-                        "lng": window.user_profile.profile.location.lng,
-                        "lat": window.user_profile.profile.location.lat,
-                        "level": window.user_profile.profile.location.level,
-                        "label": window.user_profile.profile.location.label,
-                        "grid_id": window.user_profile.profile.location.grid_id,
+                        "lng": window.user_profile.location.lng,
+                        "lat": window.user_profile.location.lat,
+                        "level": window.user_profile.location.level,
+                        "label": window.user_profile.location.label,
+                        "grid_id": window.user_profile.location.grid_id,
                         "type": type,
                         "subtype": subtype,
                         "value": button.data('stage')
@@ -429,6 +420,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
                         window.get_user_profile( user_id )
                         window.get_user_encouragement( user_id )
+                        window.get_user_completions( user_id )
                     })
 
                     if ( type === 'coaching' ) {
@@ -477,3 +469,87 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
     }
 }
 new Zume_Simulate_Funnel();
+
+class Zume_System_Completions_API
+{
+    public $namespace = 'zume_system/v1';
+    private static $_instance = null;
+
+    public static function instance()
+    {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
+
+    public function __construct()
+    {
+        if (dt_is_rest()) {
+            add_action('rest_api_init', [$this, 'add_api_routes']);
+            add_filter('dt_allow_rest_access', [$this, 'authorize_url'], 10, 1);
+        }
+    }
+
+    public function authorize_url($authorized)
+    {
+        if (isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])), $this->namespace) !== false) {
+            $authorized = true;
+        }
+        return $authorized;
+    }
+
+    public function add_api_routes()
+    {
+        $namespace = $this->namespace;
+        register_rest_route(
+            $namespace, '/user_completions', [
+                'methods' => ['GET', 'POST'],
+                'callback' => [$this, 'request_sorter'],
+                'permission_callback' => '__return_true'
+            ]
+        );
+    }
+
+    public function request_sorter(WP_REST_Request $request)
+    {
+        $params = dt_recursive_sanitize_array($request->get_params());
+
+        if (is_user_logged_in()) {
+            return $this->user($params);
+        } else {
+            return $this->guest($params);
+        }
+
+    }
+
+    public function user($params)
+    {
+        $user_id = $params['user_id'] ?? get_current_user_id();
+
+        global $wpdb;
+        $sql = $wpdb->prepare( "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
+                FROM $wpdb->dt_reports r
+                WHERE r.user_id = %s
+                AND r.post_type = 'zume'
+                ", $user_id );
+        $results = $wpdb->get_results( $sql, ARRAY_A );
+
+        $data = [];
+        foreach( $results as $item ) {
+            $data[$item['log_key']] = $item;
+        }
+
+        return $data;
+    }
+    public static function _query_user_log( $user_id ) {
+
+    }
+
+    public function guest($params)
+    {
+        return [];
+    }
+
+}
+Zume_System_Completions_API::instance();

@@ -16,13 +16,15 @@ class Zume_System_Encouragement_API
 
     public function __construct()
     {
-        if ( dt_is_rest()) {
+        if (dt_is_rest()) {
             add_action('rest_api_init', [$this, 'add_api_routes']);
             add_filter('dt_allow_rest_access', [$this, 'authorize_url'], 10, 1);
         }
     }
-    public function authorize_url( $authorized ){
-        if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
+
+    public function authorize_url($authorized)
+    {
+        if (isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])), $this->namespace) !== false) {
             $authorized = true;
         }
         return $authorized;
@@ -35,34 +37,64 @@ class Zume_System_Encouragement_API
             $namespace, '/user_encouragement', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'request_sorter'],
-                'permission_callback' =>'__return_true'
+                'permission_callback' => '__return_true'
             ]
         );
     }
-    public function request_sorter( WP_REST_Request $request ) {
+
+    public function request_sorter(WP_REST_Request $request)
+    {
         $params = dt_recursive_sanitize_array( $request->get_params() );
 
-        if( is_user_logged_in() ) {
-            return $this->user( $params );
+        if ( is_user_logged_in() ) {
+            return $this->user($params);
         } else {
-            return $this->guest( $params );
+            return $this->guest($params);
+        }
+    }
+
+    public function user($params)
+    {
+        if ( ! isset( $params['user_id'] ) ) {
+            return new WP_Error( 'no_user_id', 'No user id provided', array( 'status' => 400 ) );
+        }
+        return self::_get_encouragements( $params['user_id'] );
+    }
+
+    public function guest($params)
+    {
+        return [];
+    }
+
+    public static function _get_encouragements( $user_id, $log = NULL ) : array
+    {
+
+        if ( ! is_null( $log ) ) {
+            $log = Zume_System_Profile_API::_query_user_log( $user_id );
         }
 
-    }
-    public function user( $params) {
+        $set = '';
 
+        foreach( $log as $row ) {
+
+        }
+
+        return self::_return_set( $set );
+    }
+
+    public static function _return_set( $set ) {
         $list = [
             '' => [
-                'cta' => [ '[[Not Configured}}' ],
-                'plan' => [ '[[Not Configured}}' ],
-                'reset' => [ '[[Not Configured}}' ],
+                'cta' => ['[[Not Configured}}'],
+                'plan' => ['[[Not Configured}}'],
+                'reset' => ['[[Not Configured}}'],
             ],
             'set1' => [
-                'cta' => [ '[[Not Configured}}' ],
-                'plan' => [ '[[Not Configured}}' ],
-                 'reset' => [ '[[Not Configured}}' ],
-             ],
-             'set2' => [
+                'cta' => ['[[Not Configured}}'],
+                'plan' => ['[[Not Configured}}'],
+                'reset' => ['[[Not Configured}}'],
+            ],
+            'set2' => [
                 'cta' => [
                     'Make a Plan',
                     'Request Coach',
@@ -130,8 +162,8 @@ class Zume_System_Encouragement_API
                     'Completed 3-Month Plan',
                     'Makes first practitioner report',
                 ],
-           ],
-           'set5' => [
+            ],
+            'set5' => [
                 'cta' => [
                     'Set Profile',
                 ],
@@ -145,18 +177,12 @@ class Zume_System_Encouragement_API
                 'reset' => [
                     'Coach establishes communication'
                 ],
-           ],
-       ];
-
-       return [
-           'cta' => [ '[[Not Configured}}' ],
-           'plan' => [ '[[Not Configured}}' ],
-           'reset' => [ '[[Not Configured}}' ],
-       ];
+            ],
+        ];
+        return $list[$set];
     }
-    public function guest( $params ) {
 
-        return [];
-    }
+
+
 }
 Zume_System_Encouragement_API::instance();

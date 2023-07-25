@@ -261,3 +261,53 @@ if ( ! function_exists( 'zume_training_items' ) ) {
         return $list;
     }
 }
+
+if ( ! function_exists( 'zume_funnel_stages' ) ) {
+    function zume_funnel_stages() : array {
+        return [
+            0 => [
+                'label' => 'Anonymous',
+                'short_label' => 'Anonymous',
+                'description' => 'Anonymous visitors to the website.',
+                'stage' => 0
+            ],
+            1 => [
+                'label' => 'Registrant',
+                'short_label' => 'Registered',
+                'description' => 'Trainee who has registered for the training.',
+                'stage' => 1
+            ],
+            2 => [
+                'label' => 'Active Training Trainee',
+                'short_label' => 'Active Training',
+                'description' => 'Trainee who is in active training.',
+                'stage' => 2
+            ],
+            3 => [
+                'label' => 'Post-Training Trainee',
+                'short_label' => 'Post-Training',
+                'description' => 'Trainee who has completed training.',
+                'stage' => 3
+            ],
+            4 => [
+                'label' => '(S1) Partial Practitioner',
+                'short_label' => 'Partial Practitioner',
+                'description' => 'Practitioner still coaching through MAWL checklist.',
+                'stage' => 4
+            ],
+            5 => [
+                'label' => '(S2) Completed Practitioner',
+                'short_label' => 'Practitioner',
+                'description' => 'Practitioner who has completed the MAWL checklist but is not multiplying.',
+                'stage' => 5
+            ],
+            6 => [
+                'label' => '(S3) Multiplying Practitioner',
+                'short_label' => 'Multiplying Practitioner',
+                'description' => 'Practitioner who is seeing generational fruit.',
+                'stage' => 6
+            ],
+
+        ];
+    }
+}
