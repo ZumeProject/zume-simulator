@@ -254,24 +254,36 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                                 <div style=" padding: 1em; height:${window.innerHeight - 300}px; border: 1px solid lightgrey; overflow: hidden scroll;">
                                     <div class="grid-x grid-padding-x">
-
+                                            <div class="cell">
+                                                <button class="button zume alt-color expanded system_login" data-top="system" data-subtype="login" data-set="set5" data-stage="0">Login</button>
+                                            </div>
+                                            <div class="cell">
+                                                <h2><hr></h2>
+                                            </div>
                                             <div class="cell">
                                                 <button class="button zume alt-color expanded system_requested_a_coach" data-top="system" data-subtype="requested_a_coach" data-set="set5"  data-stage="0">Requested a Coach</button>
                                                 <button class="button zume alt-color expanded system_joined_online_training" data-top="system" data-subtype="joined_online_training" data-set="set1"  data-stage="0">Joined Online Training</button>
                                                 <button class="button zume alt-color expanded system_set_profile" data-top="system" data-subtype="set_profile" data-set="set5"  data-stage="1">Set Profile</button>
                                                 <button class="button zume alt-color expanded system_invited_friends" data-top="system" data-subtype="invited_friends" data-set="set5"  data-stage="1">Invited Friends</button>
                                             </div>
-
                                             <div class="cell">
                                                 <h2><hr></h2>
-                                            </div>
-                                            <div class="cell small-5">
                                             </div>
                                             <div class="cell">
                                                 <button class="button zume alt-color expanded reports_practitioner_report" data-top="reports" data-subtype="practitioner_report" data-set="set1"  data-stage="4">Submit Practitioner Report</button>
                                                 <button class="button zume alt-color expanded system_joined_affinity_hub" data-top="system" data-subtype="joined_affinity_hub" data-set="set1"  data-stage="4">Join Affinity Hub</button>
                                                 <button class="button zume alt-color expanded system_hub_checkin" data-top="system" data-subtype="hub_checkin" data-set="set1"  data-stage="4">Hub Checkin</button>
                                             </div>
+                                            <div class="cell">
+                                                <h2><hr></h2>
+                                            </div>
+                                            <div class="cell">
+                                                <button class="button zume alt-color expanded training_checkin" data-top="training" data-subtype="checkin" data-set="set5" data-stage="0">Training Checkin</button>
+                                                <button class="button zume alt-color expanded coaching_checkin" data-top="coaching" data-subtype="checkin" data-set="set5" data-stage="0">Coaching Checkin</button>
+                                                <button class="button zume alt-color expanded system_checkin" data-top="system" data-subtype="checkin" data-set="set5" data-stage="0">Practitioner Checkin</button>
+                                                <button class="button zume alt-color expanded report_checkin" data-top="report" data-subtype="checkin" data-set="set5" data-stage="0">Report Checkin</button>
+                                            </div>
+
                                         </div>
                                     </div>
                             </div>
@@ -282,10 +294,18 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                         <div id="last_action"></div>
                                     </div>
                                     <div class="cell medium-6">
+                                        <div class="cell"><h2>USER PROFILE</h2><BR></div>
                                         <div id="user_profile"></div>
                                     </div>
                                     <div class="cell medium-6">
-                                        <div id="encouragement_plan"></div>
+                                        <div>
+                                             <h2>CTAs</h2><br>
+                                            <div id="ctas-list" class="grid-x"></div><br>
+                                             <hr>
+                                             <h2>ENCOURAGEMENT PLAN</h2><br>
+                                            <div id="plan-list" class="grid-x"></div><br>
+                                            <div id="reset-list" class="grid-x"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -310,7 +330,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         user_profile.empty()
 
                         // set user state column
-                        let profileList = '<div class="cell"><h2>USER PROFILE</h2><BR></div>'
+                        let profileList = ''
                         jQuery.each(data.profile, function(ih, vh ) {
                             profileList += `<span style="text-transform:uppercase;">${ih} </span>: ${vh}<br>`
                         })
@@ -321,6 +341,13 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                             stateList += `<span style="text-transform:uppercase;">${ih} </span>: ${vh}<br>`
                         })
                         user_profile.append(stateList)
+
+                        let stageList = '<hr><h2>STAGE' +
+                            '</h2><br>'
+                        jQuery.each(data.stage, function(ih, vh ) {
+                            stageList += `<span style="text-transform:uppercase;">${ih} </span>: ${vh}<br>`
+                        })
+                        user_profile.append(stageList)
 
                         jQuery('.loading-spinner').removeClass('active')
                     })
@@ -347,6 +374,24 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 }
                 window.get_user_completions( user_id )
 
+                /* user ctas */
+                window.get_user_ctas = ( user_id ) => {
+                    makeRequest('POST', 'user_ctas', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
+                        console.log('user_ctas')
+                        console.log(data)
+                        window.user_ctas = data
+
+                        let ctaList = ''
+                        jQuery.each(data, function(ih, vh ) {
+                            ctaList += `<div class="cell">${vh.label}</div>`
+                        })
+                        jQuery('#ctas-list').empty().append(ctaList)
+
+                    })
+                }
+                window.get_user_ctas( user_id )
+                /* end user ctas */
+
 
                 /* user encouragement */
                 window.get_user_encouragement = ( user_id ) => {
@@ -355,36 +400,25 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         console.log(data)
                         window.user_encourangement = data
 
-                        let encouragement_plan = jQuery('#encouragement_plan')
-                        encouragement_plan.html( `
-                            <h2>ENCOURAGEMENT PLAN</h2><br>
-                            <div id="ctas-list" class="grid-x"></div><br>
-                            <div id="plan-list" class="grid-x"></div><br>
-                            <div id="reset-list" class="grid-x"></div>
-                        `)
-
-                        let ctaList = '<div class="cell"><h4>WEBSITE CTA(s)</h4></div>'
-                        jQuery.each(data.cta, function(ih, vh ) {
-                            ctaList += `<div class="cell small-8">${vh}</div><div class="cell small-4"></div>`
-                        })
-                        jQuery('#ctas-list').append(ctaList)
 
                         let emailList = '<div class="cell"><h4>EMAIL PLAN</h4></div>'
                         jQuery.each(data.plan, function(ih, vh ) {
-                            emailList += `<div class="cell small-8">${vh}</div><div class="cell small-4"></div>`
+                            emailList += `<div class="cell">${vh}</div>`
                         })
-                        jQuery('#plan-list').append(emailList)
+                        jQuery('#plan-list').empty().append(emailList)
 
-                        let resetdList = '<div class="cell"><h4>RESET ACTION</h4></div>'
+                        let resetList = '<div class="cell"><h4>RESET ACTION</h4></div>'
                         jQuery.each(data.reset, function(ih, vh ) {
-                            resetdList += `<div class="cell small-8">${vh}</div><div class="cell small-4"></div>`
+                            resetList += `<div class="cell">${vh}</div>`
                         })
-                        jQuery('#reset-list').append(resetdList)
+                        jQuery('#reset-list').empty().append(resetList)
 
                     })
                 }
                 window.get_user_encouragement( user_id )
                 /* end user encouragement */
+
+
 
 
                 /* log activity */

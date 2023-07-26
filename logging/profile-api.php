@@ -51,15 +51,13 @@ class Zume_System_Profile_API
         $user_id = (int) $params['user_id'] ?? get_current_user_id();
         $location = $params['location'] ?? self::_get_location( $user_id );
 
-        $log = self::_query_user_log( $user_id );
+        $log = zume_user_log( $user_id );
 
         return [
             'profile' => self::_get_profile( $user_id ),
             'location' => $location,
             'stage' => self::_get_stage( $user_id, $log ),
             'state' => self::_get_state( $user_id, $log ),
-            'encouragements' => self::_get_encouragements( $user_id, $log ),
-            'completions' => self::_get_completions( $user_id, $log )
         ];
     }
     public function guest( $params ) {
@@ -146,7 +144,7 @@ class Zume_System_Profile_API
     public static function _get_stage( $user_id, $log = NULL ) {
 
         if ( ! is_null( $log ) ) {
-            $log = self::_query_user_log( $user_id );
+            $log = zume_user_log( $user_id );
         }
 
         $funnel = zume_funnel_stages();
@@ -203,41 +201,9 @@ class Zume_System_Profile_API
         }
         return $stage;
     }
-    public static function _query_user_log( $user_id ) {
-        global $wpdb;
-        $sql = $wpdb->prepare( "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
-                FROM $wpdb->dt_reports r
-                WHERE r.user_id = %s
-                AND r.post_type = 'zume'
-                ", $user_id );
-        return $wpdb->get_results( $sql, ARRAY_A );
-    }
-    public static function _get_encouragements( $user_id, $log = NULL ) {
-        $encouragements = Zume_System_Encouragement_API::_get_encouragements( $user_id );
-
-        // reduce encouragements to only those that are not completed
-        return [
-            [
-                'label' => 'Register',
-                'key' => 'registered',
-                'link' => '/set-profile',
-            ],
-            [
-                'label' => 'Get a Coach',
-                'key' => 'requested_a_coach',
-                'link' => '/invite-friends',
-            ],
-            [
-                'label' => 'Join Online Training',
-                'key' => 'joined_online_training',
-                'link' => '/create-plan',
-            ],
-
-        ];
-    }
     public static function _get_state( $user_id, $log = NULL ) {
         if ( ! is_null( $log ) ) {
-            $log = self::_query_user_log( $user_id );
+            $log = zume_user_log( $user_id );
         }
 
         $data = [
@@ -277,7 +243,7 @@ class Zume_System_Profile_API
     }
     public static function _get_completions( $user_id, $log = NULL ) {
         if ( ! is_null( $log ) ) {
-            $log = self::_query_user_log( $user_id );
+            $log = zume_user_log( $user_id );
         }
 
         $data = [];

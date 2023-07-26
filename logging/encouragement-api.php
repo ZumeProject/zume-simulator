@@ -13,7 +13,6 @@ class Zume_System_Encouragement_API
         }
         return self::$_instance;
     }
-
     public function __construct()
     {
         if (dt_is_rest()) {
@@ -21,7 +20,6 @@ class Zume_System_Encouragement_API
             add_filter('dt_allow_rest_access', [$this, 'authorize_url'], 10, 1);
         }
     }
-
     public function authorize_url($authorized)
     {
         if (isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])), $this->namespace) !== false) {
@@ -29,7 +27,6 @@ class Zume_System_Encouragement_API
         }
         return $authorized;
     }
-
     public function add_api_routes()
     {
         $namespace = $this->namespace;
@@ -41,7 +38,6 @@ class Zume_System_Encouragement_API
             ]
         );
     }
-
     public function request_sorter(WP_REST_Request $request)
     {
         $params = dt_recursive_sanitize_array( $request->get_params() );
@@ -52,54 +48,240 @@ class Zume_System_Encouragement_API
             return $this->guest($params);
         }
     }
-
     public function user($params)
     {
         if ( ! isset( $params['user_id'] ) ) {
             return new WP_Error( 'no_user_id', 'No user id provided', array( 'status' => 400 ) );
         }
-        return self::_get_encouragements( $params['user_id'] );
-    }
 
-    public function guest($params)
-    {
-        return [];
-    }
+        $log = zume_user_log( $params['user_id'] );
 
-    public static function _get_encouragements( $user_id, $log = NULL ) : array
-    {
-
-        if ( ! is_null( $log ) ) {
-            $log = Zume_System_Profile_API::_query_user_log( $user_id );
-        }
-
-        $set = '';
-
+        $log_keys = [];
         foreach( $log as $row ) {
-
+            $log_keys[] = $row['log_key'];
         }
 
-        return self::_return_set( $set );
+        // current plan
+//        $current_plan = zume_user_current_plan( $params['user_id'], $log_keys );
+
+        // recommended plan
+//        $recommended_plan = zume_user_recommended_plan( $params['user_id'] );
+
+        // disable plan
+//        if ( $current_plan === $recommended_plan ) {
+//
+//        }
+
+        // encouragement plan
+//        $encouragement_plan = zume_user_encouragement_plan( $params['user_id'], $log_keys );
+
+        return $log_keys;
     }
 
-    public static function _return_set( $set ) {
+
+    /**
+    0
+    :
+    "system_registered"
+    1
+    :
+    "system_plan_created"
+    2
+    :
+    "system_requested_a_coach"
+    3
+    :
+    "system_joined_online_training"
+    4
+    :
+    "system_set_profile"
+    5
+    :
+    "system_invited_friends"
+    6
+    :
+    "reports_practitioner_report"
+    7
+    :
+    "system_joined_affinity_hub"
+    8
+    :
+    "system_hub_checkin"
+    9
+    :
+    "training_1_heard"
+    10
+    :
+    "training_2_heard"
+    11
+    :
+    "training_3_heard"
+    12
+    :
+    "training_4_heard"
+    13
+    :
+    "training_5_heard"
+    14
+    :
+    "training_6_heard"
+    15
+    :
+    "training_7_heard"
+    16
+    :
+    "training_8_heard"
+    17
+    :
+    "training_9_heard"
+    18
+    :
+    "training_10_heard"
+    19
+    :
+    "training_11_heard"
+    20
+    :
+    "training_12_heard"
+    21
+    :
+    "training_13_heard"
+    22
+    :
+    "training_14_heard"
+    23
+    :
+    "training_15_heard"
+    24
+    :
+    "training_16_heard"
+    25
+    :
+    "training_17_heard"
+    26
+    :
+    "training_18_heard"
+    27
+    :
+    "training_19_heard"
+    28
+    :
+    "training_20_heard"
+    29
+    :
+    "training_21_heard"
+    30
+    :
+    "training_22_heard"
+    31
+    :
+    "training_23_heard"
+    32
+    :
+    "training_24_heard"
+    33
+    :
+    "training_32_heard"
+    34
+    :
+    "training_31_heard"
+    35
+    :
+    "training_30_heard"
+    36
+    :
+    "training_25_heard"
+    37
+    :
+    "training_26_heard"
+    38
+    :
+    "training_27_heard"
+    39
+    :
+    "training_28_heard"
+    40
+    :
+    "training_29_heard"
+    41
+    :
+    "system_made_3_month_plan"
+    42
+    :
+    "system_training_completed"
+    43
+    :
+    "system_completed_3_month_plan"
+    44
+    :
+    "system_first_practitioner_report"
+    45
+    :
+    "coaching_4_modeling"
+    46
+    :
+    "coaching_5_modeling"
+    47
+    :
+    "coaching_7_modeling"
+    48
+    :
+    "coaching_8_modeling"
+    49
+    :
+    "coaching_10_modeling"
+    50
+    :
+    "coaching_11_modeling"
+    51
+    :
+    "coaching_12_modeling"
+    52
+    :
+    "coaching_13_modeling"
+    53
+    :
+    "coaching_16_modeling"
+    54
+    :
+    "coaching_17_modeling"
+    55
+    :
+    "coaching_19_modeling"
+    56
+    :
+    "coaching_21_modeling"
+    57
+    :
+    "coaching_22_modeling"
+    58
+    :
+    "coaching_26_modeling"
+    59
+    :
+    "coaching_31_modeling"
+    60
+    :
+    "coaching_32_modeling"
+    61
+    :
+    "system_mawl_completed"
+    62
+    :
+    "system_seeing_generational_fruit"
+     */
+
+    public static function _return_set( $set = 'set1' ) {
         $list = [
             '' => [
-                'cta' => ['[[Not Configured}}'],
                 'plan' => ['[[Not Configured}}'],
                 'reset' => ['[[Not Configured}}'],
             ],
             'set1' => [
-                'cta' => ['[[Not Configured}}'],
                 'plan' => ['[[Not Configured}}'],
                 'reset' => ['[[Not Configured}}'],
             ],
             'set2' => [
-                'cta' => [
-                    'Make a Plan',
-                    'Request Coach',
-                    'Join Online Training'
-                ],
                 'plan' => [
                     '1 day after event',
                     '2 days after event',
@@ -119,11 +301,6 @@ class Zume_System_Encouragement_API
                 ],
             ],
             'set3' => [
-                'cta' => [
-                    'Request Coach',
-                    'Set Profile',
-                    'Invite Friends'
-                ],
                 'plan' => [
                     '1 day before planned training',
                     '1 days after planned training',
@@ -138,12 +315,6 @@ class Zume_System_Encouragement_API
                 ],
             ],
             'set4' => [
-                'cta' => [
-                    'Request Coach',
-                    'Set Profile',
-                    'Completed 3-Month Plan',
-                    'Report as Practitioner'
-                ],
                 'plan' => [
                     '1 week after completed training',
                     '2 weeks after completed training',
@@ -164,9 +335,6 @@ class Zume_System_Encouragement_API
                 ],
             ],
             'set5' => [
-                'cta' => [
-                    'Set Profile',
-                ],
                 'plan' => [
                     'Immediately after event, coach notification',
                     'Immediately after event, challenge to set profile',
@@ -181,8 +349,9 @@ class Zume_System_Encouragement_API
         ];
         return $list[$set];
     }
-
-
-
+    public function guest($params)
+    {
+        return [];
+    }
 }
 Zume_System_Encouragement_API::instance();

@@ -311,3 +311,24 @@ if ( ! function_exists( 'zume_funnel_stages' ) ) {
         ];
     }
 }
+if ( ! function_exists( 'zume_user_current_plan' ) ) {
+    function zume_user_current_plan( $user_id ) {
+        return '';
+    }
+}
+if ( ! function_exists( 'zume_user_recommended_plan' ) ) {
+    function zume_user_recommended_plan( $user_id ) {
+        return '';
+    }
+}
+if ( ! function_exists( 'zume_user_log' ) ) {
+    function zume_user_log( $user_id ) {
+        global $wpdb;
+        $sql = $wpdb->prepare( "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
+                FROM $wpdb->dt_reports r
+                WHERE r.user_id = %s
+                AND r.post_type = 'zume'
+                ", $user_id );
+        return $wpdb->get_results( $sql, ARRAY_A );
+    }
+}

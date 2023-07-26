@@ -55,18 +55,22 @@ class Zume_System_Log_API
         $hash = hash('sha256', maybe_serialize($params)  . $today );
 
         // test hash for duplicate
-        $duplicate_found = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT
+        if ( 'login' === $params['subtype'] ) {
+            $hash = hash('sha256', maybe_serialize($params)  . time() );
+        } else {
+            $duplicate_found = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT
                     `id`
                 FROM
                     `$wpdb->dt_reports`
                 WHERE hash = %s AND hash IS NOT NULL;",
-                $hash
-            )
-        );
-        if ( $duplicate_found ) {
-            return new WP_Error(__METHOD__, 'Duplicate entry for today.', ['status' => 409] );
+                    $hash
+                )
+            );
+            if ($duplicate_found) {
+                return new WP_Error(__METHOD__, 'Duplicate entry for today.', ['status' => 409]);
+            }
         }
 
         // set data
@@ -97,7 +101,7 @@ class Zume_System_Log_API
 
         // user id
         if ( empty( $data['user_id'] ) && is_user_logged_in() ) {
-            $user_id = get_current_user_id();
+            $data['user_id'] = get_current_user_id();
         }
 
         if ( $data['user_id'] ) {
@@ -106,6 +110,13 @@ class Zume_System_Log_API
 
         $log = [];
         $log[] = dt_report_insert( $data, true, false );
+
+        // @todo
+        /* Additional Log Actions */
+        // additional training elements
+        // additional mawl pieces
+        // additional host items
+        // additional completion reports
 
         return $log;
 
