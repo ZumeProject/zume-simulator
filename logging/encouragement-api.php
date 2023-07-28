@@ -51,21 +51,26 @@ class Zume_System_Encouragement_API
     public function user($params)
     {
         if ( ! isset( $params['user_id'] ) ) {
-            return new WP_Error( 'no_user_id', 'No user id provided', array( 'status' => 400 ) );
+            return new WP_Error( __METHOD__, 'No user id provided', array( 'status' => 400 ) );
         }
 
         $log = zume_user_log( $params['user_id'] );
+        if ( is_null( $log ) ) {
+            return new WP_Error( __METHOD__, 'No logs', array( 'status' => 400 ) );
+        }
 
         $log_keys = [];
         foreach( $log as $row ) {
             $log_keys[] = $row['log_key'];
         }
 
+
+
         // current plan
 //        $current_plan = zume_user_current_plan( $params['user_id'], $log_keys );
 
         // recommended plan
-//        $recommended_plan = zume_user_recommended_plan( $params['user_id'] );
+        $recommended_plan = $this->zume_user_recommended_plan( $params['user_id'], $log_keys );
 
         // disable plan
 //        if ( $current_plan === $recommended_plan ) {
@@ -75,7 +80,24 @@ class Zume_System_Encouragement_API
         // encouragement plan
 //        $encouragement_plan = zume_user_encouragement_plan( $params['user_id'], $log_keys );
 
-        return $log_keys;
+        return  $recommended_plan;
+    }
+
+    public function zume_user_recommended_plan( $user_id, $log_keys ) {
+        return [
+            '1 day after event',
+            '2 days after event',
+            '3 days after event',
+            '4 days after event',
+            '5 days after event',
+            '6 days after event',
+            '7 days after event',
+            '2 weeks after event',
+            '3 weeks after event',
+            '4 weeks after event',
+            '2 months after event',
+            '3 months after event'
+        ];
     }
 
 

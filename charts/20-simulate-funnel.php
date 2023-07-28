@@ -261,8 +261,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                                 <h2><hr></h2>
                                             </div>
                                             <div class="cell">
-                                                <button class="button zume alt-color expanded system_requested_a_coach" data-top="system" data-subtype="requested_a_coach" data-set="set5"  data-stage="0">Requested a Coach</button>
                                                 <button class="button zume alt-color expanded system_joined_online_training" data-top="system" data-subtype="joined_online_training" data-set="set1"  data-stage="0">Joined Online Training</button>
+                                                <button class="button zume alt-color expanded system_requested_a_coach" data-top="system" data-subtype="requested_a_coach" data-set="set5"  data-stage="0">Requested a Coach</button>
                                                 <button class="button zume alt-color expanded system_set_profile" data-top="system" data-subtype="set_profile" data-set="set5"  data-stage="1">Set Profile</button>
                                                 <button class="button zume alt-color expanded system_invited_friends" data-top="system" data-subtype="invited_friends" data-set="set5"  data-stage="1">Invited Friends</button>
                                             </div>
@@ -400,25 +400,16 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         console.log(data)
                         window.user_encourangement = data
 
-
-                        let emailList = '<div class="cell"><h4>EMAIL PLAN</h4></div>'
-                        jQuery.each(data.plan, function(ih, vh ) {
+                        let emailList = ''
+                        jQuery.each(data, function(ih, vh ) {
                             emailList += `<div class="cell">${vh}</div>`
                         })
                         jQuery('#plan-list').empty().append(emailList)
-
-                        let resetList = '<div class="cell"><h4>RESET ACTION</h4></div>'
-                        jQuery.each(data.reset, function(ih, vh ) {
-                            resetList += `<div class="cell">${vh}</div>`
-                        })
-                        jQuery('#reset-list').empty().append(resetList)
 
                     })
                 }
                 window.get_user_encouragement( user_id )
                 /* end user encouragement */
-
-
 
 
                 /* log activity */
@@ -455,6 +446,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         window.get_user_profile( user_id )
                         window.get_user_encouragement( user_id )
                         window.get_user_completions( user_id )
+                        window.get_user_ctas( user_id )
                     })
 
                     if ( type === 'coaching' ) {

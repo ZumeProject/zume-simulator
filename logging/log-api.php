@@ -111,15 +111,26 @@ class Zume_System_Log_API
         $log = [];
         $log[] = dt_report_insert( $data, true, false );
 
+        $this->_add_additional_log_actions( $log, $data );
+
+        return $log;
+
+    }
+    public function _add_additional_log_actions( &$log, $data ) {
+        if ( 'system' === $data['type'] && 'joined_online_training' === $data['subtype'] ) {
+            $data_item = $data;
+            $data_item['type'] = 'system';
+            $data_item['subtype'] = 'plan_created';
+            $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+            $log[] = dt_report_insert( $data_item, true, false );
+        }
+
         // @todo
         /* Additional Log Actions */
         // additional training elements
         // additional mawl pieces
         // additional host items
         // additional completion reports
-
-        return $log;
-
     }
     public function _is_valid_types( $data ) : bool {
         // test types and subtypes
