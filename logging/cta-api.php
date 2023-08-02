@@ -214,7 +214,7 @@ class Zume_System_CTA_API
                 'stages' => [4,5,6],
                 'required_keys' => [],
                 'disable_keys' => ['system_joined_affinity_hub'],
-                'label' => 'Join A Hub',
+                'label' => 'Join a Hub',
                 'key' => 'system_joined_affinity_hub',
                 'type' => 'system',
                 'subtype' => 'joined_affinity_hub',

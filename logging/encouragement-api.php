@@ -51,13 +51,23 @@ class Zume_System_Encouragement_API
     public function user($params)
     {
         if ( ! isset( $params['user_id'] ) ) {
-            return new WP_Error( __METHOD__, 'No user id provided', array( 'status' => 400 ) );
+            return new WP_Error( 'no_user_id', 'No user id provided', array( 'status' => 400 ) );
+        }
+        return self::_get_encouragement( $params['user_id'] );
+
+    }
+
+    public static function _get_encouragement( $user_id, $log = NULL ) {
+
+
+        if ( is_null( $log ) ) {
+            $log = zume_user_log( $user_id );
+            if ( is_null( $log ) ) {
+                return [];
+            }
         }
 
-        $log = zume_user_log( $params['user_id'] );
-        if ( is_null( $log ) ) {
-            return new WP_Error( __METHOD__, 'No logs', array( 'status' => 400 ) );
-        }
+        $stage = Zume_System_Profile_API::_get_stage( $user_id, $log );
 
         $log_keys = [];
         foreach( $log as $row ) {
@@ -65,38 +75,51 @@ class Zume_System_Encouragement_API
         }
 
 
+        $templates = self::_get_plans( $user_id, $log_keys );
 
-        // current plan
-//        $current_plan = zume_user_current_plan( $params['user_id'], $log_keys );
-
-        // recommended plan
-        $recommended_plan = $this->zume_user_recommended_plan( $params['user_id'], $log_keys );
-
-        // disable plan
-//        if ( $current_plan === $recommended_plan ) {
-//
+        $plan = [];
+        foreach($templates as $template) {
+            if ( in_array( $stage['stage'], $template['stages'] ) ) {
+                $plan = $template;
+            }
+        }
+//        if ( ! empty( $plan ) ) {
+//            foreach( $plan as $key => $item ) {
+//                foreach( $item['required_keys'] as $required_key) {
+//                    if ( ! in_array( $required_key, $log_keys ) ) {
+//                        unset( $plan[$key] );
+//                    }
+//                }
+//                foreach( $item['disable_keys'] as $disable_key) {
+//                    if ( in_array( $disable_key, $log_keys ) ) {
+//                        unset( $plan[$key] );
+//                    }
+//                }
+//            }
 //        }
 
-        // encouragement plan
-//        $encouragement_plan = zume_user_encouragement_plan( $params['user_id'], $log_keys );
-
-        return  $recommended_plan;
+        return  $plan;
     }
 
-    public function zume_user_recommended_plan( $user_id, $log_keys ) {
+    public static function _get_plans( $user_id, $log_keys ) {
         return [
-            '1 day after event',
-            '2 days after event',
-            '3 days after event',
-            '4 days after event',
-            '5 days after event',
-            '6 days after event',
-            '7 days after event',
-            '2 weeks after event',
-            '3 weeks after event',
-            '4 weeks after event',
-            '2 months after event',
-            '3 months after event'
+            [
+                'stages' => [0,1,2,3,4,5,6],
+                'required_keys' => [],
+                'disable_keys' => [],
+                'plan' => [
+                    'Immediate queue email',
+                    '1 day after event',
+                    '2 days after event',
+                    '3 days after event',
+                    '1 week after event',
+                    '2 weeks after event',
+                    '3 weeks after event',
+                    '1 month after event',
+                    '2 months after event',
+                    '3 months after event',
+                ]
+            ]
         ];
     }
 

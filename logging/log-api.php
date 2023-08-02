@@ -51,11 +51,30 @@ class Zume_System_Log_API
                     $today = strtotime( 'Today -'.$params['days_ago'].' days' ); // @todo dev only, remove for production.
                 } // END
 
+        // process user relevant fields
+        if ( ! empty( $params['user_id'] ) || is_user_logged_in() ) {
+            if ( empty( $data['user_id'] ) && is_user_logged_in() ) {
+                $data['user_id'] = get_current_user_id();
+            }
+            $contact = Disciple_Tools_Users::get_contact_for_user( $params['user_id'] );
+            if ( ! is_wp_error( $contact ) && ! empty( $contact ) ) {
+                $params['post_id'] = $contact;
+
+                $log = zume_user_log( $params['user_id'] );
+
+                if ( empty( $params['value'] ) && '0' != $params['value'] ) {
+                    $stage = zume_get_stage( $params['user_id'], $log );
+                    $params['value'] = $stage['stage'];
+                }
+            }
+        }
+
         // get hash
         $hash = hash('sha256', maybe_serialize($params)  . $today );
 
+
         // test hash for duplicate
-        if ( 'login' === $params['subtype'] ) {
+        if ( in_array( $params['subtype'], ['login', 'checkin' ] ) ) {
             $hash = hash('sha256', maybe_serialize($params)  . time() );
         } else {
             $duplicate_found = $wpdb->get_row(
@@ -73,7 +92,7 @@ class Zume_System_Log_API
             }
         }
 
-        // set data
+        // merge complete data array
         $data = wp_parse_args(
             $params,
             [
@@ -93,44 +112,159 @@ class Zume_System_Log_API
             ]
         );
 
-        // evaluate type, subtype, and value
-        $valid_types = $this->_is_valid_types( $data );
-        if ( ! $valid_types ) {
-            return new WP_Error(__METHOD__, 'Valid type or subtype not found.', ['status' => 400] );
-        }
+        // add log
+        $added_log = [];
+        $added_log[] = dt_report_insert( $data, true, false );
 
-        // user id
-        if ( empty( $data['user_id'] ) && is_user_logged_in() ) {
-            $data['user_id'] = get_current_user_id();
-        }
+        $this->_add_additional_log_actions( $added_log, $data, $log );
 
-        if ( $data['user_id'] ) {
-            $data['post_id'] = Disciple_Tools_Users::get_contact_for_user($data['user_id']);
-        }
-
-        $log = [];
-        $log[] = dt_report_insert( $data, true, false );
-
-        $this->_add_additional_log_actions( $log, $data );
-
-        return $log;
-
+        return $added_log;
     }
-    public function _add_additional_log_actions( &$log, $data ) {
-        if ( 'system' === $data['type'] && 'joined_online_training' === $data['subtype'] ) {
+    public function _add_additional_log_actions( &$added_log, $data, $log ) {
+
+        $type = $data['type'];
+        $subtype = $data['subtype'];
+        $pre = substr( $subtype, 0, 3 );
+
+        if ( 'system' === $type && 'joined_online_training' === $subtype ) {
             $data_item = $data;
             $data_item['type'] = 'system';
             $data_item['subtype'] = 'plan_created';
             $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
-            $log[] = dt_report_insert( $data_item, true, false );
+            $added_log[] = dt_report_insert( $data_item, true, false );
+        }
+        if ( 'system' === $type && 'completed_3_month_plan' === $subtype ) {
+            if ( $this->_needs_to_be_logged( $log, 'system', 'made_3_month_plan' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'system';
+                $data_item['subtype'] = 'made_3_month_plan';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
         }
 
-        // @todo
-        /* Additional Log Actions */
-        // additional training elements
-        // additional mawl pieces
-        // additional host items
-        // additional completion reports
+
+        // additional HOST
+        else if ( 'training' === $type && str_contains( $subtype, 'trained' ) ) {
+            if ( $this->_needs_to_be_logged( $log, 'training', $pre.'shared' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'training';
+                $data_item['subtype'] = $pre.'shared';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+            if ( $this->_needs_to_be_logged( $log, 'training', $pre.'obeyed' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'training';
+                $data_item['subtype'] = $pre.'obeyed';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+            if ( $this->_needs_to_be_logged( $log, 'training', $pre.'heard' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'training';
+                $data_item['subtype'] = $pre.'heard';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+        }
+        else if ( 'training' === $type && str_contains( $subtype, 'shared' ) ) {
+            if ( $this->_needs_to_be_logged( $log, 'training', $pre.'obeyed' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'training';
+                $data_item['subtype'] = $pre.'obeyed';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+            if ( $this->_needs_to_be_logged( $log, 'training', $pre.'heard' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'training';
+                $data_item['subtype'] = $pre.'heard';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+        }
+        else if ( 'training' === $type && str_contains( $subtype, 'obeyed' ) ) {
+            if ( $this->_needs_to_be_logged( $log, 'training', $pre.'heard' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'training';
+                $data_item['subtype'] = $pre.'heard';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+        }
+        // additional MAWL
+        else if ( 'coaching' === $type && str_contains( $subtype, 'launching' ) ) {
+            if ( $this->_needs_to_be_logged( $log, 'coaching', $pre.'watching' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'coaching';
+                $data_item['subtype'] = $pre.'watching';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+            if ( $this->_needs_to_be_logged( $log, 'coaching', $pre.'assisting' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'coaching';
+                $data_item['subtype'] = $pre.'assisting';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+            if ( $this->_needs_to_be_logged( $log, 'coaching', $pre.'modeling' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'coaching';
+                $data_item['subtype'] = $pre.'modeling';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+        }
+        else if ( 'coaching' === $type && str_contains( $subtype, 'watching' ) ) {
+            if ( $this->_needs_to_be_logged( $log, 'coaching', $pre.'assisting' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'coaching';
+                $data_item['subtype'] = $pre.'watching';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+            if ( $this->_needs_to_be_logged( $log, 'coaching', $pre.'modeling' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'coaching';
+                $data_item['subtype'] = $pre.'modeling';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+        }
+        else if ( 'coaching' === $type && str_contains( $subtype, 'assisting' ) ) {
+            if ( $this->_needs_to_be_logged( $log, 'coaching', $pre.'modeling' ) ) {
+                $data_item = $data;
+                $data_item['type'] = 'coaching';
+                $data_item['subtype'] = $pre.'modeling';
+                $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+                $added_log[] = dt_report_insert( $data_item, true, false );
+            }
+        }
+
+        // check if log is registered
+        if ( is_user_logged_in() && $this->_needs_to_be_logged( $log, 'system', 'registered' ) ) {
+            $data_item = $data;
+            $data_item['type'] = 'system';
+            $data_item['subtype'] = 'registered';
+            $data_item['hash'] = hash('sha256', maybe_serialize( $data_item )  . time() );
+            $added_log[] = dt_report_insert( $data_item, true, false );
+        }
+
+
+
+        return $added_log;
+    }
+    public function _needs_to_be_logged( $log, $type, $subtype ) : bool {
+        $already_logged = true;
+        foreach ( $log as $log_item ) {
+            if ( $log_item['type'] === $type && $log_item['subtype'] === $subtype ) {
+                $already_logged = false;
+                break;
+            }
+        }
+        return $already_logged;
     }
     public function _is_valid_types( $data ) : bool {
         // test types and subtypes
