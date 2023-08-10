@@ -45,7 +45,6 @@ class Zume_System_Profile_API
         } else {
             return $this->guest( $params );
         }
-
     }
     public function user( $params) {
         $user_id = (int) $params['user_id'] ?? get_current_user_id();
@@ -56,8 +55,7 @@ class Zume_System_Profile_API
         return [
             'profile' => self::_get_profile( $user_id ),
             'location' => $location,
-            'stage' => self::_get_stage( $user_id, $log ),
-            'state' => self::_get_state( $user_id, $log ),
+            'stage' => zume_get_stage( $user_id, $log ),
         ];
     }
     public function guest( $params ) {
@@ -108,9 +106,8 @@ class Zume_System_Profile_API
     }
     public static function _get_profile( $user_id ) {
 
-        $name = '';
         $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
-        $contact = [];
+
         if ( $contact_id ) {
             $contact = DT_Posts::get_post( 'contacts', (int) $contact_id, false, false, true );
             $name = $contact['name'] ?? '';
@@ -140,106 +137,6 @@ class Zume_System_Profile_API
             $location = $params['location'];
         }
         return $location;
-    }
-    public static function _get_stage( $user_id, $log = NULL ) {
-
-        if ( ! is_null( $log ) ) {
-            $log = zume_user_log( $user_id );
-        }
-
-        $funnel = zume_funnel_stages();
-        $stage = $funnel[0];
-
-        if ( count($log) > 0 ) {
-
-            $funnel_steps = [
-                1 => false,
-                2 => false,
-                3 => false,
-                4 => false,
-                5 => false,
-                6 => false,
-            ];
-
-            foreach( $log as $index => $value ) {
-                if ( 'registered' == $value['subtype'] ) {
-                    $funnel_steps[1] = true;
-                }
-                if ( 'plan_created' == $value['subtype'] ) {
-                    $funnel_steps[2] = true;
-                }
-                if ( 'training_completed' == $value['subtype'] ) {
-                    $funnel_steps[3] = true;
-                }
-                if ( 'first_practitioner_report' == $value['subtype'] ) {
-                    $funnel_steps[4] = true;
-                }
-                if ( 'mawl_completed' == $value['subtype'] ) {
-                    $funnel_steps[5] = true;
-                }
-                if ( 'seeing_generational_fruit' == $value['subtype'] ) {
-                    $funnel_steps[6] = true;
-                }
-            }
-
-            if ( $funnel_steps[6] ) {
-                $stage = $funnel[6];
-            } else if ( $funnel_steps[5] ) {
-                $stage = $funnel[5];
-            } else if ( $funnel_steps[4] ) {
-                $stage = $funnel[4];
-            } else if ( $funnel_steps[3] ) {
-                $stage = $funnel[3];
-            } else if ( $funnel_steps[2] ) {
-                $stage = $funnel[2];
-            } else if ( $funnel_steps[1] ) {
-                $stage = $funnel[1];
-            } else {
-                $stage = $funnel[0];
-            }
-
-        }
-        return $stage;
-    }
-    public static function _get_state( $user_id, $log = NULL ) {
-        if ( ! is_null( $log ) ) {
-            $log = zume_user_log( $user_id );
-        }
-
-        $data = [
-            'has_registered' => false,
-            'has_a_plan' => false,
-            'has_coach' => false,
-            'has_set_profile' => false,
-            'has_invited_friends' => false,
-            'has_3_month_plan' => false,
-        ];
-
-        foreach( $log as $index => $value ) {
-
-            if( $value['subtype'] == 'registered' ) {
-                $data['has_registered'] = true;
-            }
-            if( $value['subtype'] == 'plan_created' ) {
-                $data['has_a_plan'] = true;
-            }
-
-            if( $value['subtype'] == 'requested_a_coach' ) {
-                $data['has_coach'] = true;
-            }
-            if( $value['subtype'] == 'set_profile' ) {
-                $data['has_set_profile'] = true;
-            }
-            if( $value['subtype'] == 'invited_friends' ) {
-                $data['has_invited_friends'] = true;
-            }
-            if( $value['subtype'] == 'completed_3_month_plan' ) {
-                $data['has_3_month_plan'] = true;
-            }
-
-        }
-
-        return $data;
     }
     public static function _get_completions( $user_id, $log = NULL ) {
         if ( ! is_null( $log ) ) {

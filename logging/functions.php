@@ -380,7 +380,7 @@ if ( ! function_exists( 'zume_funnel_stages' ) ) {
 if ( ! function_exists( 'zume_get_stage' ) ) {
     function zume_get_stage( $user_id, $log = NULL ) {
 
-        if ( ! is_null( $log ) ) {
+        if ( is_null( $log ) ) {
             $log = zume_user_log( $user_id );
         }
 
@@ -448,6 +448,11 @@ if ( ! function_exists( 'zume_user_log' ) ) {
                 AND r.post_type = 'zume'
                 ", $user_id );
         return $wpdb->get_results( $sql, ARRAY_A );
+    }
+}
+if( ! function_exists( 'zume_user_location' ) ) {
+    function zume_user_location( $user_id ) {
+
     }
 }
 

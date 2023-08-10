@@ -118,6 +118,8 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                 'hash' => hash('sha256', maybe_serialize($params)  . time() ),
             ] );
 
+            Zume_System_Encouragement_API::_install_plan( $user_id, Zume_System_Encouragement_API::_get_recommended_plan( $user_id, 'system', 'registered' ) );
+
             return [
                 'user_id' => $user_id,
                 'contact_id' => $contact_id,

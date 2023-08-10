@@ -53,6 +53,15 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 border-radius: 0 !important;
                 /*margin-bottom: 0 !important;*/
             }
+            #chart .button {
+                border-radius: 0 !important;
+            }
+            button.encouragement {
+                border-radius: 0 !important;
+            }
+            .button.encouragement.done {
+                background-color: #39ea29 !important;
+            }
             .button.button-grey {
                 border-radius: 0 !important;
                 background-color: lightgrey;
@@ -63,7 +72,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 background-color: lightgrey;
                 color: black;
             }
-            .button.zume.done {
+            .button.zume.done, .button.encouragement.done {
                 background-color: #39ea29 !important;
             }
             .button.zume.done:hover {
@@ -140,6 +149,12 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                             <h2>(0) Anonymous</h2>
                                         </div>
                                         <div class="cell small-6">
+                                        </div>
+                                        <div class="cell small-6 left-border">
+                                                <button class="button zume expanded system_joined_online_training" data-type="system" data-subtype="joined_online_training" data-stage="">Joined Online Training</button>
+                                                <button class="button expanded system_requested_a_coach" data-type="system" data-subtype="requested_a_coach" data-stage="">Requested a Coach</button>
+                                        </div>
+                                        <div class="cell small-6">
                                             <button class="button zume  expanded system_registered" data-type="system" data-subtype="registered" data-set="set2" data-stage="0">Registered</button>
                                         </div>
                                         <div class="cell small-6 left-border">
@@ -151,6 +166,14 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                                         <div class="cell center">
                                             <h2>(1) Registrant</h2>
+                                        </div>
+                                        <div class="cell small-6">
+                                        </div>
+                                        <div class="cell small-6 left-border">
+                                                <button class="button zume expanded system_joined_online_training" data-type="system" data-subtype="joined_online_training" data-stage="">Joined Online Training</button>
+                                                <button class="button expanded system_requested_a_coach" data-type="system" data-subtype="requested_a_coach" data-stage="">Requested a Coach</button>
+                                                <button class="button zume expanded system_set_profile" data-type="system" data-subtype="set_profile"  data-stage="">Set Profile</button>
+                                                <button class="button zume expanded system_invited_friends" data-type="system" data-subtype="invited_friends" data-stage="">Invited Friends</button>
                                         </div>
                                         <div class="cell small-6">
                                            <button class="button zume expanded system_plan_created" data-type="system" data-subtype="plan_created" data-set="set3" data-stage="1">Made a Plan</button>
@@ -169,7 +192,19 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                         <div class="cell small-6">
                                         </div>
                                         <div class="cell small-6 left-border">
+                                            <button class="button zume  expanded training_set_a_01" data-type="training" data-subtype="set_a_01" data-stage="2">Session 1 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_02" data-type="training" data-subtype="set_a_02" data-stage="2">Session 2 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_03" data-type="training" data-subtype="set_a_03" data-stage="2">Session 3 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_04" data-type="training" data-subtype="set_a_04" data-stage="2">Session 4 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_05" data-type="training" data-subtype="set_a_05" data-stage="2">Session 5 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_06" data-type="training" data-subtype="set_a_06" data-stage="2">Session 6 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_07" data-type="training" data-subtype="set_a_07" data-stage="2">Session 7 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_08" data-type="training" data-subtype="set_a_08" data-stage="2">Session 8 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_09" data-type="training" data-subtype="set_a_09" data-stage="2">Session 9 Checkin</button>
+                                            <button class="button zume  expanded training_set_a_10" data-type="training" data-subtype="set_a_10" data-stage="2">Session 10 Checkin</button>
+
                                             ${host_buttons_html}
+
                                             <button class="button zume alt-color expanded system_made_3_month_plan" data-type="system" data-subtype="made_3_month_plan" data-set="set5"  data-stage="2">Create 3-Month Plan</button>
                                         </div>
                                         <div class="cell small-6">
@@ -260,15 +295,14 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                                 <h3>General Actions</h3>
                                             </div>
                                             <div class="cell">
-                                                <button class="button zume alt-color expanded system_login" data-type="system" data-subtype="login" >Login</button>
-                                                <button class="button zume alt-color expanded message_response" data-type="message" data-subtype="response">Response to Message</button>
+                                                <button class="button zume alt-color expanded system_login" data-type="system" data-subtype="login" data-stage="">Login</button>
                                             </div>
                                             <div class="cell center">
                                                 <h3><hr>Training CTAs</h3>
                                             </div>
                                             <div class="cell">
                                                 <button class="button zume alt-color expanded system_joined_online_training" data-type="system" data-subtype="joined_online_training" data-stage="">Joined Online Training</button>
-                                                <button class="button zume alt-color expanded system_requested_a_coach" data-type="system" data-subtype="requested_a_coach"data-stage="">Requested a Coach</button>
+                                                <button class="button alt-color expanded system_requested_a_coach" data-type="system" data-subtype="requested_a_coach" data-stage="">Requested a Coach</button>
                                                 <button class="button zume alt-color expanded system_set_profile" data-type="system" data-subtype="set_profile"  data-stage="">Set Profile</button>
                                                 <button class="button zume alt-color expanded system_invited_friends" data-type="system" data-subtype="invited_friends" data-stage="">Invited Friends</button>
                                             </div>
@@ -276,9 +310,9 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                                 <h3><hr>Practitioner CTAs</h3>
                                             </div>
                                             <div class="cell">
-                                                <button class="button zume alt-color expanded reports_practitioner_report" data-type="reports" data-subtype="practitioner_report" data-set="set1"  data-stage="">Submit Practitioner Report</button>
-                                                <button class="button zume alt-color expanded system_joined_affinity_hub" data-type="system" data-subtype="joined_affinity_hub" data-set="set1"  data-stage="">Join Affinity Hub</button>
-                                                <button class="button zume alt-color expanded system_hub_checkin" data-type="system" data-subtype="hub_checkin" data-set="set1"  data-stage="">Hub Checkin</button>
+                                                <button class="button zume alt-color expanded reports_practitioner_report" data-type="reports" data-subtype="practitioner_report" data-stage="4">Submit Practitioner Report</button>
+                                                <button class="button zume alt-color expanded system_joined_affinity_hub" data-type="system" data-subtype="joined_affinity_hub" data-stage="">Join Affinity Hub</button>
+                                                <button class="button zume alt-color expanded system_hub_checkin" data-type="system" data-subtype="hub_checkin" data-stage="">Hub Checkin</button>
                                             </div>
                                             <div class="cell center">
                                                 <h3><hr>Checkins</h3>
@@ -300,26 +334,22 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                         <div id="last_action"></div>
                                     </div>
                                     <div class="cell medium-6">
-                                        <h2>CTAs</h2><br>
-                                        <div id="ctas-list" class="grid-x"></div>
-                                        <hr>
+                                        <h2>ENCOURAGEMENT PLAN</h2><br>
+                                        <div id="plan-list" class="grid-x"></div>
+                                        <div id="reset-list" class="grid-x"></div>
+                                    </div>
+                                    <div class="cell medium-6">
                                         <h2>STAGE</h2><br>
                                         <div id="stage-list" class="grid-x"></div>
+                                        <hr>
+                                        <h2>CTAs</h2><br>
+                                        <div id="ctas-list" class="grid-x"></div>
                                         <hr>
                                         <h2>USER PROFILE</h2><BR>
                                         <div id="user_profile" class="grid-x"></div>
                                     </div>
-                                    <div class="cell medium-6">
-                                        <div>
-
-                                             <h2>ENCOURAGEMENT PLAN</h2><br>
-                                            <div id="plan-list" class="grid-x"></div><br>
-                                            <div id="reset-list" class="grid-x"></div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                     `)
@@ -330,6 +360,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                 /* user profile */
                 window.get_user_profile = ( user_id ) => {
+                    jQuery('.loading-spinner').addClass('active')
                     makeRequest('POST', 'user_profile', { user_id: user_id } , window.site_info.system_root ).done( function( data ) {
                         console.log('user_profile')
                         console.log(data)
@@ -355,7 +386,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         jQuery.each(data.stage, function(ih, vh ) {
                             stageList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
                         })
-                        jQuery('#stage-list').append(stageList)
+                        jQuery('#stage-list').empty().append(stageList)
 
                         jQuery('.loading-spinner').removeClass('active')
                     })
@@ -369,8 +400,9 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 window.get_user_profile( user_id )
                 window.get_user_completions = ( user_id ) => {
                     makeRequest('POST', 'user_completions', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
-                        console.log('user_completions')
-                        console.log(data)
+                        // console.log('user_completions')
+                        // console.log(data)
+                        window.user_completions = data
 
                         jQuery.each(data, function(index, value) {
                             jQuery('.'+index).addClass('done')
@@ -383,8 +415,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 /* user ctas */
                 window.get_user_ctas = ( user_id ) => {
                     makeRequest('POST', 'user_ctas', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
-                        console.log('user_ctas')
-                        console.log(data)
+                        // console.log('user_ctas')
+                        // console.log(data)
                         window.user_ctas = data
 
                         let ctaList = ''
@@ -392,7 +424,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                             ctaList += `<div class="cell">${vh.label}</div>`
                         })
                         jQuery('#ctas-list').empty().append(ctaList)
-
                     })
                 }
                 window.get_user_ctas( user_id )
@@ -400,36 +431,65 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
 
                 /* user encouragement */
-                window.get_user_encouragement = ( user_id ) => {
-                    makeRequest('POST', 'user_encouragement', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
-                        console.log('user_encouragement')
-                        console.log(data)
-                        window.user_encourangement = data
+                window.get_user_encouragement = ( user_id, type, subtype ) => {
+                    makeRequest('POST', 'get_encouragement', { user_id, type, subtype }, window.site_info.system_root ).done( function( data ) {
+                        // console.log('get_encouragement')
+                        // console.log(data)
+                        window.get_encouragement = data
 
                         let plan = jQuery('#plan-list')
                         plan.empty()
 
+                        let sent = ''
+                        let responded = ''
+
                         let emailList = ''
-                        jQuery.each(data.plan, function(ih, vh ) {
-                            emailList = `<a class="button  button-grey expanded clear " style="white-space:nowrap; overflow: hidden;margin-bottom:0;">${vh}</a><div class="primary button-group expanded no-gaps">`
-                            emailList += `<button type="button" class="zume button alt-color">SEND</button>`
-                            emailList += `<button type="button" class="zume button alt-color">RESPOND</button>`
+                        jQuery.each(data, function(ih, vh ) {
+                            sent = ''
+                            responded = ''
+                            if ( vh.sent ) {
+                                sent = 'done'
+                            }
+                            if ( vh.responded ) {
+                                responded = 'done'
+                            }
+                            emailList = `<a class="button button-grey expanded clear " style="white-space:nowrap; overflow: hidden;margin-bottom:0;">${vh.subject}</a><div class="primary button-group expanded no-gaps">`
+                            emailList += `<button type="button" class="button encouragement sent alt-color encouragement_sent_${vh.message_post_id} sent_${vh.message_post_id} ${sent}" data-type="encouragement" data-subtype="sent" data-message="${vh.message_post_id}">SEND</button>`
+                            emailList += `<button type="button" class="button encouragement responded alt-color encouragement_responded_${vh.message_post_id} responded_${vh.message_post_id} ${responded}" data-type="encouragement" data-subtype="responded" data-message="${vh.message_post_id}">RESPONDED</button>`
                             emailList += `</div>`
                             plan.append(emailList)
                         })
+
+                        jQuery('.encouragement').on('click', function (event) {
+                            jQuery(this).addClass('done')
+                            window.send_encouragement_log( event )
+                        })
                     })
                 }
-                window.get_user_encouragement( user_id )
+                window.get_user_encouragement( user_id, 'no', 'trigger' )
                 /* end user encouragement */
 
 
                 /* log activity */
                 jQuery('.button.zume').on('click', function(event) {
+                    jQuery(this).addClass('done')
+                    window.post_log( event )
+                })
+                /* end log activity */
+                window.post_log = ( event ) => {
                     jQuery('.loading-spinner').addClass('active')
-                    let button = jQuery(this)
-                    let type = button.data('type')
-                    let subtype = button.data('subtype')
-                    let user_id =  jQuery('#user_id').val()
+
+                    window.user_completions = false
+
+                    let type = event.target.dataset.type
+                    let subtype = event.target.dataset.subtype
+                    let stage = false
+                    if ( event.target.dataset.stage ) {
+                        stage = event.target.dataset.stage
+                    }
+
+                    let user_id = jQuery('#user_id').val()
+                    let days_ago = jQuery('#days_ago').val()
 
                     jQuery('#last_action').html(`
                         <div class=""><h2>LAST ACTION</h2>${type} | <strong>${subtype}</strong><br><br>
@@ -437,7 +497,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                     let data = {
                         "user_id": user_id,
-                        "days_ago": jQuery('#days_ago').val(),
+                        "days_ago": days_ago,
                         "lng": window.user_profile.location.lng,
                         "lat": window.user_profile.location.lat,
                         "level": window.user_profile.location.level,
@@ -445,23 +505,99 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         "grid_id": window.user_profile.location.grid_id,
                         "type": type,
                         "subtype": subtype,
-                        "value": button.data('stage')
+                        "value": stage
                     }
-                    console.log('log activity')
-                    console.log(data)
+                    // console.log('log activity')
+                    // console.log(data)
 
-                    jQuery(this).addClass('done')
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
                         window.get_user_profile( user_id )
-                        window.get_user_encouragement( user_id )
-                        window.get_user_completions( user_id )
                         window.get_user_ctas( user_id )
+                        window.get_user_completions( user_id )
                     })
+                    window.get_user_encouragement( user_id, type, subtype )
+
+                }
+                window.send_encouragement_log = ( event ) => {
+                    // console.log('encouragement log')
+
+                    let type = event.target.dataset.type
+                    let subtype = event.target.dataset.subtype
+                    let stage = false
+                    if ( event.target.dataset.stage ) {
+                        stage = event.target.dataset.stage
+                    }
+                    let message_id = event.target.dataset.message
+
+                    let user_id = jQuery('#user_id').val()
+                    let days_ago = jQuery('#days_ago').val()
+
+                    let data = {
+                        "user_id": user_id,
+                        "post_id": message_id,
+                        "days_ago": days_ago,
+                        "lng": window.user_profile.location.lng,
+                        "lat": window.user_profile.location.lat,
+                        "level": window.user_profile.location.level,
+                        "label": window.user_profile.location.label,
+                        "grid_id": window.user_profile.location.grid_id,
+                        "type": type,
+                        "subtype": subtype,
+                        "value": stage
+                    }
+
+                    makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
+                        window.get_user_profile( user_id )
+                        window.get_user_ctas( user_id )
+                        window.get_user_completions( user_id )
+                    })
+                    window.get_user_encouragement( user_id, type, subtype )
+                }
+                jQuery('.system_requested_a_coach').on('click', function(event) {
+                    jQuery(this).addClass('done')
+
+                    jQuery('.loading-spinner').addClass('active')
+
+                    window.user_completions = false
+
+                    let type = event.target.dataset.type
+                    let subtype = event.target.dataset.subtype
+                    let stage = false
+                    if ( event.target.dataset.stage ) {
+                        stage = event.target.dataset.stage
+                    }
+
+                    let user_id = jQuery('#user_id').val()
+                    let days_ago = jQuery('#days_ago').val()
+
+                    jQuery('#last_action').html(`
+                        <div class=""><h2>LAST ACTION</h2>${type} | <strong>${subtype}</strong><br><br>
+                    `)
+
+                    let data = {
+                        "user_id": user_id,
+                        "days_ago": days_ago,
+                        "lng": window.user_profile.location.lng,
+                        "lat": window.user_profile.location.lat,
+                        "level": window.user_profile.location.level,
+                        "label": window.user_profile.location.label,
+                        "grid_id": window.user_profile.location.grid_id,
+                        "type": type,
+                        "subtype": subtype,
+                        "value": stage
+                    }
+                    console.log('get a coach')
+                    console.log(data)
+                    makeRequest('POST', 'get_a_coach', data, window.site_info.system_root ).done( function( data ) {
+                        console.log(data)
+                        window.get_user_profile( user_id )
+                        window.get_user_ctas( user_id )
+                        window.get_user_completions( user_id )
+                    })
+                    window.get_user_encouragement( user_id, type, subtype )
 
                 })
-                /* end log activity */
 
-                jQuery('.loading-spinner').removeClass('active')
             })
         </script>
         <?php
@@ -469,86 +605,4 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 }
 new Zume_Simulate_Funnel();
 
-class Zume_System_Completions_API
-{
-    public $namespace = 'zume_system/v1';
-    private static $_instance = null;
 
-    public static function instance()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
-
-    public function __construct()
-    {
-        if (dt_is_rest()) {
-            add_action('rest_api_init', [$this, 'add_api_routes']);
-            add_filter('dt_allow_rest_access', [$this, 'authorize_url'], 10, 1);
-        }
-    }
-
-    public function authorize_url($authorized)
-    {
-        if (isset($_SERVER['REQUEST_URI']) && strpos(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])), $this->namespace) !== false) {
-            $authorized = true;
-        }
-        return $authorized;
-    }
-
-    public function add_api_routes()
-    {
-        $namespace = $this->namespace;
-        register_rest_route(
-            $namespace, '/user_completions', [
-                'methods' => ['GET', 'POST'],
-                'callback' => [$this, 'request_sorter'],
-                'permission_callback' => '__return_true'
-            ]
-        );
-    }
-
-    public function request_sorter(WP_REST_Request $request)
-    {
-        $params = dt_recursive_sanitize_array($request->get_params());
-
-        if (is_user_logged_in()) {
-            return $this->user($params);
-        } else {
-            return $this->guest($params);
-        }
-
-    }
-
-    public function user($params)
-    {
-        $user_id = $params['user_id'] ?? get_current_user_id();
-
-        global $wpdb;
-        $sql = $wpdb->prepare( "SELECT CONCAT( r.type, '_', r.subtype ) as log_key, r.*
-                FROM $wpdb->dt_reports r
-                WHERE r.user_id = %s
-                AND r.post_type = 'zume'
-                ", $user_id );
-        $results = $wpdb->get_results( $sql, ARRAY_A );
-
-        $data = [];
-        foreach( $results as $item ) {
-            $data[$item['log_key']] = $item;
-        }
-
-        return $data;
-    }
-    public static function _query_user_log( $user_id ) {
-
-    }
-
-    public function guest($params)
-    {
-        return [];
-    }
-
-}
-Zume_System_Completions_API::instance();

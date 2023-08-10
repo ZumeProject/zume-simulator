@@ -31,14 +31,28 @@ class Zume_System_Encouragement_API
     {
         $namespace = $this->namespace;
         register_rest_route(
-            $namespace, '/user_encouragement', [
+            $namespace, '/get_encouragement', [
                 'methods' => ['GET', 'POST'],
                 'callback' => [$this, 'request_sorter'],
                 'permission_callback' => '__return_true'
             ]
         );
+        register_rest_route(
+            $namespace, '/send_encouragement', [
+                'methods' => ['GET', 'POST'],
+                'callback' => [$this, 'send_encouragement'],
+                'permission_callback' => '__return_true'
+            ]
+        );
+        register_rest_route(
+            $namespace, '/respond_encouragement', [
+                'methods' => ['GET', 'POST'],
+                'callback' => [$this, 'respond_encouragement'],
+                'permission_callback' => '__return_true'
+            ]
+        );
     }
-    public function request_sorter(WP_REST_Request $request)
+    public function request_sorter( WP_REST_Request $request )
     {
         $params = dt_recursive_sanitize_array( $request->get_params() );
 
@@ -53,347 +67,362 @@ class Zume_System_Encouragement_API
         if ( ! isset( $params['user_id'] ) ) {
             return new WP_Error( 'no_user_id', 'No user id provided', array( 'status' => 400 ) );
         }
-        return self::_get_encouragement( $params['user_id'] );
-
+        return self::_get_encouragement( $params['user_id'], $params['type'], $params['subtype'] );
     }
+    public static function _get_encouragement( $user_id, $type, $subtype, $log = NULL ) {
+        dt_write_log(__FUNCTION__ . ' ' . $user_id .' - '. $type .' - '. $subtype );
 
-    public static function _get_encouragement( $user_id, $log = NULL ) {
+        $plan = self::_get_recommended_plan( $user_id, $type, $subtype );
+        if ( empty( $plan ) ) {
+            dt_write_log( 'no new plan : get_current_plan' );
+            return self::_get_current_plan( $user_id );
+        }
 
+        dt_write_log( 'installing new plan' );
+        self::_delete_current_plan( $user_id );
+        self::_install_plan( $user_id, $plan );
 
-        if ( is_null( $log ) ) {
-            $log = zume_user_log( $user_id );
-            if ( is_null( $log ) ) {
-                return [];
+        return self::_get_current_plan( $user_id );
+    }
+    public static function _get_current_plan( $user_id ) {
+        global $wpdb;
+        $raw_plan = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM $wpdb->dt_zume_message_plan WHERE user_id = %d"
+            , $user_id ), ARRAY_A );
+
+        $log = zume_user_log( $user_id );
+//        dt_write_log($log);
+        if ( empty( $log ) ) {
+            return $raw_plan;
+        }
+        else {
+            $relays = [
+                'sent' => [],
+                'responded' => []
+            ];
+            foreach( $log as $item ) {
+                if( 'sent' === $item['subtype'] ) {
+                    $relays['sent'][] = $item['post_id'];
+                }
+                if( 'responded' === $item['subtype'] ) {
+                    $relays['responded'][] = $item['post_id'];
+                }
             }
-        }
-
-        $stage = Zume_System_Profile_API::_get_stage( $user_id, $log );
-
-        $log_keys = [];
-        foreach( $log as $row ) {
-            $log_keys[] = $row['log_key'];
-        }
-
-
-        $templates = self::_get_plans( $user_id, $log_keys );
-
-        $plan = [];
-        foreach($templates as $template) {
-            if ( in_array( $stage['stage'], $template['stages'] ) ) {
-                $plan = $template;
+//            dt_write_log( $relays );
+            foreach( $raw_plan as $index => $item ) {
+                $raw_plan[$index]['sent'] = false;
+                $raw_plan[$index]['responded'] = false;
+                if ( in_array( $item['message_post_id'], $relays['sent'] ) ) {
+                    $raw_plan[$index]['sent'] = true;
+                }
+                if ( in_array( $item['message_post_id'], $relays['responded'] ) ) {
+                    $raw_plan[$index]['responded'] = true;
+                }
             }
+//            dt_write_log( $raw_plan );
+            return $raw_plan;
         }
-//        if ( ! empty( $plan ) ) {
-//            foreach( $plan as $key => $item ) {
-//                foreach( $item['required_keys'] as $required_key) {
-//                    if ( ! in_array( $required_key, $log_keys ) ) {
-//                        unset( $plan[$key] );
-//                    }
-//                }
-//                foreach( $item['disable_keys'] as $disable_key) {
-//                    if ( in_array( $disable_key, $log_keys ) ) {
-//                        unset( $plan[$key] );
-//                    }
-//                }
-//            }
-//        }
+    }
+    public static function _delete_current_plan( $user_id ) {
+        global $wpdb;
+        $wpdb->query($wpdb->prepare( "DELETE FROM $wpdb->dt_zume_message_plan WHERE user_id = $user_id AND sent IS NULL", $user_id ) );
+    }
+    public static function _install_plan( $user_id, $plan ) {
+        global $wpdb;
 
-        return  $plan;
+        if ( ! is_null( $plan ) && ! is_array( $plan ) ) {
+            return;
+        }
+
+        $user = get_user_by( 'id', $user_id );
+        foreach( $plan as $message ) {
+            $message['user_id'] = $user_id;
+            $message['to'] = $user->user_email;
+            $wpdb->insert( $wpdb->dt_zume_message_plan, $message );
+        }
+    }
+    public static function _get_recommended_plan( $user_id, $type, $subtype ) {
+        $plan = false;
+
+        if ( 'system' === $type && 'registered' === $subtype ) {
+            $plan = [
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23605,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Registered Post 1 Day',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime('+1 day'),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23606,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Registered Post 2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime('+2 day'),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23607,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Registered Post 3 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime('+3 day'),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23608,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Registered Post 4 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime('+1 week'),
+                ],
+            ];
+        }
+        else if ( 'system' === $type && 'plan_created' === $subtype ) {
+            $plan = [
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23621,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Plan Created Post 1 Day',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+1 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23632,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Plan Created Post 2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+            ];
+        }
+        else if ( 'system' === $type && 'training_completed' === $subtype ) {
+            $plan = [
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23631,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Training Completed Post 1 Day',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+1 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 236382,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Training Completed Post 2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 236933,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Training Completed Post 3 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+            ];
+        }
+        else if ( 'system' === $type && 'first_practitioner_report' === $subtype ) {
+            $plan = [
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 2343,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Post First Practitioner Report  1 Day',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+1 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23644,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Post First Practitioner Report 2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23634,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Post First Practitioner Report 3 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23624,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Post First Practitioner Report 2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23643,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'Post First Practitioner Report 3 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+            ];
+        }
+        else if ( 'system' === $type && 'mawl_completed' === $subtype ) {
+            $plan = [
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23645,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'MAWL Completed 1 Day',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+1 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23655,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'MAWL Completed 2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23656,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'MAWL Completed 3 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23657,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'MAWL Completed 4 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23658,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'MAWL Completed 5 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+            ];
+        }
+        else if ( 'system' === $type && 'seeing_generational_fruit' === $subtype ) {
+            $plan = [
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23667,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'seeing_generational_fruit 1 Day',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+1 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23677,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'seeing_generational_fruit2 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+                [
+                    'user_id' => $user_id,
+                    'message_post_id' => 23678,
+                    'message_type' => 'email',
+                    'to' => '',
+                    'subject' => 'seeing_generational_fruit 3 Days',
+                    'message' => 'laskjdf ;laskd jf;alskj df;aslkd jf;laskj df;laskj d;flaskj d;flaks djf;l',
+                    'headers' => '',
+                    'drop_date' => strtotime( '+2 day' ),
+                ],
+            ];
+        }
+
+        return $plan;
+    }
+    public static function _query_plans() {
+        global $wpdb;
+        $raw_plans = $wpdb->get_results( "
+            SELECT p.ID, p.post_parent, pm.meta_value as subject, pm1.meta_value as body, pm2.meta_value as footer, pm3.meta_value as action_keys
+                FROM $wpdb->posts p
+                LEFT JOIN $wpdb->postmeta pm ON p.ID = pm.post_id AND pm.meta_key = 'zume_email_subject'
+                LEFT JOIN $wpdb->postmeta pm1 ON p.ID = pm1.post_id AND pm1.meta_key = 'zume_email_body'
+                LEFT JOIN $wpdb->postmeta pm2 ON p.ID = pm2.post_id AND pm2.meta_key = 'zume_email_footer'
+                LEFT JOIN $wpdb->postmeta pm3 ON p.ID = pm3.post_id AND pm3.meta_key = 'zume_action_keys'
+                WHERE p.post_type = 'zume_messages'
+                AND p.post_status = 'publish'", ARRAY_A
+        );
+
+        $plans = [];
+        foreach( $raw_plans as $plan ) {
+            $plans[$plan['ID']] = $plan;
+        }
+
+        return $plans;
     }
 
-    public static function _get_plans( $user_id, $log_keys ) {
-        return [
-            [
-                'stages' => [0,1,2,3,4,5,6],
-                'required_keys' => [],
-                'disable_keys' => [],
-                'plan' => [
-                    'Immediate queue email',
-                    '1 day after event',
-                    '2 days after event',
-                    '3 days after event',
-                    '1 week after event',
-                    '2 weeks after event',
-                    '3 weeks after event',
-                    '1 month after event',
-                    '2 months after event',
-                    '3 months after event',
-                ]
-            ]
-        ];
+    public function send_encouragement( WP_REST_Request $request ) {
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+
+        return $params;
+    }
+    public function respond_encouragement( WP_REST_Request $request ) {
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+
+        return $params;
     }
 
-
-    /**
-    0
-    :
-    "system_registered"
-    1
-    :
-    "system_plan_created"
-    2
-    :
-    "system_requested_a_coach"
-    3
-    :
-    "system_joined_online_training"
-    4
-    :
-    "system_set_profile"
-    5
-    :
-    "system_invited_friends"
-    6
-    :
-    "reports_practitioner_report"
-    7
-    :
-    "system_joined_affinity_hub"
-    8
-    :
-    "system_hub_checkin"
-    9
-    :
-    "training_1_heard"
-    10
-    :
-    "training_2_heard"
-    11
-    :
-    "training_3_heard"
-    12
-    :
-    "training_4_heard"
-    13
-    :
-    "training_5_heard"
-    14
-    :
-    "training_6_heard"
-    15
-    :
-    "training_7_heard"
-    16
-    :
-    "training_8_heard"
-    17
-    :
-    "training_9_heard"
-    18
-    :
-    "training_10_heard"
-    19
-    :
-    "training_11_heard"
-    20
-    :
-    "training_12_heard"
-    21
-    :
-    "training_13_heard"
-    22
-    :
-    "training_14_heard"
-    23
-    :
-    "training_15_heard"
-    24
-    :
-    "training_16_heard"
-    25
-    :
-    "training_17_heard"
-    26
-    :
-    "training_18_heard"
-    27
-    :
-    "training_19_heard"
-    28
-    :
-    "training_20_heard"
-    29
-    :
-    "training_21_heard"
-    30
-    :
-    "training_22_heard"
-    31
-    :
-    "training_23_heard"
-    32
-    :
-    "training_24_heard"
-    33
-    :
-    "training_32_heard"
-    34
-    :
-    "training_31_heard"
-    35
-    :
-    "training_30_heard"
-    36
-    :
-    "training_25_heard"
-    37
-    :
-    "training_26_heard"
-    38
-    :
-    "training_27_heard"
-    39
-    :
-    "training_28_heard"
-    40
-    :
-    "training_29_heard"
-    41
-    :
-    "system_made_3_month_plan"
-    42
-    :
-    "system_training_completed"
-    43
-    :
-    "system_completed_3_month_plan"
-    44
-    :
-    "system_first_practitioner_report"
-    45
-    :
-    "coaching_4_modeling"
-    46
-    :
-    "coaching_5_modeling"
-    47
-    :
-    "coaching_7_modeling"
-    48
-    :
-    "coaching_8_modeling"
-    49
-    :
-    "coaching_10_modeling"
-    50
-    :
-    "coaching_11_modeling"
-    51
-    :
-    "coaching_12_modeling"
-    52
-    :
-    "coaching_13_modeling"
-    53
-    :
-    "coaching_16_modeling"
-    54
-    :
-    "coaching_17_modeling"
-    55
-    :
-    "coaching_19_modeling"
-    56
-    :
-    "coaching_21_modeling"
-    57
-    :
-    "coaching_22_modeling"
-    58
-    :
-    "coaching_26_modeling"
-    59
-    :
-    "coaching_31_modeling"
-    60
-    :
-    "coaching_32_modeling"
-    61
-    :
-    "system_mawl_completed"
-    62
-    :
-    "system_seeing_generational_fruit"
-     */
-
-    public static function _return_set( $set = 'set1' ) {
-        $list = [
-            '' => [
-                'plan' => ['[[Not Configured}}'],
-                'reset' => ['[[Not Configured}}'],
-            ],
-            'set1' => [
-                'plan' => ['[[Not Configured}}'],
-                'reset' => ['[[Not Configured}}'],
-            ],
-            'set2' => [
-                'plan' => [
-                    '1 day after event',
-                    '2 days after event',
-                    '3 days after event',
-                    '4 days after event',
-                    '5 days after event',
-                    '6 days after event',
-                    '7 days after event',
-                    '2 weeks after event',
-                    '3 weeks after event',
-                    '4 weeks after event',
-                    '2 months after event',
-                    '3 months after event'
-                ],
-                'reset' => [
-                    'Plan created'
-                ],
-            ],
-            'set3' => [
-                'plan' => [
-                    '1 day before planned training',
-                    '1 days after planned training',
-                    '2 weeks after event with no checkin',
-                    '3 weeks after event with no checkin',
-                    '4 weeks after event with no checkin',
-                    '5 weeks after event with no checkin',
-                    '6 weeks after event with no checkin',
-                ],
-                'reset' => [
-                    'Training checkins'
-                ],
-            ],
-            'set4' => [
-                'plan' => [
-                    '1 week after completed training',
-                    '2 weeks after completed training',
-                    '3 weeks after completed training',
-                    '4 weeks after completed training',
-                    '5 weeks after completed training',
-                    '6 weeks after completed training',
-                    '7 weeks after completed training',
-                    '8 weeks after completed training',
-                    '9 weeks after completed training',
-                    '10 weeks after completed training',
-                    '11 weeks after completed training',
-                    '12 weeks after completed training',
-                ],
-                'reset' => [
-                    'Completed 3-Month Plan',
-                    'Makes first practitioner report',
-                ],
-            ],
-            'set5' => [
-                'plan' => [
-                    'Immediately after event, coach notification',
-                    'Immediately after event, challenge to set profile',
-                    '1 day after request ??',
-                    '2 day after request ?? ',
-                    '3 day after request ??',
-                ],
-                'reset' => [
-                    'Coach establishes communication'
-                ],
-            ],
-        ];
-        return $list[$set];
-    }
     public function guest($params)
     {
         return [];

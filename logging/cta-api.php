@@ -62,7 +62,6 @@ class Zume_System_CTA_API
     }
     public static function _get_ctas( $user_id, $log = NULL ) : array
     {
-
         if ( is_null( $log ) ) {
             $log = zume_user_log( $user_id );
             if ( is_null( $log ) ) {
@@ -70,7 +69,7 @@ class Zume_System_CTA_API
             }
         }
 
-        $stage = Zume_System_Profile_API::_get_stage( $user_id, $log );
+        $stage = zume_get_stage( $user_id, $log );
 
         $log_keys = [];
         foreach( $log as $row ) {
