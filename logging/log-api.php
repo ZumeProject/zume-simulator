@@ -43,16 +43,17 @@ class Zume_System_Log_API
     }
 
     /**
-     * @param $type
-     * @param $subtype
-     * @param $data
+     * @param string $type
+     * @param string $subtype
+     * @param array $data
      * @return array|WP_Error
      */
-    public static function log( $type, $subtype, $data = [] ) {
+    public static function log( string $type, string $subtype, array $data = [] ) {
         $added_log = [];
         if ( ! isset( $type, $subtype ) ) {
             return new WP_Error(__METHOD__, 'Missing required parameters: type, subtype.', ['status' => 400] );
         }
+        $data = dt_recursive_sanitize_array( $data );
 
         $report = [
             'user_id' => null,
@@ -75,7 +76,7 @@ class Zume_System_Log_API
         self::_prepare_user_id( $report, $data );
         self::_prepare_location( $report, $data );
 
-        // no user id found, just insert anonymous log
+        // if no user_id found, just insert anonymous log
         if( empty( $report['user_id'] ) ) {
             $report['hash'] = hash('sha256', maybe_serialize($report)  . time() );
             $added_log[] = dt_report_insert( $report, true, true );
@@ -86,75 +87,9 @@ class Zume_System_Log_API
 
         self::_prepare_post_id( $report, $data );
         self::_prepare_time_end( $report, $data );
+        self::_prepare_value( $report, $data );
 
-
-
-
-
-        $data = dt_recursive_sanitize_array( $data );
-
-
-
-        // get time
-        $data['time_end'] = $time = time();
-        $today = date( 'Ymd', strtotime( 'Today' ) );
-
-                // BEGIN @todo dev only, remove for production.
-                if ( isset( $data['days_ago'] ) && ! empty( $data['days_ago'] ) ) {
-                    $today = strtotime( 'Today -'.$data['days_ago'].' days' ); // @todo dev only, remove for production.
-                } // END
-
-        /**
-         * USER
-         */
-
-
-        /**
-         * Get contact or post type for log
-         */
-
-
-        // process log
-        if ( ! empty( $data['user_id'] ) ) {
-            $log = zume_user_log( $data['user_id'] );
-
-            if ( ( ! isset( $data['value'] ) || empty( $data['value'] ) ) && '0' != $data['value'] ) {
-                $stage = zume_get_stage( $data['user_id'], $log );
-                $data['value'] = $stage['stage'];
-            }
-        }
-
-        // process location fields
-        // @todo get location?
-
-        // get hash
-        $hash = hash('sha256', maybe_serialize($data)  . $today );
-
-        // test hash for duplicate
-        if ( in_array( $subtype, ['login', 'checkin', 'sent', 'responded' ] ) ) {
-            $hash = hash('sha256', maybe_serialize($data)  . time() );
-        } else {
-            $duplicate_found = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT
-                    `id`
-                FROM
-                    `$wpdb->dt_reports`
-                WHERE hash = %s AND hash IS NOT NULL;",
-                    $hash
-                )
-            );
-            if ($duplicate_found) {
-                return new WP_Error(__METHOD__, 'Duplicate entry for today.', ['status' => 409]);
-            }
-        }
-
-
-
-        $report['post_type'] = 'zume';
-
-        // add log
-        $added_log = [];
+        $report['hash'] = hash('sha256', maybe_serialize($report)  . time() );
         $added_log[] = dt_report_insert( $report, true, false );
 
         // run additional actions
@@ -175,26 +110,50 @@ class Zume_System_Log_API
     }
     private static function _prepare_location( &$report, $data ) {
 
-        // if no user_id, build location from IP
-        // if user_id, build location from contact record
-        // if no contact record, build location from IP and store to contact record
+        if ( isset( $data['lng'], $data['lat'], $data['level'], $data['label'], $data['grid_id'] ) ) {
+            $report['lng'] = $data['lng'];
+            $report['lat'] = $data['lat'];
+            $report['level'] = $data['level'];
+            $report['label'] = $data['label'];
+            $report['grid_id'] = $data['grid_id'];
 
-        // @todo tempp location data
-        $report['lng'] = -199.699;
-        $report['lat'] = 37.0744;
-        $report['level'] = 'region';
-        $report['label'] = 'California, United States';
-        $report['grid_id'] = 100364453;
+            return $report;
+        }
+        else {
+            $location = zume_get_user_location( $report['user_id'], true );
+            if ( ! empty( $location ) ) {
+                $report['lng'] = $location['lng'];
+                $report['lat'] = $location['lat'];
+                $report['level'] = $location['level'];
+                $report['label'] = $location['label'];
+                $report['grid_id'] = $location['grid_id'];
+
+                return $report;
+            }
+        }
+
+        error_log(__METHOD__);
+        error_log('Silent log warning: Failing to generate a viable location lookup.');
+        $report['lng'] = null;
+        $report['lat'] = null;
+        $report['level'] = null;
+        $report['label'] = null;
+        $report['grid_id'] = null;
 
         return $report;
     }
     private static function _prepare_post_id( &$report, $data ) {
-        if ( isset( $data['post_id'] ) && empty( $data['user_id'] ) ) {
-            $contact = Disciple_Tools_Users::get_contact_for_user( $data['user_id'] );
+
+        if ( isset( $data['post_id'] ) && ! empty( $data['post_id'] ) ) {
+            $report['post_id'] = absint( $data['post_id'] );
+        }
+        else if ( isset( $report['user_id'] ) && ! empty( $report['user_id'] ) ) {
+            $contact = Disciple_Tools_Users::get_contact_for_user( $report['user_id'] );
             if ( ! is_wp_error( $contact ) && ! empty( $contact ) ) {
-                $data['post_id'] = $contact;
+                $report['post_id'] = $contact;
             }
         }
+
         return $report;
     }
     private static function _prepare_time_end( &$report, $data ) {
@@ -206,6 +165,14 @@ class Zume_System_Log_API
 
         return $report;
     }
+    private static function _prepare_value( &$report, $data ) {
+        $stage = zume_get_stage( $report['user_id'] );
+        $report['value'] = $stage['stage'];
+
+        return $report;
+    }
+
+
     public static function _add_additional_log_actions( &$added_log, $data, $log ) {
 
         $type = $data['type'];
@@ -606,25 +573,7 @@ class Zume_System_Log_API
         }
         return $already_logged;
     }
-    public static function build_log_for_current_user( $type, $subtype, $data = [] ) {
 
-        $params = [
-            'user_id' => null,
-            'type' => null,
-            'subtype' => null,
-            'value' => 0,
-            'lng' => null,
-            'lat' => null,
-            'level' => null,
-            'label' => null,
-            'grid_id' => null,
-        ];
-
-
-
-
-        $log_result = self::log($params);
-    }
 
     public function authorize_url( $authorized ){
         if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {

@@ -387,6 +387,10 @@ if ( ! function_exists( 'zume_get_stage' ) ) {
         $funnel = zume_funnel_stages();
         $stage = $funnel[0];
 
+        if ( empty( $log ) ) {
+            return $stage;
+        }
+
         if ( count($log) > 0 ) {
 
             $funnel_steps = [
@@ -450,9 +454,48 @@ if ( ! function_exists( 'zume_user_log' ) ) {
         return $wpdb->get_results( $sql, ARRAY_A );
     }
 }
-if( ! function_exists( 'zume_user_location' ) ) {
-    function zume_user_location( $user_id ) {
+if( ! function_exists( 'zume_get_user_location' ) ) {
+    function zume_get_user_location( $user_id, $ip_lookup = false  ) {
+        global $wpdb;
+        $location = $wpdb->get_row( $wpdb->prepare(
+            "SELECT lng, lat, level, label, grid_id
+                    FROM $wpdb->postmeta pm
+                    JOIN $wpdb->dt_location_grid_meta lgm ON pm.post_id=lgm.post_id
+                    WHERE pm.meta_key = 'corresponds_to_user' AND pm.meta_value = %d
+                    ORDER BY grid_meta_id desc
+                    LIMIT 1"
+            , $user_id ), ARRAY_A );
 
+        if ( empty( $location ) && $ip_lookup ) {
+            $result = DT_Ipstack_API::get_location_grid_meta_from_current_visitor();
+            if ( ! empty( $result ) ) {
+                $location = [
+                    'lng' => $result['lng'],
+                    'lat' => $result['lat'],
+                    'level' => $result['level'],
+                    'label' => $result['label'],
+                    'grid_id' => $result['grid_id'],
+                ];
+            }
+        }
+
+        if ( empty( $location ) ) {
+           return false;
+        }
+
+        return [
+            'lng' => $location['lng'],
+            'lat' => $location['lat'],
+            'level' => $location['level'],
+            'label' => $location['label'],
+            'grid_id' => $location['grid_id'],
+        ];
+    }
+}
+if( ! function_exists( 'zume_get_contact_id' ) ) {
+    function zume_get_contact_id( $user_id ) {
+        global $wpdb;
+        return $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'corresponds_to_user' AND meta_value = %s", $user_id ) );
     }
 }
 

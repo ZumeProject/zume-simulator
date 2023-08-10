@@ -48,7 +48,8 @@ class Zume_System_Profile_API
     }
     public function user( $params) {
         $user_id = (int) $params['user_id'] ?? get_current_user_id();
-        $location = $params['location'] ?? self::_get_location( $user_id );
+
+        $location = zume_get_user_location( $user_id, true );
 
         $log = zume_user_log( $user_id );
 
@@ -106,7 +107,7 @@ class Zume_System_Profile_API
     }
     public static function _get_profile( $user_id ) {
 
-        $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
+        $contact_id = zume_get_contact_id( $user_id );
 
         if ( $contact_id ) {
             $contact = DT_Posts::get_post( 'contacts', (int) $contact_id, false, false, true );
@@ -122,21 +123,6 @@ class Zume_System_Profile_API
             'contact_id' => $contact_id,
             'language' => 'en',
         ];
-    }
-    public static function _get_location( $params ) {
-        if ( empty( $params['location'] ?? null ) ) {
-            // @todo replace with location lookup system
-            $location = [
-                'lng' => -119.699,
-                'lat' => 37.0744,
-                'level' => 'region',
-                'label' => 'California, United States',
-                'grid_id' => 100364453
-            ];
-        } else {
-            $location = $params['location'];
-        }
-        return $location;
     }
     public static function _get_completions( $user_id, $log = NULL ) {
         if ( ! is_null( $log ) ) {

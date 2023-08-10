@@ -400,8 +400,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 window.get_user_profile( user_id )
                 window.get_user_completions = ( user_id ) => {
                     makeRequest('POST', 'user_completions', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
-                        // console.log('user_completions')
-                        // console.log(data)
                         window.user_completions = data
 
                         jQuery.each(data, function(index, value) {
@@ -415,8 +413,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 /* user ctas */
                 window.get_user_ctas = ( user_id ) => {
                     makeRequest('POST', 'user_ctas', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
-                        // console.log('user_ctas')
-                        // console.log(data)
                         window.user_ctas = data
 
                         let ctaList = ''
@@ -433,8 +429,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 /* user encouragement */
                 window.get_user_encouragement = ( user_id, type, subtype ) => {
                     makeRequest('POST', 'get_encouragement', { user_id, type, subtype }, window.site_info.system_root ).done( function( data ) {
-                        // console.log('get_encouragement')
-                        // console.log(data)
                         window.get_encouragement = data
 
                         let plan = jQuery('#plan-list')
@@ -483,13 +477,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                     let type = event.target.dataset.type
                     let subtype = event.target.dataset.subtype
-                    let stage = false
-                    if ( event.target.dataset.stage ) {
-                        stage = event.target.dataset.stage
-                    }
-
                     let user_id = jQuery('#user_id').val()
-                    let days_ago = jQuery('#days_ago').val()
 
                     jQuery('#last_action').html(`
                         <div class=""><h2>LAST ACTION</h2>${type} | <strong>${subtype}</strong><br><br>
@@ -497,18 +485,9 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                     let data = {
                         "user_id": user_id,
-                        "days_ago": days_ago,
-                        "lng": window.user_profile.location.lng,
-                        "lat": window.user_profile.location.lat,
-                        "level": window.user_profile.location.level,
-                        "label": window.user_profile.location.label,
-                        "grid_id": window.user_profile.location.grid_id,
                         "type": type,
                         "subtype": subtype,
-                        "value": stage
                     }
-                    // console.log('log activity')
-                    // console.log(data)
 
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
                         window.get_user_profile( user_id )
@@ -523,27 +502,14 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                     let type = event.target.dataset.type
                     let subtype = event.target.dataset.subtype
-                    let stage = false
-                    if ( event.target.dataset.stage ) {
-                        stage = event.target.dataset.stage
-                    }
                     let message_id = event.target.dataset.message
-
                     let user_id = jQuery('#user_id').val()
-                    let days_ago = jQuery('#days_ago').val()
 
                     let data = {
                         "user_id": user_id,
                         "post_id": message_id,
-                        "days_ago": days_ago,
-                        "lng": window.user_profile.location.lng,
-                        "lat": window.user_profile.location.lat,
-                        "level": window.user_profile.location.level,
-                        "label": window.user_profile.location.label,
-                        "grid_id": window.user_profile.location.grid_id,
                         "type": type,
                         "subtype": subtype,
-                        "value": stage
                     }
 
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
@@ -562,13 +528,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                     let type = event.target.dataset.type
                     let subtype = event.target.dataset.subtype
-                    let stage = false
-                    if ( event.target.dataset.stage ) {
-                        stage = event.target.dataset.stage
-                    }
-
                     let user_id = jQuery('#user_id').val()
-                    let days_ago = jQuery('#days_ago').val()
 
                     jQuery('#last_action').html(`
                         <div class=""><h2>LAST ACTION</h2>${type} | <strong>${subtype}</strong><br><br>
@@ -576,20 +536,11 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                     let data = {
                         "user_id": user_id,
-                        "days_ago": days_ago,
-                        "lng": window.user_profile.location.lng,
-                        "lat": window.user_profile.location.lat,
-                        "level": window.user_profile.location.level,
-                        "label": window.user_profile.location.label,
-                        "grid_id": window.user_profile.location.grid_id,
                         "type": type,
                         "subtype": subtype,
-                        "value": stage
                     }
-                    console.log('get a coach')
-                    console.log(data)
+
                     makeRequest('POST', 'get_a_coach', data, window.site_info.system_root ).done( function( data ) {
-                        console.log(data)
                         window.get_user_profile( user_id )
                         window.get_user_ctas( user_id )
                         window.get_user_completions( user_id )
