@@ -362,8 +362,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 window.get_user_profile = ( user_id ) => {
                     jQuery('.loading-spinner').addClass('active')
                     makeRequest('POST', 'user_profile', { user_id: user_id } , window.site_info.system_root ).done( function( data ) {
-                        console.log('user_profile')
-                        console.log(data)
+                        // console.log('user_profile')
+                        // console.log(data)
                         window.user_profile = data
 
                         let user_profile = jQuery('#user_profile')
@@ -409,7 +409,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 }
                 window.get_user_completions( user_id )
 
-
                 /* user ctas */
                 window.get_user_ctas = ( user_id ) => {
                     makeRequest('POST', 'user_ctas', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
@@ -429,6 +428,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 /* user encouragement */
                 window.get_user_encouragement = ( user_id, type, subtype ) => {
                     makeRequest('POST', 'get_encouragement', { user_id, type, subtype }, window.site_info.system_root ).done( function( data ) {
+                        // console.log('get_encouragement')
+                        // console.log(data)
                         window.get_encouragement = data
 
                         let plan = jQuery('#plan-list')
@@ -490,6 +491,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     }
 
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
+                        console.log('log')
                         window.get_user_profile( user_id )
                         window.get_user_ctas( user_id )
                         window.get_user_completions( user_id )
@@ -498,7 +500,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                 }
                 window.send_encouragement_log = ( event ) => {
-                    // console.log('encouragement log')
 
                     let type = event.target.dataset.type
                     let subtype = event.target.dataset.subtype
@@ -513,6 +514,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     }
 
                     makeRequest('POST', 'log', data, window.site_info.system_root ).done( function( data ) {
+                        console.log(data)
                         window.get_user_profile( user_id )
                         window.get_user_ctas( user_id )
                         window.get_user_completions( user_id )
@@ -520,6 +522,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     window.get_user_encouragement( user_id, type, subtype )
                 }
                 jQuery('.system_requested_a_coach').on('click', function(event) {
+                    // console.log('system_requested_a_coach')
+                    // console.log(data)
                     jQuery(this).addClass('done')
 
                     jQuery('.loading-spinner').addClass('active')
@@ -541,6 +545,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     }
 
                     makeRequest('POST', 'get_a_coach', data, window.site_info.system_root ).done( function( data ) {
+                        console.log(data)
                         window.get_user_profile( user_id )
                         window.get_user_ctas( user_id )
                         window.get_user_completions( user_id )

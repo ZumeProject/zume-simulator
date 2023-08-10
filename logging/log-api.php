@@ -93,7 +93,7 @@ class Zume_System_Log_API
         $added_log[] = dt_report_insert( $report, true, false );
 
         // run additional actions
-        self::_add_additional_log_actions( $added_log, $data, $log );
+        self::_add_additional_log_actions( $added_log, $report, $log );
 
         return $added_log;
     }

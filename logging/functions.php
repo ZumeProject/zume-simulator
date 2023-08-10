@@ -378,7 +378,7 @@ if ( ! function_exists( 'zume_funnel_stages' ) ) {
     }
 }
 if ( ! function_exists( 'zume_get_stage' ) ) {
-    function zume_get_stage( $user_id, $log = NULL ) {
+    function zume_get_stage( $user_id, $log = NULL, $number_only = false ) {
 
         if ( is_null( $log ) ) {
             $log = zume_user_log( $user_id );
@@ -440,7 +440,12 @@ if ( ! function_exists( 'zume_get_stage' ) ) {
             }
 
         }
-        return $stage;
+
+        if ( $number_only ) {
+            return $stage['stage'];
+        } else {
+            return $stage;
+        }
     }
 }
 if ( ! function_exists( 'zume_user_log' ) ) {
