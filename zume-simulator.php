@@ -86,7 +86,6 @@ class Zume_Simulator {
         return self::$_instance;
     }
     private function __construct() {
-        require_once( 'logging/loader.php' );
         require_once( 'api/completions-api.php' );
 
         if ( dt_is_rest() ) {
