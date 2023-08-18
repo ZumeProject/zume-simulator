@@ -91,7 +91,6 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
             $fields = [
                 'user_email' => $params['email'],
                 'user_phone' => $params['phone'],
-                'user_language' => $locale ?? null,
                 'location_grid_meta' => [
                     'values' => [
                         [

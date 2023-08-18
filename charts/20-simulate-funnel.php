@@ -117,6 +117,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                             <div class="cell medium-6">
                                 Configure: :
                                 ${user_selector} ${time_selector}
+                                <a href="" class="button primary" id="switch_to">Switch to User</a>
                                 <span class="loading-spinner active"></span>
                             </div>
                             <div class="cell medium-6 right">
@@ -372,7 +373,18 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         // set user state column
                         let profileList = ''
                         jQuery.each(data.profile, function(ih, vh ) {
-                            profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
+                            if ( typeof(vh) === 'string' ) {
+                                profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
+                            }
+                            else if ( ih === 'language' ) {
+                                profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh.name}</div>`
+                            }
+                            else if ( ih === 'location' ) {
+                                profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh.label}</div>`
+                            }
+                            else {
+                                profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${JSON.stringify(vh)}</div>`
+                            }
                         })
                         user_profile.append(profileList)
 
@@ -387,6 +399,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                             stageList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
                         })
                         jQuery('#stage-list').empty().append(stageList)
+
+                        jQuery('#switch_to').prop('href', `https://zume5.training/wp-admin/users.php?s=${user_id}&action=-1&new_role&paged=1&action2=-1&new_role2` )
 
                         jQuery('.loading-spinner').removeClass('active')
                     })
