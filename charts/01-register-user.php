@@ -56,12 +56,12 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
             if ( empty( $params['name'] ) ) {
                 $params['name'] = $params['username'];
             }
-
-            if ( isset( $params['user-optional-fields'] ) ) {
-                $optional_fields = $params['user-optional-fields'];
-            }
             if ( isset( $params['locale'] ) ) {
                 $locale = $params['locale'];
+            }
+            $phone = null;
+            if ( isset( $params['phone'] ) ) {
+                $phone = $params['phone'];
             }
 
             $user_object = wp_get_current_user();
@@ -89,6 +89,9 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
             $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
 
             $fields = [
+                'user_email' => $params['email'],
+                'user_phone' => $params['phone'],
+                'user_language' => $locale ?? null,
                 'location_grid_meta' => [
                     'values' => [
                         [
@@ -176,6 +179,8 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                                     <input type="text" id="user-username" placeholder="username">
                                     <label for="user-password">Password</label>
                                     <input type="text" id="user-password" placeholder="password">
+                                    <label for="user-phone">Phone</label>
+                                    <input type="text" id="user-phone" placeholder="phone">
                                     <label for="user-days_ago">Number of Days Ago</label>
                                     <select id="days_ago">
                                         <option value="0">today</option>
@@ -216,11 +221,13 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                 let username = makeid(8)
                 let email = username + '@emailtest.com'
                 let password = username + '_password'
+                let phone = Math.floor(Math.random() * 1000000000);
 
                 jQuery('#user-email').val(email)
                 jQuery('#user-username').val(username)
                 jQuery('#user-name').val(username)
                 jQuery('#user-password').val(password)
+                jQuery('#user-phone').val(phone)
 
                 jQuery('#register-user').on('click', function(e){
                     e.preventDefault()
@@ -228,6 +235,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                     let name = jQuery('#user-name').val()
                     let username = jQuery('#user-username').val()
                     let password = jQuery('#user-password').val()
+                    let phone = jQuery('#user-phone').val()
                     let locale = jQuery('#user-locale').val()
                     let location = jQuery('#location')
 
@@ -238,6 +246,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                         username: username,
                         password: password,
                         locale: locale,
+                        phone: phone,
                         lng: location.find(':selected').data('lng'),
                         lat: location.find(':selected').data('lat'),
                         level: location.find(':selected').data('level'),
