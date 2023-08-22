@@ -91,6 +91,7 @@ class Zume_Simulator {
         if ( dt_is_rest() ) {
             require_once ('api/queries.php');
             require_once( 'api/rest-api.php' );
+            require_once( 'api/profile-api.php' );
         }
 
         require_once( 'charts/loader.php' );

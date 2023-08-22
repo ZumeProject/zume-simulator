@@ -114,13 +114,14 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                 chart.empty().html(`
                         <div class="grid-x">
-                            <div class="cell medium-6">
+                            <div class="cell medium-8">
                                 Configure: :
                                 ${user_selector} ${time_selector}
-                                <a href="" class="button primary" id="switch_to">Switch to User</a>
+                                <a href="" class="button primary small" id="switch_to">Switch to User</a>
+                                <a href="" class="button primary small" target="_blank" id="coaching_record">Coaching Record</a>
                                 <span class="loading-spinner active"></span>
                             </div>
-                            <div class="cell medium-6 right">
+                            <div class="cell medium-4 right">
                                 <h2>SIMULATE FUNNEL</h2>
                             </div>
                             <div class="cell">
@@ -363,8 +364,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                 window.get_user_profile = ( user_id ) => {
                     jQuery('.loading-spinner').addClass('active')
                     makeRequest('POST', 'user_profile', { user_id: user_id } , window.site_info.system_root ).done( function( data ) {
-                        // console.log('user_profile')
-                        // console.log(data)
+                        console.log('user_profile')
+                        console.log(data)
                         window.user_profile = data
 
                         let user_profile = jQuery('#user_profile')
@@ -388,11 +389,11 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         })
                         user_profile.append(profileList)
 
-                        let stateList = '<hr>'
-                        jQuery.each(data.state, function(ih, vh ) {
-                            stateList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
-                        })
-                        user_profile.append(stateList)
+                        // let stateList = '<hr>'
+                        // jQuery.each(data.state, function(ih, vh ) {
+                        //     stateList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
+                        // })
+                        // user_profile.append(stateList)
 
                         let stageList = ''
                         jQuery.each(data.stage, function(ih, vh ) {
@@ -401,6 +402,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         jQuery('#stage-list').empty().append(stageList)
 
                         jQuery('#switch_to').prop('href', `https://zume5.training/wp-admin/users.php?s=${user_id}&action=-1&new_role&paged=1&action2=-1&new_role2` )
+
+                        jQuery('#coaching_record').prop('href', `https://zume5.training/coaching/contacts/${data.coaching_contact_id}` )
 
                         jQuery('.loading-spinner').removeClass('active')
                     })
