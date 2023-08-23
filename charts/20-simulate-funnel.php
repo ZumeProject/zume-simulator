@@ -207,7 +207,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                                             ${host_buttons_html}
 
-                                            <button class="button zume alt-color expanded system_made_3_month_plan" data-type="system" data-subtype="made_3_month_plan" data-set="set5"  data-stage="2">Create 3-Month Plan</button>
+                                            <button class="button zume alt-color expanded system_made_3_month_plan" data-type="system" data-subtype="made_3_month_plan" data-set="set5"  data-stage="2">Create Post Training Plan</button>
                                         </div>
                                         <div class="cell small-6">
                                             <button class="button zume expanded system_training_completed" data-type="system" data-subtype="training_completed" data-set="set4" data-stage="2">Training Completed</button>
@@ -228,7 +228,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                                         </div>
                                         <div class="cell small-6 left-border">
-                                            <button class="button zume alt-color expanded system_completed_3_month_plan" data-type="system" data-subtype="completed_3_month_plan" data-set="set1"  data-stage="3">Complete 3-Month Plan</button>
+                                            <button class="button zume alt-color expanded system_completed_3_month_plan" data-type="system" data-subtype="completed_3_month_plan" data-set="set1"  data-stage="3">Complete Post Training Plan</button>
                                         </div>
                                         <div class="cell small-6">
                                            <button class="button zume expanded system_first_practitioner_report" data-type="system" data-subtype="first_practitioner_report" data-set="set1"  data-stage="3">Made First Report</button>
