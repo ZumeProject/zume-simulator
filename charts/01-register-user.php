@@ -2,7 +2,7 @@
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
 
-class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
+class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
     public $permissions = ['manage_dt'];
@@ -49,6 +49,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
 
     public function register_user( WP_REST_Request $request ){
         $params = $request->get_params();
+        dt_write_log( $params );
 
         if ( isset( $params['email'], $params['name'], $params['username'], $params['password'] ) ){
             $user_roles = [ 'multiplier' ];
@@ -59,10 +60,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
             if ( isset( $params['locale'] ) ) {
                 $locale = $params['locale'];
             }
-            $phone = null;
-            if ( isset( $params['phone'] ) ) {
-                $phone = $params['phone'];
-            }
+
 
             $user_object = wp_get_current_user();
             $user_object->add_cap( 'create_users' );
@@ -118,6 +116,22 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                 'grid_id' => $params['grid_id'],
                 'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
                 'hash' => hash('sha256', maybe_serialize($params)  . time() ),
+            ] );
+
+            dt_report_insert( [
+                'user_id' => $user_id,
+                'post_id' => $contact_id,
+                'post_type' => 'zume',
+                'type' => 'stage',
+                'subtype' => 'current_level',
+                'value' => 1,
+                'lng' => $params['lng'],
+                'lat' => $params['lat'],
+                'level' => $params['level'],
+                'label' => $params['label'],
+                'grid_id' => $params['grid_id'],
+                'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
+                'hash' => hash('sha256', maybe_serialize($params)  . 'current_level' . time() ),
             ] );
 
             Zume_System_Encouragement_API::_install_plan( $user_id, Zume_System_Encouragement_API::_get_recommended_plan( $user_id, 'system', 'registered' ) );
@@ -182,6 +196,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                                     <input type="text" id="user-phone" placeholder="phone">
                                     <label for="user-days_ago">Number of Days Ago</label>
                                     <select id="days_ago">
+                                        <option value="100">100 Days Ago</option>
                                         <option value="0">today</option>
                                         <option value="3">3 Days Ago</option>
                                         <option value="7">7 Days Ago</option>
@@ -192,7 +207,6 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                                         <option value="30">30 Days Ago</option>
                                         <option value="60">60 Days Ago</option>
                                         <option value="90">90 Days Ago</option>
-                                        <option value="100">100 Days Ago</option>
                                     </select>
                                     <label for="user-locale">Language</label>
                                     ${dt_language_select}
@@ -235,7 +249,7 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
                     let username = jQuery('#user-username').val()
                     let password = jQuery('#user-password').val()
                     let phone = jQuery('#user-phone').val()
-                    let locale = jQuery('#user-locale').val()
+                    let locale = jQuery('select[name="locale"]').val()
                     let location = jQuery('#location')
 
                     let days_ago = jQuery('#days_ago').val()
@@ -356,4 +370,4 @@ class Zume_Simulator_Path_Goals extends Zume_Simulator_Chart_Base
     }
 
 }
-new Zume_Simulator_Path_Goals();
+new Zume_Simulator_Register();
