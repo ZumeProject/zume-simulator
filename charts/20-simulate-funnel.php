@@ -263,16 +263,20 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                             <h2>(5) Practitioner</h2>
                                         </div>
                                         <div class="cell small-6">
+                                        </div>
+                                        <div class="cell small-6 left-border">
+                                           <button id="post_parent_record" class="button expanded post_parent_record" data-stage="5">Parent Church</button>
+                                           <button id="post_child_record" class="button expanded post_child_record" value="" data-stage="5">Child Church</button>
+                                        </div>
+                                        <div class="cell small-6">
                                            <button class="button zume expanded system_seeing_generational_fruit" data-type="system" data-subtype="seeing_generational_fruit" data-set="set1"  data-stage="5">Seeing Generational Fruit</button>
                                         </div>
                                         <div class="cell small-6 left-border">
-
                                         </div>
 
                                          <div class="cell">
                                             <hr>
                                         </div>
-
 
                                         <div class="cell center">
                                             <h2>(6) Multiplying Practitioner</h2>
@@ -388,12 +392,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                             }
                         })
                         user_profile.append(profileList)
-
-                        // let stateList = '<hr>'
-                        // jQuery.each(data.state, function(ih, vh ) {
-                        //     stateList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh}</div>`
-                        // })
-                        // user_profile.append(stateList)
 
                         let stageList = ''
                         jQuery.each(data.stage, function(ih, vh ) {
@@ -570,6 +568,58 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     window.get_user_encouragement( user_id, type, subtype )
 
                 })
+                jQuery('.post_parent_record').on('click', function(event) {
+                    console.log('parent_record')
+
+                    jQuery('.loading-spinner').addClass('active')
+
+                    window.user_completions = false
+                    let user_id = jQuery('#user_id').val()
+
+                    let data = {
+                        "user_id": user_id,
+                        "type": 'parent_record',
+                        "location": window.user_profile.profile.location,
+                    }
+
+                    makeRequest('POST', 'make_post', data, window.site_info.rest_root ).done( function( data ) {
+                        console.log(data)
+                        jQuery('#post_child_record').val(data.post_id)
+
+                        window.get_user_profile( user_id )
+                        window.get_user_ctas( user_id )
+                        window.get_user_completions( user_id )
+                    })
+                })
+                jQuery('.post_child_record').on('click', function(event) {
+                    console.log('child_record')
+
+                    jQuery('.loading-spinner').addClass('active')
+
+                    window.user_completions = false
+                    let user_id = jQuery('#user_id').val()
+                    let value =  jQuery('#post_child_record').val()
+
+                    if ( ! value ) {
+                        return
+                    }
+
+                    let data = {
+                        "user_id": user_id,
+                        "parent_id": value,
+                        "type": 'child_record',
+                        "location": window.user_profile.profile.location,
+                    }
+
+                    makeRequest('POST', 'make_post', data, window.site_info.rest_root ).done( function( data ) {
+                        console.log(data)
+                        jQuery('#post_child_record').val(data.post_id)
+
+                        window.get_user_profile( user_id )
+                        window.get_user_ctas( user_id )
+                        window.get_user_completions( user_id )
+                    })
+                })
 
             })
         </script>
@@ -577,5 +627,241 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
     }
 }
 new Zume_Simulate_Funnel();
+
+
+
+class Zume_Simulator_Stats_Endpoints
+{
+    public $permissions = ['manage_dt'];
+    public $namespace = 'zume_simulator/v1';
+    private static $_instance = null;
+    public static function instance() {
+        if ( is_null( self::$_instance ) ) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
+    public function __construct() {
+        if ( dt_is_rest() ) {
+            add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
+            add_filter( 'dt_allow_rest_access', [ $this, 'authorize_url' ], 10, 1 );
+        }
+    }
+    public function add_api_routes() {
+        $namespace = $this->namespace;
+
+        register_rest_route(
+            $namespace, '/user_progress', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'user_progress' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
+        );
+        register_rest_route(
+            $namespace, '/reset_tracking', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'reset_tracking' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
+        );
+        register_rest_route(
+            $namespace, '/make_post', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'make_post' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
+        );
+    }
+
+    public function user_progress( WP_REST_Request $request ) {
+        global $wpdb;
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+        $user_id = (int) $params['user_id'];
+        $sql = $wpdb->prepare( "SELECT id, user_id, type, subtype, label FROM wp_dt_reports WHERE user_id = %s AND post_type = 'zume' ORDER BY time_end DESC", $user_id );
+        return $wpdb->get_results( $sql, ARRAY_A );
+    }
+
+    public function make_post( WP_REST_Request $request ) {
+
+        $params = dt_recursive_sanitize_array( $request->get_params() );
+
+        $user_id = (int) $params['user_id'];
+        $user = get_userdata( $user_id );
+
+        if ( 'child_record' === $params['type'] ) {
+            $parent_id = (int) $params['parent_id'];
+
+            $fields = [
+                'title' => 'Child for '.  $parent_id . ' and ' . $user->display_name,
+                "assigned_to" => $user_id,
+                "group_status" => "active",
+                "group_type" => "church",
+                'start_date' => date('Y-m-d'),
+                "church_start_date" => date('Y-m-d'),
+                "member_count" => 5,
+                "leader_count" => 1,
+                "parent_groups" => [
+                    "values" => [
+                        [ "value" => $parent_id ],
+                    ],
+                    "force_values" => true,
+                ],
+                'location_grid_meta' => [
+                    'values' => $params['location'],
+                ]
+            ];
+        } else {
+            $fields = [
+                'title' => 'Parent for ' . $user->display_name,
+                "assigned_to" => $user_id,
+                "group_status" => "active",
+                "group_type" => "church",
+                'start_date' => date('Y-m-d'),
+                "church_start_date" => date('Y-m-d'),
+                "member_count" => 5,
+                "leader_count" => 1,
+                'location_grid_meta' => [
+                    'values' => $params['location'],
+                ],
+            ];
+        }
+
+        $group = DT_Posts::create_post( 'groups',  $fields, true, false );
+
+        // log event
+
+        if ( 'child_record' === $params['type'] ) {
+            Zume_System_Log_API::log('system', 'seeing_generational_fruit' );
+        } else {
+            Zume_System_Log_API::log('reports', 'new_church' );
+        }
+
+        // set encouragements
+        Zume_System_Encouragement_API::_install_plan( $user_id, Zume_System_Encouragement_API::_get_recommended_plan( $user_id, 'system', 'registered' ) );
+
+        return [
+            'post_id' => $group['ID'],
+            'post' => $group,
+            'user_id' => $user_id,
+        ];
+    }
+
+    public function register_user( WP_REST_Request $request ){
+        $params = $request->get_params();
+
+        if ( isset( $params['email'], $params['name'], $params['username'], $params['password'] ) ){
+            $user_roles = [ 'multiplier' ];
+
+            if ( empty( $params['name'] ) ) {
+                $params['name'] = $params['username'];
+            }
+            if ( isset( $params['locale'] ) ) {
+                $locale = $params['locale'];
+            }
+
+
+            $user_object = wp_get_current_user();
+            $user_object->add_cap( 'create_users' );
+            $user_object->add_cap( 'create_contacts' );
+            $user_object->add_cap( 'access_contacts' );
+
+            $user_id = Disciple_Tools_Users::create_user(
+                $params['username'],
+                $params['email'],
+                $params['name'],
+                $user_roles,
+                null,
+                $locale ?? null,
+                false,
+                $params['password'],
+                [],
+                false
+            );
+
+            if ( is_wp_error( $user_id ) ) {
+                return $user_id;
+            }
+
+            $contact_id = Disciple_Tools_Users::get_contact_for_user( $user_id );
+
+            $fields = [
+                'user_email' => $params['email'],
+                'user_phone' => $params['phone'],
+                'location_grid_meta' => [
+                    'values' => [
+                        [
+                            'label' => $params['label'],
+                            'level' => $params['level'],
+                            'lng' => $params['lng'],
+                            'lat' => $params['lat'],
+                        ]
+                    ],
+                ]
+            ];
+            $contact_location = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
+
+            dt_report_insert( [
+                'user_id' => $user_id,
+                'post_id' => $contact_id,
+                'post_type' => 'zume',
+                'type' => 'system',
+                'subtype' => 'registered',
+                'value' => 0,
+                'lng' => $params['lng'],
+                'lat' => $params['lat'],
+                'level' => $params['level'],
+                'label' => $params['label'],
+                'grid_id' => $params['grid_id'],
+                'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
+                'hash' => hash('sha256', maybe_serialize($params)  . time() ),
+            ] );
+
+            dt_report_insert( [
+                'user_id' => $user_id,
+                'post_id' => $contact_id,
+                'post_type' => 'zume',
+                'type' => 'stage',
+                'subtype' => 'current_level',
+                'value' => 1,
+                'lng' => $params['lng'],
+                'lat' => $params['lat'],
+                'level' => $params['level'],
+                'label' => $params['label'],
+                'grid_id' => $params['grid_id'],
+                'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
+                'hash' => hash('sha256', maybe_serialize($params)  . 'current_level' . time() ),
+            ] );
+
+            Zume_System_Encouragement_API::_install_plan( $user_id, Zume_System_Encouragement_API::_get_recommended_plan( $user_id, 'system', 'registered' ) );
+
+            return [
+                'user_id' => $user_id,
+                'contact_id' => $contact_id,
+                'contact_location' => $contact_location,
+            ];
+        } else {
+            return new WP_Error( 'missing_error', 'Missing fields', [ 'status' => 400 ] );
+        }
+    }
+
+    public function reset_tracking( WP_REST_Request $request ) {
+        global $wpdb;
+        return $wpdb->query( "DELETE FROM $wpdb->dt_reports WHERE post_type = 'zume';" );
+    }
+    public function authorize_url( $authorized ){
+        if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
+            $authorized = true;
+        }
+        return $authorized;
+    }
+
+}
+Zume_Simulator_Stats_Endpoints::instance();
 
 

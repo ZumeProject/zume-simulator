@@ -146,6 +146,8 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
         }
     }
 
+
+
     public function base_menu( $content ) {
         $content .= '<li>ZÚME SIMULATOR</li>';
         $content .= '<li><hr></li>';
