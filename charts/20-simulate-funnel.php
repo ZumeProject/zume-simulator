@@ -713,7 +713,14 @@ class Zume_Simulator_Stats_Endpoints
                     "force_values" => true,
                 ],
                 'location_grid_meta' => [
-                    'values' => $params['location'],
+                    'values' => [
+                        [
+                            "label" => $params['location']['label'],
+                            "level" => 'admin3',
+                            "lng" => $params['location']['lng'],
+                            "lat" => $params['location']['lat'],
+                        ]
+                    ],
                 ]
             ];
         } else {
@@ -727,23 +734,39 @@ class Zume_Simulator_Stats_Endpoints
                 "member_count" => 5,
                 "leader_count" => 1,
                 'location_grid_meta' => [
-                    'values' => $params['location'],
+                    'values' => [
+                        [
+                            "label" => $params['location']['label'],
+                            "level" => 'admin3',
+                            "lng" => $params['location']['lng'],
+                            "lat" => $params['location']['lat'],
+                        ]
+                    ],
                 ],
             ];
         }
 
         $group = DT_Posts::create_post( 'groups',  $fields, true, false );
 
-        // log event
+        Zume_System_Log_API::log('reports', 'new_church', ['user_id' => $user_id ] );
 
         if ( 'child_record' === $params['type'] ) {
-            Zume_System_Log_API::log('system', 'seeing_generational_fruit' );
-        } else {
-            Zume_System_Log_API::log('reports', 'new_church' );
+            $already_logged = false;
+            $log = zume_user_log($user_id);
+            foreach ( $log as $log_item ) {
+                if ( $log_item['type'] === 'system' && $log_item['subtype'] === 'seeing_generational_fruit' ) {
+                    $already_logged = true;
+                    break;
+                }
+            }
+            if ( ! $already_logged ) {
+                Zume_System_Log_API::log('system', 'seeing_generational_fruit', ['user_id' => $user_id ] );
+            }
         }
 
+
         // set encouragements
-        Zume_System_Encouragement_API::_install_plan( $user_id, Zume_System_Encouragement_API::_get_recommended_plan( $user_id, 'system', 'registered' ) );
+//        Zume_System_Encouragement_API::_install_plan( $user_id, Zume_System_Encouragement_API::_get_recommended_plan( $user_id, $log_type, $log_subtype ) );
 
         return [
             'post_id' => $group['ID'],

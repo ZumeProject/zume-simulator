@@ -61,7 +61,6 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
                 $locale = $params['locale'];
             }
 
-
             $user_object = wp_get_current_user();
             $user_object->add_cap( 'create_users' );
             $user_object->add_cap( 'create_contacts' );
@@ -319,40 +318,42 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
     public function  _dev_location_list( $grid_id = null )
     {
         $list = array(
-            array('lng' => '-119.699', 'lat' => '37.0744', 'level' => 'region', 'label' => 'California, United States', 'grid_id' => '100364453'),
-            array('lng' => '-114.757', 'lat' => '54.6427', 'level' => 'region', 'label' => 'Alberta, Canada', 'grid_id' => '100041940'),
-            array('lng' => '-105.605', 'lat' => '39.1902', 'level' => 'region', 'label' => 'Colorado, United States', 'grid_id' => '100364539'),
-            array('lng' => '-100', 'lat' => '31', 'level' => 'region', 'label' => 'Texas, United States of America', 'grid_id' => '100366941'),
-            array('lng' => '-99.1456', 'lat' => '19.4194', 'level' => 'region', 'label' => 'Ciudad de México, México', 'grid_id' => '100245639'),
-            array('lng' => '-99.1456', 'lat' => '19.4194', 'level' => 'region', 'label' => 'Mexico City, Mexico', 'grid_id' => '100245639'),
-            array('lng' => '-90.5131', 'lat' => '14.6414', 'level' => 'region', 'label' => 'Guatemala, Guatemala', 'grid_id' => '100132337'),
-            array('lng' => '-85.9823', 'lat' => '35.9886', 'level' => 'region', 'label' => 'Tennessee, United States', 'grid_id' => '100366703'),
-            array('lng' => '-79.3897', 'lat' => '35.5569', 'level' => 'region', 'label' => 'North Carolina, United States', 'grid_id' => '100366162'),
-            array('lng' => '-71.5783', 'lat' => '43.6899', 'level' => 'region', 'label' => 'New Hampshire, United States', 'grid_id' => '100366017'),
-            array('lng' => '-3.25', 'lat' => '37.25', 'level' => 'region', 'label' => 'Granada, Spain', 'grid_id' => '100075268'),
-            array('lng' => '7.75', 'lat' => '10.3333', 'level' => 'region', 'label' => 'Kaduna, Nigeria', 'grid_id' => '100254189'),
-            array('lng' => '16.3731', 'lat' => '48.2083', 'level' => 'region', 'label' => 'Wien, Österreich', 'grid_id' => '100003596'),
-            array('lng' => '19.0408', 'lat' => '47.4983', 'level' => 'region', 'label' => 'Budapest, Hungary', 'grid_id' => '100134485'),
-            array('lng' => '32.5764', 'lat' => '-25.9153', 'level' => 'region', 'label' => 'Maputo, Mozambique', 'grid_id' => '100249267'),
-            array('lng' => '32.5764', 'lat' => '-25.9153', 'level' => 'region', 'label' => 'Maputo, Mozambique', 'grid_id' => '100249533'),
-            array('lng' => '36.8172', 'lat' => '-1.28325', 'level' => 'region', 'label' => 'Nairobi, Kenya', 'grid_id' => '100234685'),
-            array('lng' => '42.9545', 'lat' => '14.7979', 'level' => 'region', 'label' => 'Al Hudaydah, Yemen', 'grid_id' => '100380173'),
-            array('lng' => '44.0167', 'lat' => '13.5667', 'level' => 'region', 'label' => 'Ta\'izz, Yemen', 'grid_id' => '100380435'),
-            array('lng' => '44.0333', 'lat' => '36.1833', 'level' => 'region', 'label' => 'Erbil Governorate, Iraq', 'grid_id' => '100222764'),
-            array('lng' => '44.2', 'lat' => '15.35', 'level' => 'region', 'label' => 'Sana\'a, Yemen', 'grid_id' => '100380228'),
-            array('lng' => '44.2', 'lat' => '15.35', 'level' => 'region', 'label' => 'صنعاء اليمن', 'grid_id' => '100380228'),
-            array('lng' => '44.2059', 'lat' => '15.3539', 'level' => 'region', 'label' => 'Sana\'a, Yemen', 'grid_id' => '100380228'),
-            array('lng' => '45.3333', 'lat' => '14.2667', 'level' => 'region', 'label' => 'Al Bayda\', Yemen', 'grid_id' => '100380143'),
-            array('lng' => '74.3142', 'lat' => '31.5657', 'level' => 'region', 'label' => 'Punjab, Pakistan', 'grid_id' => '100260114'),
-            array('lng' => '74.5667', 'lat' => '42.8667', 'level' => 'region', 'label' => 'Бишкек, Киргизия', 'grid_id' => '100235155'),
-            array('lng' => '85.13', 'lat' => '25.37', 'level' => 'region', 'label' => 'Bihar, India', 'grid_id' => '100219470'),
-            array('lng' => '102.51', 'lat' => '18.14', 'level' => 'region', 'label' => 'Vientiane, Laos', 'grid_id' => '100238955'),
-            array('lng' => '104.322', 'lat' => '15.12', 'level' => 'region', 'label' => 'Si Sa Ket, Thailand', 'grid_id' => '100344410'),
-            array('lng' => '112.629', 'lat' => '31.358', 'level' => 'region', 'label' => 'Hubei, People\'s Republic of China', 'grid_id' => '100052035'),
-            array('lng' => '115.138', 'lat' => '-8.36917', 'level' => 'region', 'label' => 'Bali, Indonesia', 'grid_id' => '100134675'),
-            array('lng' => '115.138', 'lat' => '-8.36917', 'level' => 'region', 'label' => 'Bali, Indonesia', 'grid_id' => '100148999'),
-            array('lng' => '121.466', 'lat' => '25.012', 'level' => 'region', 'label' => '台湾新北市', 'grid_id' => '100352885'),
-            array('lng' => '127', 'lat' => '37.5833', 'level' => 'region', 'label' => '서울특별시, 대한민국', 'grid_id' => '100238808')
+            array('lng' => '-118.242766', 'lat' => '34.053691', 'level' => 'place', 'label' => 'Los Angeles, California, United States', 'grid_id' => '100364452'),
+            array('lng' => '-104.984862', 'lat' => '39.739236', 'level' => 'place', 'label' => 'Denver, Colorado, United States', 'grid_id' => '100364508'),
+
+            array('lng' => '-114.757', 'lat' => '54.6427', 'level' => 'place', 'label' => 'Alberta, Canada', 'grid_id' => '100041940'),
+            array('lng' => '-105.605', 'lat' => '39.1902', 'level' => 'place', 'label' => 'Colorado, United States', 'grid_id' => '100364539'),
+            array('lng' => '-100', 'lat' => '31', 'level' => 'place', 'label' => 'Texas, United States of America', 'grid_id' => '100366941'),
+            array('lng' => '-99.1456', 'lat' => '19.4194', 'level' => 'place', 'label' => 'Ciudad de México, México', 'grid_id' => '100245639'),
+            array('lng' => '-99.1456', 'lat' => '19.4194', 'level' => 'place', 'label' => 'Mexico City, Mexico', 'grid_id' => '100245639'),
+            array('lng' => '-90.5131', 'lat' => '14.6414', 'level' => 'place', 'label' => 'Guatemala, Guatemala', 'grid_id' => '100132337'),
+            array('lng' => '-85.9823', 'lat' => '35.9886', 'level' => 'place', 'label' => 'Tennessee, United States', 'grid_id' => '100366703'),
+            array('lng' => '-79.3897', 'lat' => '35.5569', 'level' => 'place', 'label' => 'North Carolina, United States', 'grid_id' => '100366162'),
+            array('lng' => '-71.5783', 'lat' => '43.6899', 'level' => 'place', 'label' => 'New Hampshire, United States', 'grid_id' => '100366017'),
+            array('lng' => '-3.25', 'lat' => '37.25', 'level' => 'place', 'label' => 'Granada, Spain', 'grid_id' => '100075268'),
+            array('lng' => '7.75', 'lat' => '10.3333', 'level' => 'place', 'label' => 'Kaduna, Nigeria', 'grid_id' => '100254189'),
+            array('lng' => '16.3731', 'lat' => '48.2083', 'level' => 'place', 'label' => 'Wien, Österreich', 'grid_id' => '100003596'),
+            array('lng' => '19.0408', 'lat' => '47.4983', 'level' => 'place', 'label' => 'Budapest, Hungary', 'grid_id' => '100134485'),
+            array('lng' => '32.5764', 'lat' => '-25.9153', 'level' => 'place', 'label' => 'Maputo, Mozambique', 'grid_id' => '100249267'),
+            array('lng' => '32.5764', 'lat' => '-25.9153', 'level' => 'place', 'label' => 'Maputo, Mozambique', 'grid_id' => '100249533'),
+            array('lng' => '36.8172', 'lat' => '-1.28325', 'level' => 'place', 'label' => 'Nairobi, Kenya', 'grid_id' => '100234685'),
+            array('lng' => '42.9545', 'lat' => '14.7979', 'level' => 'place', 'label' => 'Al Hudaydah, Yemen', 'grid_id' => '100380173'),
+            array('lng' => '44.0167', 'lat' => '13.5667', 'level' => 'place', 'label' => 'Ta\'izz, Yemen', 'grid_id' => '100380435'),
+            array('lng' => '44.0333', 'lat' => '36.1833', 'level' => 'place', 'label' => 'Erbil Governorate, Iraq', 'grid_id' => '100222764'),
+            array('lng' => '44.2', 'lat' => '15.35', 'level' => 'place', 'label' => 'Sana\'a, Yemen', 'grid_id' => '100380228'),
+            array('lng' => '44.2', 'lat' => '15.35', 'level' => 'place', 'label' => 'صنعاء اليمن', 'grid_id' => '100380228'),
+            array('lng' => '44.2059', 'lat' => '15.3539', 'level' => 'place', 'label' => 'Sana\'a, Yemen', 'grid_id' => '100380228'),
+            array('lng' => '45.3333', 'lat' => '14.2667', 'level' => 'place', 'label' => 'Al Bayda\', Yemen', 'grid_id' => '100380143'),
+            array('lng' => '74.3142', 'lat' => '31.5657', 'level' => 'place', 'label' => 'Punjab, Pakistan', 'grid_id' => '100260114'),
+            array('lng' => '74.5667', 'lat' => '42.8667', 'level' => 'place', 'label' => 'Бишкек, Киргизия', 'grid_id' => '100235155'),
+            array('lng' => '85.13', 'lat' => '25.37', 'level' => 'place', 'label' => 'Bihar, India', 'grid_id' => '100219470'),
+            array('lng' => '102.51', 'lat' => '18.14', 'level' => 'place', 'label' => 'Vientiane, Laos', 'grid_id' => '100238955'),
+            array('lng' => '104.322', 'lat' => '15.12', 'level' => 'place', 'label' => 'Si Sa Ket, Thailand', 'grid_id' => '100344410'),
+            array('lng' => '112.629', 'lat' => '31.358', 'level' => 'place', 'label' => 'Hubei, People\'s Republic of China', 'grid_id' => '100052035'),
+            array('lng' => '115.138', 'lat' => '-8.36917', 'level' => 'place', 'label' => 'Bali, Indonesia', 'grid_id' => '100134675'),
+            array('lng' => '115.138', 'lat' => '-8.36917', 'level' => 'place', 'label' => 'Bali, Indonesia', 'grid_id' => '100148999'),
+            array('lng' => '121.466', 'lat' => '25.012', 'level' => 'place', 'label' => '台湾新北市', 'grid_id' => '100352885'),
+            array('lng' => '127', 'lat' => '37.5833', 'level' => 'place', 'label' => '서울특별시, 대한민국', 'grid_id' => '100238808')
         );
 
         if ($grid_id) {
