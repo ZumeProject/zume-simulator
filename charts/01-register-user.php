@@ -49,7 +49,6 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
 
     public function register_user( WP_REST_Request $request ){
         $params = $request->get_params();
-        dt_write_log( $params );
 
         if ( isset( $params['email'], $params['name'], $params['username'], $params['password'] ) ){
             $user_roles = [ 'multiplier' ];
@@ -112,7 +111,7 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
                 'lat' => $params['lat'],
                 'level' => $params['level'],
                 'label' => $params['label'],
-                'grid_id' => $params['grid_id'],
+                'grid_id' => $contact_location['location_grid_meta'][0]['grid_id'],
                 'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
                 'hash' => hash('sha256', maybe_serialize($params)  . time() ),
             ] );
@@ -128,7 +127,7 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
                 'lat' => $params['lat'],
                 'level' => $params['level'],
                 'label' => $params['label'],
-                'grid_id' => $params['grid_id'],
+                'grid_id' => $contact_location['location_grid_meta'][0]['grid_id'],
                 'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
                 'hash' => hash('sha256', maybe_serialize($params)  . 'current_level' . time() ),
             ] );
@@ -265,7 +264,6 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
                         lat: location.find(':selected').data('lat'),
                         level: location.find(':selected').data('level'),
                         label: location.find(':selected').data('label'),
-                        grid_id: location.find(':selected').data('grid-id'),
                         days_ago: days_ago
                     }
                     jQuery('.loading-spinner').addClass('active')
