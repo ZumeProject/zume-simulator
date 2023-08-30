@@ -385,7 +385,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                 profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh.name}</div>`
                             }
                             else if ( ih === 'location' ) {
-                                profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${vh.label}</div>`
+                                profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: label: ${vh.label}, grid_id: ${vh.grid_id}</div>`
                             }
                             else {
                                 profileList += `<div class="cell"><span style="text-transform:uppercase;">${ih} </span>: ${JSON.stringify(vh)}</div>`
