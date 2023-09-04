@@ -341,15 +341,16 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                     </div>
                                     <div class="cell medium-6">
                                         <h2>ENCOURAGEMENT PLAN</h2><br>
+                                        <h2>CTAs</h2><br>
+                                        <div id="ctas-list" class="grid-x"></div>
+                                        <hr>
+                                        <h2>EMAILS</h2><br>
                                         <div id="plan-list" class="grid-x"></div>
-                                        <div id="reset-list" class="grid-x"></div>
+<!--                                        <div id="reset-list" class="grid-x"></div>-->
                                     </div>
                                     <div class="cell medium-6">
                                         <h2>STAGE</h2><br>
                                         <div id="stage-list" class="grid-x"></div>
-                                        <hr>
-                                        <h2>CTAs</h2><br>
-                                        <div id="ctas-list" class="grid-x"></div>
                                         <hr>
                                         <h2>USER PROFILE</h2><BR>
                                         <div id="user_profile" class="grid-x"></div>
@@ -429,11 +430,16 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     makeRequest('POST', 'user_ctas', { user_id: user_id }, window.site_info.system_root ).done( function( data ) {
                         window.user_ctas = data
 
+                        let cta = jQuery('#ctas-list')
+                        cta.empty()
+
                         let ctaList = ''
                         jQuery.each(data, function(ih, vh ) {
-                            ctaList += `<div class="cell">${vh.label}</div>`
+                            ctaList = `<a class="button button-grey expanded clear " style="white-space:nowrap; overflow: hidden;margin-bottom:0;">${vh.label}</a><div class="primary button-group expanded no-gaps">`
+                            ctaList += `<button type="button" class="button encouragement responded alt-color encouragement_responded_ responded_ " data-type="cta" data-subtype="responded" data-message="">RESPOND</button>`
+                            ctaList += `</div>`
+                            cta.append(ctaList)
                         })
-                        jQuery('#ctas-list').empty().append(ctaList)
                     })
                 }
                 window.get_user_ctas( user_id )
