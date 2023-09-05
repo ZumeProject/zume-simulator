@@ -207,13 +207,16 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
                                             ${host_buttons_html}
 
-                                            <button class="button zume alt-color expanded system_made_3_month_plan" data-type="system" data-subtype="made_3_month_plan" data-set="set5"  data-stage="2">Create Post Training Plan</button>
+                                            <hr>
+                                            <input type="text" class="commitment_note_1" placeholder="Commitment" value="Post training commitment plan item #1" >
+                                            <input type="text" class="commitment_note_2" placeholder="Commitment" value="Post training commitment plan item #2" >
+                                            <input type="text" class="commitment_note_3" placeholder="Commitment" value="Post training commitment plan item #3" >
+                                            <button class="button plan zume alt-color expanded system_made_3_month_plan" data-type="system" data-subtype="made_3_month_plan" data-stage="2">Create Post Training Plan</button>
                                         </div>
                                         <div class="cell small-6">
                                             <button class="button zume expanded system_training_completed" data-type="system" data-subtype="training_completed" data-set="set4" data-stage="2">Training Completed</button>
                                         </div>
                                         <div class="cell small-6 left-border">
-
                                         </div>
 
                                         <div class="cell">
@@ -626,6 +629,53 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         window.get_user_completions( user_id )
                     })
                 })
+                jQuery('.button.plan').on('click', function(event) {
+                    console.log('log plan')
+                    jQuery('.loading-spinner').addClass('active')
+
+                    // three plan submittions
+                    makeRequest('POST', 'add_commitment', {
+                        "user_id": window.user_profile.profile.user_id,
+                        "post_id": window.user_profile.profile.contact_id,
+                        "meta_key": "tasks",
+                        "meta_value": {
+                            note: jQuery('.commitment_note_1').val(),
+                        },
+                        "date": "2023-12-01",
+                        "category": "custom"
+                    }, window.site_info.rest_root ).done( function( data ) {
+                        console.log('add 1')
+                    })
+
+                    makeRequest('POST', 'add_commitment', {
+                        "user_id": window.user_profile.profile.user_id,
+                        "post_id": window.user_profile.profile.contact_id,
+                        "meta_key": "tasks",
+                        "meta_value": {
+                            note: jQuery('.commitment_note_2').val(),
+                        },
+                        "date": "2023-12-01",
+                        "category": "custom"
+                    }, window.site_info.rest_root ).done( function( data ) {
+                        console.log('add 2')
+                    })
+
+                    makeRequest('POST', 'add_commitment', {
+                        "user_id": window.user_profile.profile.user_id,
+                        "post_id": window.user_profile.profile.contact_id,
+                        "meta_key": "tasks",
+                        "meta_value": {
+                            note: jQuery('.commitment_note_3').val(),
+                        },
+                        "date": "2023-12-01",
+                        "category": "custom"
+                    }, window.site_info.rest_root ).done( function( data ) {
+                        console.log('add 3')
+                        window.get_user_profile( user_id )
+                        window.get_user_ctas( user_id )
+                        window.get_user_completions( user_id )
+                    })
+                })
 
             })
         </script>
@@ -683,6 +733,15 @@ class Zume_Simulator_Stats_Endpoints
                 }
             ]
         );
+        register_rest_route(
+            $namespace, '/add_commitment', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'add_commitment' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
+        );
     }
 
     public function user_progress( WP_REST_Request $request ) {
@@ -692,7 +751,16 @@ class Zume_Simulator_Stats_Endpoints
         $sql = $wpdb->prepare( "SELECT id, user_id, type, subtype, label FROM wp_dt_reports WHERE user_id = %s AND post_type = 'zume' ORDER BY time_end DESC", $user_id );
         return $wpdb->get_results( $sql, ARRAY_A );
     }
+    public function add_commitment( WP_REST_Request $request ) {
+        global $wpdb;
+        $params = dt_recursive_sanitize_array( $request->get_params() );
 
+        $params['meta_value'] = serialize( $params['meta_value'] );
+        $create = $wpdb->insert( $wpdb->dt_post_user_meta, $params );
+
+        return $params;
+
+    }
     public function make_post( WP_REST_Request $request ) {
 
         $params = dt_recursive_sanitize_array( $request->get_params() );
@@ -758,7 +826,7 @@ class Zume_Simulator_Stats_Endpoints
 
         if ( 'child_record' === $params['type'] ) {
             $already_logged = false;
-            $log = zume_user_log($user_id);
+            $log = zume_get_user_log($user_id);
             foreach ( $log as $log_item ) {
                 if ( $log_item['type'] === 'system' && $log_item['subtype'] === 'seeing_generational_fruit' ) {
                     $already_logged = true;
