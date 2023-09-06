@@ -471,8 +471,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 
 
                 /* user encouragement */
-                window.get_user_encouragement = ( user_id, type, subtype ) => {
-                    makeRequest('POST', 'get_encouragement', { user_id, type, subtype }, window.site_info.system_root ).done( function( data ) {
+                window.get_user_encouragement = ( user_id ) => {
+                    makeRequest('POST', 'encouragement/get', { user_id }, window.site_info.system_root ).done( function( data ) {
                         // console.log('get_encouragement')
                         // console.log(data)
                         window.get_encouragement = data
@@ -506,7 +506,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         })
                     })
                 }
-                window.get_user_encouragement( user_id, 'no', 'trigger' )
+                window.get_user_encouragement( user_id )
                 /* end user encouragement */
 
 
