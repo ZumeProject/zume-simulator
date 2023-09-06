@@ -4,7 +4,7 @@ if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
-    public $base_slug = 'simulate_funnel'; // lowercase
+    public $base_slug = ''; // lowercase
     public $slug = '';
     public $title;
     public $base_title;
@@ -20,17 +20,38 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
         $this->base_title = __( 'simulate funnel', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-simulator/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }
     }
-
     public function base_menu( $content ) {
-        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
+        $content .= '<li>ZÚME SIMULATOR</li>';
+        $content .= '<li><hr></li>';
+        $content .= '<li><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
     }
+
+    public function styles() {
+        ?>
+        <style>
+            .side-menu-item-highlight {
+                font-weight: 300;
+            }
+            #-menu {
+                font-weight: 700;
+            }
+            .zume-cards {
+                max-width: 700px;
+            }
+            #location {
+                width: 100% !important;
+            }
+        </style>
+        <?php
+    }
     public function wp_head() {
+        $this->styles();
         $this->js_api();
         ?>
         <style>

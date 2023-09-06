@@ -27,9 +27,9 @@ class Zume_Simulator_Metrics_Base {
             add_filter('dt_metrics_menu', [$this, 'dt_metrics_menu'], 99);
 
             require_once ('abstract.php');
-            require_once ('01-register-user.php');
 
             require_once ('20-simulate-funnel.php');
+            require_once ('01-register-user.php');
 //            require_once ('23-simulate-encouragement.php');
 
 
