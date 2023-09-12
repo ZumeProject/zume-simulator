@@ -143,12 +143,9 @@ class Zume_Simulator_Register extends Zume_Simulator_Chart_Base
             return new WP_Error( 'missing_error', 'Missing fields', [ 'status' => 400 ] );
         }
     }
-
-
-
-
     public function base_menu( $content ) {
-        $content .= '<li class=""><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
+        $content .= '<li><hr></li>';
+        $content .= '<li><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
         return $content;
     }
     public function wp_head() {

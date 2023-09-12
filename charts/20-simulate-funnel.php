@@ -378,6 +378,9 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                         <hr>
                                         <h2>USER PROFILE</h2><BR>
                                         <div id="user_profile" class="grid-x"></div>
+                                        <hr>
+                                        <h2>PLANS</h2><BR>
+                                        <div id="user-plans" class="grid-x"></div>
                                     </div>
                                 </div>
                             </div>
@@ -424,6 +427,17 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                         })
                         jQuery('#stage-list').empty().append(stageList)
 
+                        let plansList = ''
+                        jQuery.each(data.plans, function(ih, vh ) {
+                            jQuery.each(vh, function(ihh, vhh ) {
+                                if ( typeof vhh === 'object' ) {
+                                    vhh = JSON.stringify(vhh)
+                                }
+                                plansList += `<div class="cell"><span style="text-transform:uppercase;">${ihh} </span>: ${vhh}</div>`
+                            })
+                        })
+                        jQuery('#user-plans').empty().append(plansList)
+
                         jQuery('#switch_to').prop('href', `https://zume5.training/wp-admin/users.php?s=${user_id}&action=-1&new_role&paged=1&action2=-1&new_role2` )
 
                         jQuery('#coaching_record').prop('href', `https://zume5.training/coaching/contacts/${data.coaching_contact_id}` )
@@ -435,7 +449,10 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                     event.preventDefault()
                     jQuery('.loading-spinner').addClass('active')
                     jQuery('.button').removeClass('done')
-                    window.get_user_profile( jQuery(this).val() )
+                    let user_id = jQuery(this).val()
+                    window.get_user_profile( user_id )
+                    window.get_user_ctas( user_id )
+                    window.get_user_completions( user_id )
                 })
                 window.get_user_profile( user_id )
                 window.get_user_completions = ( user_id ) => {

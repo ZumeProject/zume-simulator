@@ -45,6 +45,7 @@ class Zume_System_Profile_API
         return [
             "profile" => zume_get_user_profile($params['user_id']),
             "stage" => zume_get_user_stage($params['user_id']),
+            "plans" => zume_get_user_plans($params['user_id']),
             "coaching_contact_id" => $coaching_contact_id,
         ];
     }

@@ -26,11 +26,7 @@ class Zume_Simulator_Reset_Tracking extends Zume_Simulator_Chart_Base
         }
     }
 
-    public function base_menu( $content ) {
-        $content .= '<li><hr></li>';
-        $content .= '<li><a href="'.site_url('/zume-simulator/'.$this->base_slug).'" id="'.$this->base_slug.'-menu">' .  $this->base_title . '</a></li>';
-        return $content;
-    }
+
 
     public function wp_head() {
         $this->js_api();
