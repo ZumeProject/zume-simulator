@@ -215,16 +215,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                         <div class="cell small-6">
                                         </div>
                                         <div class="cell small-6 left-border">
-                                            <button class="button zume  expanded training_set_a_01" data-type="training" data-subtype="set_a_01" data-stage="2">Session 1 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_02" data-type="training" data-subtype="set_a_02" data-stage="2">Session 2 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_03" data-type="training" data-subtype="set_a_03" data-stage="2">Session 3 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_04" data-type="training" data-subtype="set_a_04" data-stage="2">Session 4 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_05" data-type="training" data-subtype="set_a_05" data-stage="2">Session 5 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_06" data-type="training" data-subtype="set_a_06" data-stage="2">Session 6 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_07" data-type="training" data-subtype="set_a_07" data-stage="2">Session 7 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_08" data-type="training" data-subtype="set_a_08" data-stage="2">Session 8 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_09" data-type="training" data-subtype="set_a_09" data-stage="2">Session 9 Checkin</button>
-                                            <button class="button zume  expanded training_set_a_10" data-type="training" data-subtype="set_a_10" data-stage="2">Session 10 Checkin</button>
+
 
                                             ${host_buttons_html}
 
