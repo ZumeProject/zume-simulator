@@ -265,7 +265,8 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                             ${mawl_buttons_html}
                                         </div>
                                         <div class="cell small-6">
-                                            <button class="button zume expanded system_mawl_completed" data-type="system" data-subtype="mawl_completed" data-set="set1"  data-stage="4">Full Launch MAWL Skills</button>
+                                            <button class="button zume expanded system_host_completed" data-type="system" data-subtype="host_completed" data-set="set1"  data-stage="4">Complete HOST Reported</button>
+                                            <button class="button zume expanded system_mawl_completed" data-type="system" data-subtype="mawl_completed" data-set="set1"  data-stage="4">Complete MAWL Reported</button>
                                         </div>
                                         <div class="cell small-6 left-border">
 
