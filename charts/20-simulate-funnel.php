@@ -216,7 +216,6 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                         </div>
                                         <div class="cell small-6 left-border">
 
-
                                             ${host_buttons_html}
 
                                             <hr>
@@ -246,6 +245,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                             <button class="button zume alt-color expanded system_completed_3_month_plan" data-type="system" data-subtype="completed_3_month_plan" data-set="set1"  data-stage="3">Complete Post Training Plan</button>
                                         </div>
                                         <div class="cell small-6">
+                                           <button class="button zume expanded system_join_community" data-type="system" data-subtype="join_community" data-set="set1"  data-stage="3">Joined Zume Community</button>
                                            <button class="button zume expanded system_first_practitioner_report" data-type="system" data-subtype="first_practitioner_report" data-set="set1"  data-stage="3">Made First Report</button>
                                         </div>
                                         <div class="cell small-6 left-border">
@@ -311,7 +311,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                             <div class="cell medium-2">
                                 <div class="center"><h2>ACTIONS</h2><br></div>
 
-                                <div style=" padding: 1em; height:${window.innerHeight - 300}px; border: 1px solid lightgrey; overflow: hidden scroll;">
+                                <div style=" padding: 1em; height: ${window.innerHeight - 300}px; border: 1px solid lightgrey; overflow: hidden scroll;">
                                     <div class="grid-x grid-padding-x">
                                             <div class="cell center">
                                                 <h3>General Actions</h3>
@@ -332,7 +332,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                                 <h3><hr>Practitioner CTAs</h3>
                                             </div>
                                             <div class="cell">
-                                                <button class="button zume alt-color expanded reports_practitioner_report" data-type="reports" data-subtype="practitioner_report" data-stage="4">Submit Practitioner Report</button>
+                                                <button class="button zume alt-color expanded reports_new_church reports_survey" data-type="reports" data-subtype="new_church" data-stage="4">Submit Church Report</button>
                                                 <button class="button zume alt-color expanded system_joined_affinity_hub" data-type="system" data-subtype="joined_affinity_hub" data-stage="">Join Affinity Hub</button>
                                                 <button class="button zume alt-color expanded system_hub_checkin" data-type="system" data-subtype="hub_checkin" data-stage="">Hub Checkin</button>
                                             </div>
