@@ -222,7 +222,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
                                             <input type="text" class="commitment_note_1" placeholder="Commitment" value="Post training commitment plan item #1" >
                                             <input type="text" class="commitment_note_2" placeholder="Commitment" value="Post training commitment plan item #2" >
                                             <input type="text" class="commitment_note_3" placeholder="Commitment" value="Post training commitment plan item #3" >
-                                            <button class="button plan zume alt-color expanded system_made_3_month_plan" data-type="system" data-subtype="made_3_month_plan" data-stage="2">Create Post Training Plan</button>
+                                            <button class="button plan zume alt-color expanded system_made_post_training_plan" data-type="system" data-subtype="made_post_training_plan" data-stage="2">Create Post Training Plan</button>
                                         </div>
                                         <div class="cell small-6">
                                             <button class="button zume expanded system_training_completed" data-type="system" data-subtype="training_completed" data-set="set4" data-stage="2">Training Completed</button>
