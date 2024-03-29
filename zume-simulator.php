@@ -133,8 +133,8 @@ function zume_simulator_selectors() {
     global $wpdb;
     $users = $wpdb->get_results(
         "SELECT ID, display_name
-                    FROM $wpdb->users
-                    JOIN $wpdb->usermeta ON $wpdb->users.ID = $wpdb->usermeta.user_id AND $wpdb->usermeta.meta_key = 'wp_capabilities'
+                    FROM zume_users
+                    JOIN zume_usermeta ON zume_users.ID = zume_usermeta.user_id AND zume_usermeta.meta_key = 'zume_capabilities'
                     ORDER BY ID DESC
                     LIMIT 100
                     ", ARRAY_A
@@ -145,6 +145,7 @@ function zume_simulator_selectors() {
         $html .= '<option value="' . $user['ID'] . '">' . $user['display_name'] . '</option>';
     }
     $html .= '</select>';
+
 
     return $html;
 }

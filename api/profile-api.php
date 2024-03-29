@@ -41,7 +41,7 @@ class Zume_System_Profile_API
     {
         $params = dt_recursive_sanitize_array($request->get_params());
         global $wpdb;
-        $coaching_contact_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM wp_3_postmeta WHERE meta_key = 'trainee_user_id' AND meta_value = %s", $params['user_id'] ), );
+        $coaching_contact_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM zume_3_postmeta WHERE meta_key = 'trainee_user_id' AND meta_value = %s", $params['user_id'] ), );
         return [
             "profile" => zume_get_user_profile($params['user_id']),
             "stage" => zume_get_user_stage($params['user_id']),
