@@ -29,6 +29,7 @@ class Zume_Simulator_Metrics_Base {
             require_once ('abstract.php');
 
             require_once ('20-simulate-funnel.php');
+            require_once ( '30-migrate.php' );
 //            require_once ('23-simulate-encouragement.php');
 
 

@@ -772,7 +772,41 @@ class Zume_Simulator_Stats_Endpoints
                 }
             ]
         );
+
+
+        // migrator
+        register_rest_route(
+            $namespace, '/get_user_list', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'get_user_list' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
+        );
+        register_rest_route(
+            $namespace, '/create_contact_id', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'create_contact_id' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
+        );
+
     }
+
+
+    public function get_user_list( WP_REST_Request $request ) {
+        return Zume_Simulator_Migrator::get_user_id( $request );
+    }
+    public function create_contact_id( WP_REST_Request $request ) {
+        return Zume_Simulator_Migrator::create_contact_id( $request );
+    }
+
+
+
+
 
     public function user_progress( WP_REST_Request $request ) {
         global $wpdb;
