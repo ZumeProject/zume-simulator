@@ -57,7 +57,7 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
                 })
 
                 function loop() {
-                    if ( window.inc > 10 ) {
+                    if ( window.inc > 1000 ) {
                         return;
                     }
                     let hash = (+new Date).toString(36);
