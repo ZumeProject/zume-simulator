@@ -57,9 +57,9 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
                 })
 
                 function loop() {
-                    if ( window.inc > 1000 ) {
-                        return;
-                    }
+                    // if ( window.inc > 1000 ) {
+                    //     return;
+                    // }
                     let hash = (+new Date).toString(36);
 
                     jQuery('#loop-list').prepend(`<div class="cell small-12 ${hash}"><span class="${hash} loading-spinner active"></span></div>`)
