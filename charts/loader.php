@@ -19,8 +19,6 @@ class Zume_Simulator_Metrics_Base {
 
         $url_path = dt_get_url_path(true);
 
-
-
         // top
         if ( str_contains( $url_path, $this->base_slug ) !== false || dt_is_rest() ) {
             add_filter('dt_templates_for_urls', [$this, 'dt_templates_for_urls']);
@@ -29,11 +27,11 @@ class Zume_Simulator_Metrics_Base {
             require_once ('abstract.php');
 
             require_once ('20-simulate-funnel.php');
+            require_once ('31-migrate-locations.php');
             require_once ( '30-migrate.php' );
-//            require_once ('23-simulate-encouragement.php');
 
 
-            require_once ('100-reset-tracking.php');
+//            require_once ('100-reset-tracking.php');
 
         }
     }

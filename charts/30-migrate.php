@@ -17,7 +17,7 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'migrate', 'disciple_tools' );
+        $this->base_title = __( 'contact covert', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
