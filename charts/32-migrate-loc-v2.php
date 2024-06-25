@@ -119,7 +119,8 @@ class Zume_Simulator_Migrator_Loc2 extends Zume_Simulator_Chart_Base
                     "lat" => $location['lat'],
                     "source" => $location['source'],
                 ]
-            ]
+            ],
+            "force_values" => true,
         ];
 
 
@@ -170,9 +171,9 @@ class Zume_Simulator_Migrator_Loc2 extends Zume_Simulator_Chart_Base
                 })
 
                 function loop() {
-                    if ( window.inc > 100 ) {
-                        return;
-                    }
+                    // if ( window.inc > 100 ) {
+                    //     return;
+                    // }
                     let hash = (+new Date).toString(36);
 
                     jQuery('#loop-list').prepend(`<div class="cell small-12 ${hash}"><span class="${hash} loading-spinner active"></span></div>`)
