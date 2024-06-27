@@ -1,10 +1,10 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
+class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
-    public $base_slug = 'migratelocation3'; // lowercase
+    public $base_slug = 'migrateregistration'; // lowercase
     public $slug = 'location'; // lowercase
     public $title;
     public $base_title;
@@ -19,7 +19,7 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
             return;
         }
         $this->namespace = $this->namespace.'/'.$this->base_slug.'/'.$this->slug;
-        $this->base_title = __( 'migrate location 3', 'disciple_tools' );
+        $this->base_title = __( 'migrate registrations', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
@@ -85,60 +85,23 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
         $contact_id = $params['contact_id'];
         $fields = [];
 
-        $location = get_user_meta( $user_id, 'zume_location_grid_meta_from_ip', true );
-        $raw = get_user_meta( $user_id, 'zume_raw_location_from_ip', true );
+        return;
 
-        if ( ! isset( $location['lng'] ) || empty( $location['lng'] ) ) {
-            $location = get_user_meta( $user_id, 'location_grid_meta', true );
-            if ( ! isset( $location['lng'] ) || empty( $location['lng'] ) ) {
-                $location = get_user_meta( $user_id, 'ip_location_grid_meta', true );
-                if ( ! isset( $location['lng'] ) || empty( $location['lng'] ) ) {
-                    $location = false;
-                }
-            }
-        }
-        if ( $raw ) {
-            $fields['user_timezone'] = $raw['time_zone']['id'] ?? '';
-        }
-
-        if ( $location ) {
-            $fields['location_grid_meta'] = [
-                'values' => [
-                    [
-                        "label" => $location['label'],
-                        "level" => $location['level'],
-                        "lng" => $location['lng'],
-                        "lat" => $location['lat'],
-                        "source" => $location['source'],
-                    ]
-                ]
-            ];
-//            $fields = [
-//                'location_grid_meta' => [
-//                    'values' => [
-//                        [
-//                            "label" => $location['label'],
-//                            "level" => $location['level'],
-//                            "lng" => $location['lng'],
-//                            "lat" => $location['lat'],
-//                            "source" => $location['source'],
-//                        ]
-//                    ],
-//
-//                ],
-//            ];
-        } else if ( ! $location && $raw ) {
-            $fields['location_grid_meta'] = [
-                'values' => [
-                    [
-                        "lng" => $raw['longitude'],
-                        "lat" => $raw['latitude'],
-                    ]
-                ]
-            ];
-        } else {
-            return false;
-        }
+        dt_report_insert( [
+            'user_id' => $user_id,
+            'post_id' => $contact_id,
+            'post_type' => 'zume',
+            'type' => 'system',
+            'subtype' => 'registered',
+            'value' => 0,
+            'lng' => $params['lng'],
+            'lat' => $params['lat'],
+            'level' => $params['level'],
+            'label' => $params['label'],
+            'grid_id' => $params['grid_id'],
+            'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
+            'hash' => hash('sha256', maybe_serialize($params)  . time() ),
+        ] );
 
 
         $update_user_contact = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
@@ -165,7 +128,7 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
                             <hr>
                             <div class="grid-x">
                                 <div class="cell small-12">
-                                    <button class="button" id="process_record">Assign Locations</button><span class="process_record loading-spinner"></span>
+                                    <button class="button" id="process_record">Add Reports</button><span class="process_record loading-spinner"></span>
                                 </div>
                             </div>
                             <hr>
@@ -179,33 +142,22 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
                 })
 
                 function loop() {
-                    // if ( window.inc > 100 ) {
-                    //     return;
-                    // }
+                    if ( window.inc > 10 ) {
+                        return;
+                    }
                     let hash = (+new Date).toString(36);
 
                     jQuery('#loop-list').prepend(`<div class="cell small-12 ${hash}"><span class="${hash} loading-spinner active"></span></div>`)
 
-                    makeRequest('POST', 'get_user_id', [], namespace)
-                        .done(function(response) {
-                            console.log(response)
+                    makeRequest('POST', 'process_record', { user_id: response.user_id, contact_id: response.contact_id }, namespace)
+                        .done(function(response2) {
+                            console.log(response2)
 
-                            if ( response ) {
-                                jQuery('.cell.'+hash).append( response.user_id )
+                            jQuery('.'+hash+'.loading-spinner').removeClass( 'active' )
 
-                                makeRequest('POST', 'process_record', { user_id: response.user_id, contact_id: response.contact_id }, namespace)
-                                    .done(function(response2) {
-                                        console.log(response2)
 
-                                        jQuery('.'+hash+'.loading-spinner').removeClass( 'active' )
-                                        if ( ! response2 ) {
-                                            jQuery('.cell.'+hash).append( ' | Failed to add location' )
-                                        }
-
-                                        window.inc++
-                                        loop()
-                                    })
-                            }
+                            window.inc++
+                            loop()
                         })
                 }
             })
@@ -215,4 +167,4 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
 
 
 }
-new Zume_Simulator_Migrator_Loc3();
+new Zume_Simulator_Migrator_Registration();
