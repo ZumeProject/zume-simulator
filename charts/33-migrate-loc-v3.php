@@ -1,10 +1,10 @@
 <?php
 if ( !defined( 'ABSPATH' ) ) { exit; } // Exit if accessed directly.
 
-class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
+class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
 {
     //slug and title of the top menu folder
-    public $base_slug = 'migrateregistration'; // lowercase
+    public $base_slug = 'migratelocation3'; // lowercase
     public $slug = 'location'; // lowercase
     public $title;
     public $base_title;
@@ -19,7 +19,7 @@ class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
             return;
         }
         $this->namespace = $this->namespace.'/'.$this->base_slug.'/'.$this->slug;
-        $this->base_title = __( 'migrate registrations', 'disciple_tools' );
+        $this->base_title = __( 'migrate plans install', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
         if ( "zume-simulator/$this->base_slug" === $url_path ) {
@@ -34,8 +34,6 @@ class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
     }
     public function add_api_routes() {
         $namespace = $this->namespace;
-
-        // migrator
         register_rest_route(
             $namespace, '/get_user_id', [
                 'methods'  => [ 'GET', 'POST' ],
@@ -66,47 +64,114 @@ class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
     public static function get_user_id( WP_REST_Request $request ) {
         global $wpdb;
 
-        $users = $wpdb->get_results(
-            "SELECT pm.meta_value as user_id, pm.post_id as contact_id, pm1.meta_value
-                    FROM zume_postmeta pm
-                    LEFT JOIN zume_postmeta pm1 ON pm1.post_id=pm.post_id AND pm1.meta_key = 'location_grid_meta'
-                    WHERE pm.meta_key = 'corresponds_to_user'
-                    AND	pm1.meta_value IS NULL
-                   ;", ARRAY_A
+        $users = $wpdb->get_col(
+            "SELECT um.umeta_id
+                    FROM zume_usermeta um
+                    JOIN zume_usermeta um1 ON um1.user_id=um.user_id AND um1.meta_key = 'zume_corresponds_to_contact'
+                    WHERE um.meta_key LIKE 'zume_group%'
+                   ;"
         );
-        shuffle($users);
 
-        return $users[0];
+        sort( $users);
+
+        update_post_meta( 5, 'legacy_plan_install', $users );
+
+        return true;
     }
     public static function process_record( WP_REST_Request $request )
     {
+        global $wpdb;
         $params = dt_recursive_sanitize_array( $request->get_params() );
-        $user_id = $params['user_id'];
-        $contact_id = $params['contact_id'];
         $fields = [];
 
-        return;
+        $user_list = get_post_meta( 5, 'legacy_plan_install', true);
+        sort( $user_list);
+        $user_id = $user_list[0];
+        if ( empty( $user_id ) ) {
+            return 'done.';
+        }
+        unset($user_list[0]);
+        sort( $user_list);
+        update_post_meta( 5, 'legacy_plan_install', $user_list );
 
-        dt_report_insert( [
-            'user_id' => $user_id,
-            'post_id' => $contact_id,
-            'post_type' => 'zume',
-            'type' => 'system',
-            'subtype' => 'registered',
-            'value' => 0,
-            'lng' => $params['lng'],
-            'lat' => $params['lat'],
-            'level' => $params['level'],
-            'label' => $params['label'],
-            'grid_id' => $params['grid_id'],
-            'time_end' =>  strtotime( 'Today -'.$params['days_ago'].' days' ),
-            'hash' => hash('sha256', maybe_serialize($params)  . time() ),
-        ] );
+        $result = $wpdb->get_row($wpdb->prepare( "
+            SELECT um.umeta_id, um.user_id, um.meta_value, um1.meta_value as contact_id
+                FROM zume_usermeta um
+                JOIN zume_usermeta um1 ON um1.user_id=um.user_id AND um1.meta_key = 'zume_corresponds_to_contact'
+                WHERE um.meta_key LIKE 'zume_group%'
+                AND um.umeta_id = %s
+        ", $user_id), ARRAY_A );
 
+        $group = unserialize( $result['meta_value'] );
+        if ( empty($group['owner'] ) ) {
+            return false;
+        }
 
-        $update_user_contact = DT_Posts::update_post( 'contacts', $contact_id, $fields, true, false );
+        $title = $group['group_name'];
+        $user_id = $result['user_id'];
+        $contact_id = $result['contact_id'];
 
-        return $update_user_contact;
+        $creation_time = strtotime( $group['created_date'] );
+        $set_a_01 = $creation_time + 604800;
+        $set_a_02 = $creation_time + ( 604800 * 2 );
+        $set_a_03 = $creation_time + ( 604800 * 3 );
+        $set_a_04 = $creation_time + ( 604800 * 4 );
+        $set_a_05 = $creation_time + ( 604800 * 5 );
+        $set_a_06 = $creation_time + ( 604800 * 6 );
+        $set_a_07 = $creation_time + ( 604800 * 7 );
+        $set_a_08 = $creation_time + ( 604800 * 8 );
+        $set_a_09 = $creation_time + ( 604800 * 9 );
+        $set_a_10 = $creation_time + ( 604800 * 10 );
+
+        $fields = [
+            'title' => $title,
+            'assigned_to' => $user_id,
+            'set_type' => 'set_a',
+            'visibility' => 'private',
+            'created_date' => $creation_time,
+            'set_a_01' => $set_a_01,
+            'set_a_02' => $set_a_02,
+            'set_a_03' => $set_a_03,
+            'set_a_04' => $set_a_04,
+            'set_a_05' => $set_a_05,
+            'set_a_06' => $set_a_06,
+            'set_a_07' => $set_a_07,
+            'set_a_08' => $set_a_08,
+            'set_a_09' => $set_a_09,
+            'set_a_10' => $set_a_10,
+            'participants' => [
+                'values' => [
+                    [ 'value' => $contact_id ]
+                ]
+            ]
+        ];
+
+        // if coleaders
+        if ( ! empty( $group['coleaders'] ) ) {
+            $coleaders = $group['coleaders'];
+
+            $coleader_contact_ids = [];
+            foreach( $coleaders as $coleader_email ) {
+                $cid = $wpdb->get_var("
+                        SELECT um.meta_value as contact_id
+                        FROM zume_users u
+                        JOIN zume_usermeta um ON um.user_id=u.ID AND um.meta_key = 'zume_corresponds_to_contact'
+                        WHERE u.user_email = '$coleader_email'"
+                );
+                if ( empty($cid ) ) {
+                    continue;
+                }
+                $coleader_contact_ids[] = $cid;
+            }
+
+            if ( ! empty( $coleader_contact_ids ) ) {
+                foreach( $coleader_contact_ids as $coleader_contact_id ) {
+                    $fields['participants']['values'][] = [ 'value' => $coleader_contact_id ];
+                }
+            }
+        }
+
+        return DT_Posts::create_post( 'zume_plans', $fields, true, false );
 
     }
 
@@ -128,7 +193,8 @@ class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
                             <hr>
                             <div class="grid-x">
                                 <div class="cell small-12">
-                                    <button class="button" id="process_record">Add Reports</button><span class="process_record loading-spinner"></span>
+                                    <button class="button" id="set_records">Set Records</button><span class="set_records loading-spinner"></span><br>
+                                    <button class="button" id="process_record">Add Plans</button><span class="process_record loading-spinner"></span>
                                 </div>
                             </div>
                             <hr>
@@ -136,25 +202,38 @@ class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
                         </div>
                     `)
 
+                jQuery('#set_records').on('click', function(){
+                    makeRequest('POST', 'get_user_id', [], namespace)
+                        .done(function(response) {
+                            console.log(response)
+                            jQuery('#set_records').addClass('success')
+                        })
+                })
+
                 window.inc = 0
                 jQuery('#process_record').on('click', function(){
                     loop()
                 })
 
                 function loop() {
-                    if ( window.inc > 10 ) {
-                        return;
-                    }
+                    // if ( window.inc > 100 ) {
+                    //     return;
+                    // }
                     let hash = (+new Date).toString(36);
 
                     jQuery('#loop-list').prepend(`<div class="cell small-12 ${hash}"><span class="${hash} loading-spinner active"></span></div>`)
 
-                    makeRequest('POST', 'process_record', { user_id: response.user_id, contact_id: response.contact_id }, namespace)
+                    makeRequest('POST', 'process_record', { }, namespace)
                         .done(function(response2) {
                             console.log(response2)
 
-                            jQuery('.'+hash+'.loading-spinner').removeClass( 'active' )
 
+                            jQuery('.'+hash+'.loading-spinner').removeClass( 'active' )
+                            if ( ! response2 ) {
+                                jQuery('.cell.'+hash).append( 'Unable to create plan' )
+                            } else {
+                                jQuery('.cell.'+hash).append( response2.ID )
+                            }
 
                             window.inc++
                             loop()
@@ -167,4 +246,4 @@ class Zume_Simulator_Migrator_Registration extends Zume_Simulator_Chart_Base
 
 
 }
-new Zume_Simulator_Migrator_Registration();
+new Zume_Simulator_Migrator_Loc3();
