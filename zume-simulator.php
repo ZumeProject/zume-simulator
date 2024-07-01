@@ -86,6 +86,11 @@ class Zume_Simulator {
         return self::$_instance;
     }
     private function __construct() {
+        $user = wp_get_current_user();
+        if ( ! in_array( 'dt_admin', (array) $user->roles ) ) {
+            //The user has the "author" role
+            return;
+        }
         require_once( 'api/completions-api.php' );
 
         if ( dt_is_rest() ) {
