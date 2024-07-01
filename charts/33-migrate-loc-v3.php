@@ -103,12 +103,19 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
         ", $user_id), ARRAY_A );
 
         $group = unserialize( $result['meta_value'] );
-        if ( empty($group['owner'] ) ) {
+
+
+        $dup_list = $wpdb->get_col("
+            SELECT pm.meta_value
+            FROM zume_postmeta pm
+            WHERE pm.meta_key = 'join_key' and pm.meta_value LIKE 'zume_group_%'
+        " );
+        if ( in_array( $group['key'], $dup_list ) ) {
             return false;
         }
 
         $title = $group['group_name'];
-        $user_id = $result['user_id'];
+//        $user_id = $result['user_id'];
         $contact_id = $result['contact_id'];
 
         $creation_time = strtotime( $group['created_date'] );
@@ -125,7 +132,7 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
 
         $fields = [
             'title' => $title,
-            'assigned_to' => $user_id,
+            'join_key' => $group['key'],
             'set_type' => 'set_a',
             'visibility' => 'private',
             'created_date' => $creation_time,
@@ -171,7 +178,11 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
             }
         }
 
-        return DT_Posts::create_post( 'zume_plans', $fields, true, false );
+        $new_plan = DT_Posts::create_post( 'zume_plans', $fields, true, false );
+        if ( ! is_wp_error( $new_plan ) ) {
+            $new_plan = DT_Posts::update_post('zume_plans', $new_plan['ID'], [ 'join_key' => $group['key'] ] );
+        }
+        return $new_plan;
 
     }
 
@@ -230,7 +241,7 @@ class Zume_Simulator_Migrator_Loc3 extends Zume_Simulator_Chart_Base
 
                             jQuery('.'+hash+'.loading-spinner').removeClass( 'active' )
                             if ( ! response2 ) {
-                                jQuery('.cell.'+hash).append( 'Unable to create plan' )
+                                jQuery('.cell.'+hash).append( 'Already uploaded' )
                             } else {
                                 jQuery('.cell.'+hash).append( response2.ID )
                             }
