@@ -27,12 +27,6 @@ class Zume_Simulator_Metrics_Base {
             require_once ('abstract.php');
 
             require_once ( '20-simulate-funnel.php' );
-            require_once ( '31-migrate-locations.php' );
-            require_once ( '32-migrate-loc-v2.php' );
-            require_once ( '33-migrate-loc-v3.php' );
-            require_once ( '30-migrate.php' );
-
-//            require_once ('100-reset-tracking.php');
 
         }
     }
