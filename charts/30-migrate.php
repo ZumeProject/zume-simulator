@@ -368,7 +368,7 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
             }
         }
 
-        return 'Already installed: <a href="/zume_plans/'.$plan_post['ID'].'">' . $plan_post['ID'] . "</a>";
+        return 'Newly installed: <a href="/zume_plans/'.$plan_post['ID'].'">' . $plan_post['ID'] . "</a>";
     }
 
 
