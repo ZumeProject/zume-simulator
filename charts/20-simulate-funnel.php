@@ -20,7 +20,7 @@ class Zume_Simulate_Funnel extends Zume_Simulator_Chart_Base
         $this->base_title = __( 'simulate funnel', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-simulator" === $url_path ) {
+        if ( "zume-simulator/$this->base_slug" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
         }

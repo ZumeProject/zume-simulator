@@ -8,21 +8,26 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
     public $slug = ''; // lowercase
     public $title;
     public $base_title;
+    public $namespace = 'zume_simulator/v1';
     public $js_object_name = 'wp_js_object'; // This object will be loaded into the metrics.js file by the wp_localize_script.
     public $js_file_name = '/dt-metrics/groups/overview.js'; // should be full file name plus extension
-    public $permissions = [ 'dt_all_access_contacts', 'view_project_metrics' ];
+    public $permissions = ['manage_dt'];
 
     public function __construct() {
         parent::__construct();
         if ( !$this->has_permission() ){
             return;
         }
-        $this->base_title = __( 'contact covert', 'disciple_tools' );
+        $this->base_title = __( 'Migrate Legacy Group', 'disciple_tools' );
 
         $url_path = dt_get_url_path( true );
-        if ( "zume-simulator/$this->base_slug" === $url_path ) {
+        if ( "zume-simulator" === $url_path ) {
             add_action( 'wp_enqueue_scripts', [ $this, 'base_scripts' ], 99 );
             add_action( 'wp_head',[ $this, 'wp_head' ], 1000);
+        }
+        if ( dt_is_rest() ) {
+            add_action( 'rest_api_init', [ $this, 'add_api_routes' ] );
+            add_filter( 'dt_allow_rest_access', [ $this, 'authorize_url' ], 10, 1 );
         }
     }
 
@@ -40,9 +45,10 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
                                 <div class="cell"><h2>MIGRATE</h2></div>
                             </div>
                             <hr>
-                            <div class="grid-x">
+
                                 <div class="cell small-12">
-                                    <button class="button" id="create_contacts">Create Contact IDs</button><span class="create_contacts loading-spinner"></span>
+                                    <input type="text" id="zume_meta_key" value="" placeholder="Add zume key like zume_group_636950134a032" />
+                                    <button class="button" id="migrate_meta">Install Legacy  Group</button><span class="migrate_spinner loading-spinner"></span>
                                 </div>
                             </div>
                             <hr>
@@ -51,117 +57,323 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
                         </div>
                     `)
 
-                window.inc = 0
-                jQuery('#create_contacts').on('click', function(){
-                    loop()
-                })
 
-                function loop() {
-                    // if ( window.inc > 1000 ) {
-                    //     return;
-                    // }
-                    let hash = (+new Date).toString(36);
+                jQuery('#migrate_meta').on('click', function(){
+                    jQuery('#loop-list').html('')
+                    let key_value = jQuery('#zume_meta_key').val()
+                    jQuery('.migrate_spinner.loading-spinner').addClass('active')
 
-                    jQuery('#loop-list').prepend(`<div class="cell small-12 ${hash}"><span class="${hash} loading-spinner active"></span></div>`)
-
-                    makeRequest('POST', 'get_user_list', [], 'zume_simulator/v1/')
+                    makeRequest('POST', 'migrate_group_meta', { key: key_value }, 'zume_simulator/v1/')
                         .done(function(response) {
                             console.log(response)
+                            jQuery('#loop-list').html(response)
+                            jQuery('.migrate_spinner.loading-spinner').removeClass('active')
+                        }) /* makeRequest*/
+                })/* on click*/
 
-                            if ( response ) {
-                                jQuery('.cell.'+hash).append( response )
 
-                                makeRequest('POST', 'create_contact_id', { user_id: response }, 'zume_simulator/v1/')
-                                    .done(function(response2) {
-                                        console.log(response2)
-                                        jQuery('.'+hash+'.loading-spinner').removeClass( 'active' )
-
-                                        window.inc++
-                                        loop()
-                                    })
-                            }
-                        })
-                }
-            })
+            }) /* is ready*/
         </script>
         <?php
     }
 
+    public function add_api_routes() {
+        $namespace = $this->namespace;
 
-
-    public static function get_user_id( WP_REST_Request $request ) {
-        global $wpdb;
-        $user_id = $wpdb->get_results(
-            "SELECT ID
-                    FROM zume_users
-                    WHERE ID NOT IN (
-                    SELECT user_id
-                        FROM zume_usermeta um
-                        WHERE um.meta_key = 'zume_corresponds_to_contact')
-                   ;", ARRAY_A
+        register_rest_route(
+            $namespace, '/migrate_group_meta', [
+                'methods'  => [ 'GET', 'POST' ],
+                'callback' => [ $this, 'process_meta' ],
+                'permission_callback' => function () {
+                    return dt_has_permissions($this->permissions);
+                }
+            ]
         );
-        shuffle($user_id);
-        return $user_id[0]['ID'];
     }
-    public static function create_contact_id( WP_REST_Request $request )
-    {
-        $data = [];
+
+    public static function process_meta( WP_REST_Request $request ) {
+
+        global $wpdb;
         $params = dt_recursive_sanitize_array( $request->get_params() );
-        $user_id = $params['user_id'];
-        $user = get_user_by('id', $user_id );
+        if ( ! isset( $params['key'] ) || empty( $params['key'] ) ) {
+            return new WP_Error(__METHOD__, 'no key', ['status' => 404 ] );
+        }
 
-        // create contact id
-        $title = $user->display_name;
+        // get group from key
+        $public_zume_key = $params['key'];
+        $row = $wpdb->get_row($wpdb->prepare( "
+                            SELECT *
+                            FROM zume_usermeta um
+                            WHERE um.meta_key LIKE %s
+                              ", $public_zume_key ), ARRAY_A );
+        if ( ! $row ) {
+            return new WP_Error(__METHOD__, 'no record found', ['status' => 404 ] );
+        } else {
+            $group = unserialize( $row['meta_value'] );
+        }
 
-        $phone = get_user_meta( $user_id, 'zume_phone_number', true );
-        $email = $user->user_email;
-        $language = get_user_meta( $user_id, 'zume_language', true );
+//        dt_write_log( $group );
+
+        extract( $group );
+        $user_id = $owner;
+
+        // check if key is present in plans
+        $is_installed = $wpdb->get_var($wpdb->prepare( "SELECT pm.post_id
+                                FROM zume_usermeta um
+                                JOIN zume_postmeta pm ON pm.meta_value=um.meta_key AND pm.meta_key = 'join_key'
+                                WHERE um.meta_key = %s;", $key ) );
+
+        // if not installed, then proceed
+        if ( $is_installed ) {
+            return 'Already installed: <a href="/zume_plans/'.$is_installed.'">' . $is_installed . "</a>";
+        }
+
+        // build post
+        $contact_id = get_user_meta( $owner, 'zume_corresponds_to_contact', true );
+
+        $creation_time = strtotime( $group['created_date'] );
+        $set_a_01 = $creation_time + 604800;
+        $set_a_02 = $creation_time + ( 604800 * 2 );
+        $set_a_03 = $creation_time + ( 604800 * 3 );
+        $set_a_04 = $creation_time + ( 604800 * 4 );
+        $set_a_05 = $creation_time + ( 604800 * 5 );
+        $set_a_06 = $creation_time + ( 604800 * 6 );
+        $set_a_07 = $creation_time + ( 604800 * 7 );
+        $set_a_08 = $creation_time + ( 604800 * 8 );
+        $set_a_09 = $creation_time + ( 604800 * 9 );
+        $set_a_10 = $creation_time + ( 604800 * 10 );
 
         $fields = [
-            'title' => $title,
-            'type' => 'user',
-            'corresponds_to_user' => $user_id,
-            'user_ui_language' => $language,
-            'user_language' => $language,
-            'user_preferred_language' => $language,
-            'user_phone' => $phone,
-            'user_email' => $email,
-            'user_communications_email' => $email,
-            'contact_email' => [ 'values' => [ [ 'value' => $email ] ] ],
-            'user_friend_key' => self::get_unique_public_key(),
+            'title' => $group_name,
+            'assigned_to' => $owner,
+            'set_type' => 'set_a',
+            'visibility' => 'private',
+            'created_date' => $creation_time,
+            'join_key' => $key,
+            'set_a_01' => $set_a_01,
+            'set_a_02' => $set_a_02,
+            'set_a_03' => $set_a_03,
+            'set_a_04' => $set_a_04,
+            'set_a_05' => $set_a_05,
+            'set_a_06' => $set_a_06,
+            'set_a_07' => $set_a_07,
+            'set_a_08' => $set_a_08,
+            'set_a_09' => $set_a_09,
+            'set_a_10' => $set_a_10,
+            'set_a_01_completed' => $group['session_1_complete'],
+            'set_a_02_completed' => $group['session_2_complete'],
+            'set_a_03_completed' => $group['session_3_complete'],
+            'set_a_04_completed' => $group['session_4_complete'],
+            'set_a_05_completed' => $group['session_5_complete'],
+            'set_a_06_completed' => $group['session_6_complete'],
+            'set_a_07_completed' => $group['session_7_complete'],
+            'set_a_08_completed' => $group['session_8_complete'],
+            'set_a_09_completed' => $group['session_9_complete'],
+            'set_a_10_completed' => $group['session_10_complete'],
+            'participants' => [
+                'values' => [
+                    [ 'value' => $contact_id ]
+                ]
+            ]
         ];
-        $data['contact_fields'] = $fields;
 
-        // Add contact id to user record
-        $new_user_contact = DT_Posts::create_post( 'contacts', $fields, true, false );
-        if ( !is_wp_error( $new_user_contact ) ){
-            update_user_option( $user_id, 'corresponds_to_contact', $new_user_contact['ID'] );
+        // if coleaders
+        if ( ! empty( $group['coleaders'] ) ) {
+            $coleaders = $group['coleaders'];
+
+            $coleader_contact_ids = [];
+            foreach( $coleaders as $coleader_email ) {
+                $cl_raw = $wpdb->get_results(
+                    "
+                        SELECT um.meta_value as contact_id
+                        FROM zume_users u
+                        JOIN zume_usermeta um ON um.user_id=u.ID AND um.meta_key = 'zume_corresponds_to_contact'
+                        WHERE u.user_email = '$coleader_email'
+                     ", ARRAY_A );
+                if ( empty( $cl_raw ) ) {
+                    continue;
+                }
+
+                $cid = $cl_raw['contact_id'];// lookup user_id from user_email
+
+                $coleader_contact_ids[] = $cid;
+            }
+
+            if ( ! empty( $coleader_contact_ids ) ) {
+                foreach( $coleader_contact_ids as $coleader_contact_id ) {
+                    $fields['participants']['values'][] = [ 'value' => $coleader_contact_id ];
+                }
+            }
         }
-        $data['new_contact'] = $new_user_contact;
-        $data['user_meta'] = [];
 
+        $plan_post= DT_Posts::create_post( 'zume_plans', $fields, true, false );
 
-        // Add roles and permissions
-        $data['roles'] = Disciple_Tools_Users::save_user_roles( $user_id, [ 'multiplier' ] );
+        if ( ! is_wp_error( $plan_post ) ) {
 
+            update_post_meta( $plan_post['ID'], 'join_key', $public_zume_key );
 
-        return $data;
+            $location = $wpdb->get_row( $wpdb->prepare(
+                "SELECT lng, lat, level, label, grid_id, source
+                    FROM zume_postmeta pm
+                    JOIN zume_dt_location_grid_meta lgm ON pm.post_id=lgm.post_id
+                    WHERE pm.meta_key = 'corresponds_to_user' AND pm.meta_value = %d
+                    ORDER BY grid_meta_id desc
+                    LIMIT 1",
+                $user_id ), ARRAY_A );
 
-    }
-    public static function get_unique_public_key() {
-        global $wpdb;
-        $duplicate_check = 1;
-        while ( $duplicate_check != 0 ) {
-            $key = hash( 'sha256', rand( 0, 100000 ) . uniqid(  ) . time() . rand( 0, 100000000000 ) );
-            $key = str_replace( '0', '', $key );
-            $key = str_replace( 'O', '', $key );
-            $key = str_replace( 'o', '', $key );
-            $key = strtoupper( substr( $key, 0, 5 ) );
-            $duplicate_check = $wpdb->get_var( $wpdb->prepare( "SELECT count(*) FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %s", 'user_friend_key', $key ) );
+            // session completed
+            if ( $group['session_1_complete'] ) {
+                Zume_System_Log_API::log('training', 'set_a_01', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime(  $group['session_1_complete'] ),
+                ] );
+            }
+            if ($group['session_2_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_02', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_2_complete'] ),
+                ] );
+            }
+            if ($group['session_3_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_03', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_3_complete'] ),
+                ]);
+            }
+            if ($group['session_4_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_04', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_4_complete'] ),
+                ]);
+            }
+            if ($group['session_5_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_05', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_5_complete'] ),
+                ]);
+            }
+            if ($group['session_6_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_06', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_6_complete'] ),
+                ]);
+            }
+            if ($group['session_7_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_07', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_7_complete'] ),
+                ]);
+            }
+            if ($group['session_8_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_08', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_8_complete'] ),
+                ]);
+            }
+            if ($group['session_9_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_09', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_9_complete'] ),
+                ]);
+            }
+            if ($group['session_10_complete']) {
+                Zume_System_Log_API::log('training', 'set_a_10', [
+                    'user_id' => $user_id,
+                    'post_id' => $contact_id,
+                    'post_type' => 'zume',
+                    'value' => 2,
+                    'lng' => $location['lng'],
+                    'lat' => $location['lat'],
+                    'level' => $location['level'],
+                    'label' => $location['label'],
+                    'grid_id' => $location['grid_id'],
+                    'time_end' => strtotime( $group['session_10_complete'] ),
+                ]);
+            }
         }
-        return $key;
+
+        return 'Already installed: <a href="/zume_plans/'.$plan_post['ID'].'">' . $plan_post['ID'] . "</a>";
     }
 
 
+
+    public function authorize_url( $authorized ){
+        if ( isset( $_SERVER['REQUEST_URI'] ) && strpos( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), $this->namespace  ) !== false ) {
+            $authorized = true;
+        }
+        return $authorized;
+    }
 }
 new Zume_Simulator_Migrator();
