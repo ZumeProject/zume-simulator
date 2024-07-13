@@ -207,6 +207,9 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
         }
 
         $plan_post= DT_Posts::create_post( 'zume_plans', $fields, true, false );
+        if ( is_wp_error() ) {
+            return $plan_post;
+        }
 
         if ( ! is_wp_error( $plan_post ) ) {
 
@@ -220,6 +223,7 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
                     ORDER BY grid_meta_id desc
                     LIMIT 1",
                 $user_id ), ARRAY_A );
+
 
             // session completed
             if ( $group['session_1_complete'] ) {
