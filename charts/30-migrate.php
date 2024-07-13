@@ -207,7 +207,7 @@ class Zume_Simulator_Migrator extends Zume_Simulator_Chart_Base
         }
 
         $plan_post= DT_Posts::create_post( 'zume_plans', $fields, true, false );
-        if ( is_wp_error() ) {
+        if ( is_wp_error($plan_post) ) {
             return $plan_post;
         }
 
